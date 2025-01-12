@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.pathplanner.lib.config.PIDConstants;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -72,6 +73,7 @@ public final class Constants {
         private static final double VELOCITY_CONVERSION_FACTOR = Units.inchesToMeters(4) * Math.PI / 6.12;
         private static final double POSITION_CONVERSION_FACTOR = Units.inchesToMeters(4) * Math.PI / 6.12;
         private static final double ROTATION_VELOCITY_CONVERSION_FACTOR = (2 * Math.PI) / (21.4285714);
+        public static final PIDConstants ANGLE_PID_CONSTANTS =  new PIDConstants(10.0, 0.0, 0.0);
         public static final NavX GYRO = new NavX(new Rotation3d());
 
         public static Command resetSwerveCommand() {
