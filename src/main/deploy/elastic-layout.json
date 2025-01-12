@@ -1,0 +1,68 @@
+{
+  "version": 1.0,
+  "grid_size": 128,
+  "tabs": [
+    {
+      "name": "Autonomous",
+      "grid_layout": {
+        "layouts": [],
+        "containers": []
+      }
+    },
+    {
+      "name": "Teleoperated",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Swerve Drive",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "SwerveDrive",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve Drive",
+              "period": 0.06,
+              "show_robot_rotation": true,
+              "rotation_unit": "Radians"
+            }
+          },
+          {
+            "title": "FMSInfo",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "FMSInfo",
+            "properties": {
+              "topic": "/FMSInfo",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "swerve velocity",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/Robot/m_swerve/m_MODULES/swerve velocity",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -140.0,
+              "end_angle": 140.0,
+              "min_value": 0.0,
+              "max_value": 5.0,
+              "number_of_labels": 10,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
