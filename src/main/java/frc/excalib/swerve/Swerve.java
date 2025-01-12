@@ -90,7 +90,7 @@ public class Swerve extends SubsystemBase implements Logged {
             Vector2D velocity = velocityMPS.get();
 //            Vector2D velocity = getSmartTranslationalVelocitySetPoint(getVelocity(), velocityMPS.get());
             if (fieldOriented.getAsBoolean()) {
-                Rotation2d yaw = getRotation2D();
+                Rotation2d yaw = getRotation2D().unaryMinus();
                 return velocity.rotate(yaw);
             }
             return velocity;

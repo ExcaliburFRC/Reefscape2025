@@ -26,8 +26,6 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
 
-  private VideoSink server;
-
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -44,11 +42,6 @@ public class Robot extends TimedRobot {
     boolean fileOnly = false;
     boolean lazyLogging = false;
     Monologue.setupMonologue(m_robotContainer, "Robot", fileOnly, lazyLogging);
-
-    HttpCamera camera = new HttpCamera("camera", "http://10.67.38.139:5801/stream.mjpg");
-    CameraServer.startAutomaticCapture(camera);
-    server = CameraServer.getServer();
-    server.setSource(camera);
   }
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
@@ -67,8 +60,6 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    System.out.println(server.getName());
-
 //    addPeriodic(m_robotContainer.updateOdometry, 0.01);
   }
 

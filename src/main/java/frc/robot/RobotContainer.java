@@ -54,6 +54,8 @@ public class RobotContainer implements Logged {
 
         m_swerve.initShuffleboard();
 
+        initAutoChooser();
+
         // Configure the trigger bindings
         configureBindings();
     }
