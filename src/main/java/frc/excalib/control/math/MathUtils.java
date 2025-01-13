@@ -1,4 +1,4 @@
-package frc.excalib.control;
+package frc.excalib.control.math;
 
 public class MathUtils {
     /**
