@@ -6,9 +6,13 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -76,10 +80,6 @@ public class RobotContainer implements Logged {
         );
 
         driver.PS().onTrue(resetSwerveCommand());
-
-        driver.povUp().onTrue(m_swerve.turnToAngleCommand(() -> Math.PI / 2));
-
-        driver.triangle().onTrue(m_swerve.driveToPoseCommand(new Pose2d(0.0, 0.0, new Rotation2d(Math.PI))));
     }
 
     public double deadband(double value) {
@@ -91,7 +91,7 @@ public class RobotContainer implements Logged {
         autoChooser = AutoBuilder.buildAutoChooser();
         autoChooser.setDefaultOption("default", new InstantCommand());
         autoChooser.addOption("test", new PathPlannerAuto("test"));
-        autoChooser.addOption("translation calibration auto", new PathPlannerAuto("translationCalibrationAuto"));
+        autoChooser.addOption("choreo test", new PathPlannerAuto("choreoTest"));
 
         // Another option that allows you to specify the default auto by its name
         // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");

@@ -4,7 +4,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.excalib.control.imu.IMU;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.slam.mapper.Odometry;
-import frc.robot.Constants;
 import monologue.Annotations;
 import monologue.Logged;
 
@@ -118,26 +116,16 @@ public class Swerve extends SubsystemBase implements Logged {
     /**
      * A method that turns the robot to a desired angle.
      *
-     * @param angle The desired angle in radians.
+     * @param angle           The desired angle in radians.
+     * @param angleController A PIDController for the angle.
      * @return A command that turns the robot to the wanted angle.
      */
-    public Command turnToAngleCommand(DoubleSupplier angle) {
-        PIDController angleController = new PIDController(1.9, 0.0, 0.0);
-        angleController.enableContinuousInput(0, 2 * Math.PI);
+    public Command turnToAngleCommand(DoubleSupplier angle, PIDController angleController) {
         return driveCommand(
                 () -> new Vector2D(0, 0),
                 () -> angleController.calculate(getPose2D().getRotation().getRadians(), angle.getAsDouble()),
                 () -> true
         ).withTimeout(2);
-    }
-
-    public Command driveToPoseCommand(Pose2d setPoint) {
-        Command driveToPoseCommand = AutoBuilder.pathfindToPose(
-                setPoint,
-                new PathConstraints(MAX_VEL, MAX_FORWARD_ACC, MAX_OMEGA_RAD_PER_SEC, MAX_OMEGA_RAD_PER_SEC, 12.0, false)
-        );
-        driveToPoseCommand.addRequirements(this);
-        return driveToPoseCommand;
     }
 
     /**
@@ -201,7 +189,7 @@ public class Swerve extends SubsystemBase implements Logged {
         // Load the RobotConfig from the GUI settings. You should probably
         // store this in your Constants file
         RobotConfig config = null;
-        try {
+        try{
             config = RobotConfig.fromGUISettings();
         } catch (Exception e) {
             // Handle exception as needed
@@ -215,8 +203,8 @@ public class Swerve extends SubsystemBase implements Logged {
                 this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 (speeds, feedforwards) -> driveRobotRelativeChassisSpeeds(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                        new PIDConstants(15.0, 0.0, 0.0), // Translation PID constants
-                        ANGLE_PID_CONSTANTS // Rotation PID constants
+                        new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                        new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
                 ),
                 config, // The robot configuration
                 () -> {
