@@ -99,8 +99,8 @@ public class SwerveModule implements Logged {
         return deltaDirection < 0;
     }
 
-    public Command setVelocityCommand(Supplier<Vector2D> moduleVelocity, SubsystemBase... requirements) {
-        Command setVelocityCommand = new ParallelCommandGroup(
+    public Command setVelocityCommand(Supplier<Vector2D> moduleVelocity) {
+        return new ParallelCommandGroup(
                 m_driveWheel.setDynamicVelocityCommand(() -> {
                     Vector2D velocity = moduleVelocity.get();
                     double speed = velocity.getDistance();
@@ -129,8 +129,6 @@ public class SwerveModule implements Logged {
                     m_setPoint.setX(moduleVelocity.get().getX());
                 })
         );
-        setVelocityCommand.addRequirements(requirements);
-        return setVelocityCommand;
     }
 
     public Command setVelocityCommand(
