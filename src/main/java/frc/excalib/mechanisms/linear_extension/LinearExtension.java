@@ -3,6 +3,7 @@ package frc.excalib.mechanisms.linear_extension;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import frc.excalib.control.gains.Gains;
 import frc.excalib.control.motor.controllers.Motor;
@@ -31,7 +32,7 @@ public class LinearExtension extends Mechanism {
 
     }
 
-    public Command extendCommand(DoubleSupplier lengthSetPoint) {
+    public Command extendCommand(DoubleSupplier lengthSetPoint, SubsystemBase... requirements) {
         return new TrapezoidProfileCommand(
                 new TrapezoidProfile(new TrapezoidProfile.Constraints(m_MAX_VELOCITY, m_MAX_ACCELERATION)),
                 state -> {
@@ -43,7 +44,8 @@ public class LinearExtension extends Mechanism {
                     setVoltage(ff + pidValue);
                     },
                 () -> new TrapezoidProfile.State(lengthSetPoint.getAsDouble(), 0),
-                () -> new TrapezoidProfile.State(super.m_motor.getMotorPosition(), super.m_motor.getMotorVelocity())
+                () -> new TrapezoidProfile.State(super.m_motor.getMotorPosition(), super.m_motor.getMotorVelocity()),
+                requirements
 
         );
     }

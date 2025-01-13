@@ -5,6 +5,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.excalib.control.math.Vector2D;
 import monologue.Logged;
 
@@ -119,12 +120,12 @@ public class ModulesHolder implements Logged {
      * @param translationalVel The desired translation velocity supplier.
      * @return A command to set the velocities.
      */
-    public Command setVelocitiesCommand(Supplier<Vector2D> translationalVel, DoubleSupplier omega) {
+    public Command setVelocitiesCommand(Supplier<Vector2D> translationalVel, DoubleSupplier omega, SubsystemBase... requirements) {
         return new ParallelCommandGroup(
-                m_frontLeft.setVelocityCommand(() -> computeModuleVelocity(m_frontLeft, translationalVel, omega)),
-                m_frontRight.setVelocityCommand(() -> computeModuleVelocity(m_frontRight, translationalVel, omega)),
-                m_backLeft.setVelocityCommand(() -> computeModuleVelocity(m_backLeft, translationalVel, omega)),
-                m_backRight.setVelocityCommand(() -> computeModuleVelocity(m_backRight, translationalVel, omega))
+                m_frontLeft.setVelocityCommand(() -> computeModuleVelocity(m_frontLeft, translationalVel, omega), requirements),
+                m_frontRight.setVelocityCommand(() -> computeModuleVelocity(m_frontRight, translationalVel, omega), requirements),
+                m_backLeft.setVelocityCommand(() -> computeModuleVelocity(m_backLeft, translationalVel, omega), requirements),
+                m_backRight.setVelocityCommand(() -> computeModuleVelocity(m_backRight, translationalVel, omega), requirements)
         );
     }
 

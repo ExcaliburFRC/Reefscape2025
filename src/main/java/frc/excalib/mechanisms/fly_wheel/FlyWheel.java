@@ -6,6 +6,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import frc.excalib.control.gains.Gains;
 import frc.excalib.control.motor.controllers.Motor;
@@ -44,7 +45,7 @@ public class FlyWheel extends Mechanism {
      * @param velocitySupplier a dynamic velocity setpoint.
      * @return a command that controls the FlyWheels velocity with high precision
      */
-    public Command smartVelocityCommand(DoubleSupplier velocitySupplier) {
+    public Command smartVelocityCommand(DoubleSupplier velocitySupplier, SubsystemBase... requirements) {
         return new TrapezoidProfileCommand(
                 new TrapezoidProfile(new TrapezoidProfile.Constraints(maxAcceleration, maxJerk)),
                 state -> {
@@ -55,7 +56,8 @@ public class FlyWheel extends Mechanism {
                     setVoltage(0.2);
                 },
                 () -> new TrapezoidProfile.State(velocitySupplier.getAsDouble(), 0),
-                () -> new TrapezoidProfile.State(super.m_motor.getMotorVelocity(), getAcceleration()));
+                () -> new TrapezoidProfile.State(super.m_motor.getMotorVelocity(), getAcceleration()),
+                requirements);
     }
 
     /**
@@ -72,8 +74,8 @@ public class FlyWheel extends Mechanism {
      * @param velocity the dynamic velocity setpoint
      * @return a command which controls the FlyWheels velocity
      */
-    public Command setDynamicVelocityCommand(DoubleSupplier velocity) {
-        return new RunCommand(() -> setDynamicVelocity(velocity.getAsDouble()));
+    public Command setDynamicVelocityCommand(DoubleSupplier velocity, SubsystemBase... requirements) {
+        return new RunCommand(() -> setDynamicVelocity(velocity.getAsDouble()), requirements);
     }
 
     /**

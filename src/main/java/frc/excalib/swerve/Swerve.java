@@ -96,12 +96,11 @@ public class Swerve extends SubsystemBase implements Logged {
             return velocity;
         };
 
-        Command driveCommand = m_MODULES.setVelocitiesCommand(
+        return m_MODULES.setVelocitiesCommand(
                 adjustedVelocitySupplier,
-                omegaRadPerSec
+                omegaRadPerSec,
+                this
         );
-        driveCommand.addRequirements(this);
-        return driveCommand;
     }
 
     /**

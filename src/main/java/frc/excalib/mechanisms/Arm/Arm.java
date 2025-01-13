@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.excalib.control.gains.Gains;
 import frc.excalib.control.limits.SoftLimit;
 import frc.excalib.control.math.physics.Mass;
@@ -45,7 +46,7 @@ public class Arm extends Mechanism {
      * @param toleranceConsumer gets updated if the measurement is at tolerance.
      * @return a command that moves the arm to the specified dynamic setpoint.
      */
-    public Command anglePositionControlCommand(DoubleSupplier setPointSupplier, Consumer<Boolean> toleranceConsumer) {
+    public Command anglePositionControlCommand(DoubleSupplier setPointSupplier, Consumer<Boolean> toleranceConsumer, SubsystemBase... requirements) {
         final double dutyCycle = 0.02;
         return new RunCommand(() -> {
             double error = setPointSupplier.getAsDouble() - ANGLE_SUPPLIER.getAsDouble();
@@ -58,7 +59,7 @@ public class Arm extends Mechanism {
             double output = phyOutput + pid;
             super.setVoltage(output);
             toleranceConsumer.accept(Math.abs(error) < 0.2);
-        });
+        }, requirements);
     }
 
     /**
@@ -66,7 +67,7 @@ public class Arm extends Mechanism {
      * @param toleranceConsumer gets updated if the measurement is at tolerance.
      * @return a command that moves the arm to the specified setpoint.
      */
-    public Command goToAngleCommand(double angle, Consumer<Boolean> toleranceConsumer) {
-        return anglePositionControlCommand(() -> angle, toleranceConsumer);
+    public Command goToAngleCommand(double angle, Consumer<Boolean> toleranceConsumer, SubsystemBase... requirements) {
+        return anglePositionControlCommand(() -> angle, toleranceConsumer, requirements);
     }
 }

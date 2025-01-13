@@ -7,6 +7,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.excalib.control.gains.Gains;
 import frc.excalib.control.limits.ContinuousSoftLimit;
@@ -98,8 +99,8 @@ public class SwerveModule implements Logged {
         return deltaDirection < 0;
     }
 
-    public Command setVelocityCommand(Supplier<Vector2D> moduleVelocity) {
-        return new ParallelCommandGroup(
+    public Command setVelocityCommand(Supplier<Vector2D> moduleVelocity, SubsystemBase... requirements) {
+        Command setVelocityCommand = new ParallelCommandGroup(
                 m_driveWheel.setDynamicVelocityCommand(() -> {
                     Vector2D velocity = moduleVelocity.get();
                     double speed = velocity.getDistance();
@@ -128,6 +129,8 @@ public class SwerveModule implements Logged {
                     m_setPoint.setX(moduleVelocity.get().getX());
                 })
         );
+        setVelocityCommand.addRequirements(requirements);
+        return setVelocityCommand;
     }
 
     public Command setVelocityCommand(
