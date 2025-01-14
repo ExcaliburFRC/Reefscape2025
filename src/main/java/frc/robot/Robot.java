@@ -4,16 +4,12 @@
 
 package frc.robot;
 
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.HttpCamera;
-import edu.wpi.first.cscore.VideoSink;
+import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import monologue.Annotations;
-import monologue.Logged;
 import monologue.Monologue;
 
 /**
@@ -42,6 +38,8 @@ public class Robot extends TimedRobot {
     boolean fileOnly = false;
     boolean lazyLogging = false;
     Monologue.setupMonologue(m_robotContainer, "Robot", fileOnly, lazyLogging);
+
+    WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
   }
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
