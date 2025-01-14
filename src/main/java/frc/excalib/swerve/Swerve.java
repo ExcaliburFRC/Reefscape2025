@@ -4,14 +4,22 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,6 +30,8 @@ import frc.excalib.slam.mapper.Odometry;
 import monologue.Annotations;
 import monologue.Logged;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -34,10 +44,12 @@ import static monologue.Annotations.*;
  * A class representing a swerve subsystem.
  */
 public class Swerve extends SubsystemBase implements Logged {
-    public final ModulesHolder m_MODULES;
+    private final ModulesHolder m_MODULES;
     private final IMU m_imu;
     private final Odometry m_odometry;
     private final SwerveDriveKinematics m_swerveDriveKinematics;
+
+    public final Field2d m_field = new Field2d();
 
     /**
      * A constructor that initialize the Swerve Subsystem
@@ -161,7 +173,7 @@ public class Swerve extends SubsystemBase implements Logged {
      */
     @Log.NT
     public Pose2d getPose2D() {
-        return m_odometry.getPoseMeters();
+        return m_odometry.getRobotPose();
     }
 
     /**
@@ -271,5 +283,6 @@ public class Swerve extends SubsystemBase implements Logged {
     @Override
     public void periodic() {
         updateOdometry();
+        m_field.setRobotPose(getPose2D());
     }
 }

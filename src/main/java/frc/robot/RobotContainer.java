@@ -11,15 +11,16 @@ import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
 import monologue.Logged;
@@ -55,6 +56,7 @@ public class RobotContainer implements Logged {
         m_swerve.initShuffleboard();
 
         initAutoChooser();
+        initElastic();
 
         // Configure the trigger bindings
         configureBindings();
@@ -89,9 +91,8 @@ public class RobotContainer implements Logged {
     private void initAutoChooser() {
         // Build an auto chooser. This will use Commands.none() as the default option.
         autoChooser = AutoBuilder.buildAutoChooser();
-        autoChooser.setDefaultOption("default", new InstantCommand());
         autoChooser.addOption("test", new PathPlannerAuto("test"));
-        autoChooser.addOption("choreo test", new PathPlannerAuto("choreoTest"));
+        autoChooser.addOption("Calibration Auto", new PathPlannerAuto("translationCalibrationAuto"));
 
         // Another option that allows you to specify the default auto by its name
         // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
@@ -99,6 +100,14 @@ public class RobotContainer implements Logged {
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
+    private void initElastic(){
+
+        PowerDistribution PDH = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
+        SmartDashboard.putData("PDH", PDH);
+
+        SmartDashboard.putData("Field", m_swerve.m_field);
+
+    }
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
