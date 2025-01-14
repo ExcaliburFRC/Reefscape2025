@@ -131,14 +131,14 @@ public class Swerve extends SubsystemBase implements Logged {
      * @param angle           The desired angle in radians.
      * @return A command that turns the robot to the wanted angle.
      */
-    public Command turnToAngleCommand(DoubleSupplier angle) {
-        PIDController angleController = new PIDController(1.9, 0.0, 0.0);
+    public Command turnToAngleCommand(Supplier<Rotation2d> angle) {
+        PIDController angleController = new PIDController(1.35, 0.0, 0.0);
         angleController.enableContinuousInput(0, 2 * Math.PI);
         return driveCommand(
                 () -> new Vector2D(0, 0),
-                () -> angleController.calculate(getPose2D().getRotation().getRadians(), angle.getAsDouble()),
+                () -> angleController.calculate(getPose2D().getRotation().getRadians(), angle.get().getRadians()),
                 () -> true
-        ).withTimeout(2);
+        ).until(angleController::atSetpoint);
     }
 
     public Command driveToPoseCommand(Pose2d setPoint) {
@@ -225,7 +225,7 @@ public class Swerve extends SubsystemBase implements Logged {
                 this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 (speeds, feedforwards) -> driveRobotRelativeChassisSpeeds(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                        new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                        new PIDConstants(5.0, 0.0, 1.0), // Translation PID constants
                         ANGLE_PID_CONSTANTS // Rotation PID constants
                 ),
                 config, // The robot configuration

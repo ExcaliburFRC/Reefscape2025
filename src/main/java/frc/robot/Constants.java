@@ -63,7 +63,7 @@ public final class Constants {
         public static final double MAX_SIDE_ACC = 6;
         public static final double MAX_SKID_ACC = 6;
         public static final double MAX_FORWARD_ACC = 9;
-        public static final double MAX_VEL = 2; //4.45
+        public static final double MAX_VEL = 4.45;
         public static final double MAX_OMEGA_RAD_PER_SEC = 6; //11.5
 
         private static final CANcoder FRONT_LEFT_ABS_ENCODER = new CANcoder(13);
@@ -73,7 +73,7 @@ public final class Constants {
         private static final double VELOCITY_CONVERSION_FACTOR = Units.inchesToMeters(4) * Math.PI / 6.12;
         private static final double POSITION_CONVERSION_FACTOR = Units.inchesToMeters(4) * Math.PI / 6.12;
         private static final double ROTATION_VELOCITY_CONVERSION_FACTOR = (2 * Math.PI) / (21.4285714);
-        public static final PIDConstants ANGLE_PID_CONSTANTS =  new PIDConstants(10.0, 0.0, 0.0);
+        public static final PIDConstants ANGLE_PID_CONSTANTS =  new PIDConstants(1.0, 0.0, 0.0);
 
         public static final NavX GYRO = new NavX(new Rotation3d());
 

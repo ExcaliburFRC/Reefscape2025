@@ -90,11 +90,11 @@ public class RobotContainer implements Logged {
 
         GenericEntry angleEntry = Shuffleboard.getTab("calibration").add("Angle", 0).getEntry();
 
-        driver.triangle().onTrue(m_swerve.turnToAngleCommand(() -> angleEntry.getDouble(0)));
+        driver.triangle().onTrue(m_swerve.turnToAngleCommand(() -> new Rotation2d(Math.PI)/*Rotation2d.fromDegrees(angleEntry.getDouble(0))*/));
     }
 
     public double deadband(double value) {
-        return Math.abs(value) < 0.07 ? 0 : value;
+        return Math.abs(value) < 0.1 ? 0 : value;
     }
 
     private void initAutoChooser() {
