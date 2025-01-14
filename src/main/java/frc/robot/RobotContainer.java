@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.config.PIDConstants;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.cscore.VideoSink;
@@ -99,8 +100,8 @@ public class RobotContainer implements Logged {
     private void initAutoChooser() {
         // Build an auto chooser. This will use Commands.none() as the default option.
         autoChooser = AutoBuilder.buildAutoChooser();
-        autoChooser.addOption("test", new PathPlannerAuto("test"));
-        autoChooser.addOption("Calibration Auto", new PathPlannerAuto("translationCalibrationAuto"));
+//        autoChooser.addOption("test", new PathPlannerAuto("test"));
+        autoChooser.addOption("Calibration Auto", new PathPlannerAuto("calibrationAuto"));
 
         // Another option that allows you to specify the default auto by its name
         // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
