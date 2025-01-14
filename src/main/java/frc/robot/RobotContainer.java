@@ -12,9 +12,12 @@ import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -84,8 +87,9 @@ public class RobotContainer implements Logged {
 
         driver.PS().onTrue(resetSwerveCommand());
 
-        driver.povUp().onTrue(m_swerve.turnToAngleCommand(() -> Math.PI / 2));
-        driver.triangle().onTrue(m_swerve.driveToPoseCommand(new Pose2d(0.0, 0.0, new Rotation2d(Math.PI))));
+        GenericEntry angleEntry = Shuffleboard.getTab("calibration").add("Angle", 0).getEntry();
+
+        driver.triangle().onTrue(m_swerve.turnToAngleCommand(() -> angleEntry.getDouble(0)));
     }
 
     public double deadband(double value) {
@@ -104,15 +108,16 @@ public class RobotContainer implements Logged {
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
-    private void initElastic(){
+    private void initElastic() {
+
+
         PowerDistribution PDH = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
         SmartDashboard.putData("PDH", PDH);
 
         SmartDashboard.putData("Field", m_swerve.m_field);
 
-        SmartDashboard.putData("Auto Rotate (degrees)", builder -> {
-        });
     }
+
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
