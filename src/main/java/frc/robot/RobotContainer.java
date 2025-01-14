@@ -103,7 +103,7 @@ public class RobotContainer implements Logged {
 
     private void initElastic(){
 
-        PowerDistribution PDH = new PowerDistribution(ID, PowerDistribution.ModuleType.kRev);
+        PowerDistribution PDH = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
         SmartDashboard.putData("PDH", PDH);
 
         SmartDashboard.putData("Field", m_swerve.m_field);
