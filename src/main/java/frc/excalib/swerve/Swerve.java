@@ -112,6 +112,7 @@ public class Swerve extends SubsystemBase implements Logged {
                 adjustedVelocitySupplier,
                 omegaRadPerSec
         );
+        driveCommand.setName("Drive Command");
         driveCommand.addRequirements(this);
         return driveCommand;
     }
@@ -132,8 +133,9 @@ public class Swerve extends SubsystemBase implements Logged {
      * @return A command that turns the robot to the wanted angle.
      */
     public Command turnToAngleCommand(Supplier<Rotation2d> angle) {
-        PIDController angleController = new PIDController(1.35, 0.0, 0.0);
+        PIDController angleController = new PIDController(ANGLE_PID_CONSTANTS.kP, ANGLE_PID_CONSTANTS.kI, ANGLE_PID_CONSTANTS.kD);
         angleController.enableContinuousInput(0, 2 * Math.PI);
+        angleController.setTolerance(0.07);
         return driveCommand(
                 () -> new Vector2D(0, 0),
                 () -> angleController.calculate(getPose2D().getRotation().getRadians(), angle.get().getRadians()),

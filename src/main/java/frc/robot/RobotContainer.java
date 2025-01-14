@@ -22,6 +22,9 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -88,9 +91,11 @@ public class RobotContainer implements Logged {
 
         driver.PS().onTrue(resetSwerveCommand());
 
-        GenericEntry angleEntry = Shuffleboard.getTab("calibration").add("Angle", 0).getEntry();
+        GenericEntry angleEntry = Shuffleboard.getTab("Swerve").add("Angle", 0).getEntry();
 
         driver.triangle().onTrue(m_swerve.turnToAngleCommand(() -> new Rotation2d(Math.PI)/*Rotation2d.fromDegrees(angleEntry.getDouble(0))*/));
+
+        driver.cross().onTrue(m_swerve.driveToPoseCommand(new Pose2d(0, 0, new Rotation2d())));
     }
 
     public double deadband(double value) {
@@ -100,7 +105,7 @@ public class RobotContainer implements Logged {
     private void initAutoChooser() {
         // Build an auto chooser. This will use Commands.none() as the default option.
         autoChooser = AutoBuilder.buildAutoChooser();
-//        autoChooser.addOption("test", new PathPlannerAuto("test"));
+        autoChooser.addOption("Test Auto", new PathPlannerAuto("testAuto"));
         autoChooser.addOption("Calibration Auto", new PathPlannerAuto("calibrationAuto"));
 
         // Another option that allows you to specify the default auto by its name
@@ -110,13 +115,14 @@ public class RobotContainer implements Logged {
     }
 
     private void initElastic() {
-
-
         PowerDistribution PDH = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
         SmartDashboard.putData("PDH", PDH);
 
         SmartDashboard.putData("Field", m_swerve.m_field);
 
+        SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance());
+
+        Shuffleboard.getTab("Swerve").add("Reset Odometry", new InstantCommand(() -> m_swerve.restartOdometry(new Pose2d()), m_swerve).ignoringDisable(true));
     }
 
     /**
