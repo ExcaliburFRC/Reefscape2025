@@ -91,11 +91,12 @@ public class RobotContainer implements Logged {
 
         driver.PS().onTrue(resetSwerveCommand());
 
-        GenericEntry angleEntry = Shuffleboard.getTab("Swerve").add("Angle", 0).getEntry();
+//        GenericEntry angleEntry = Shuffleboard.getTab("Swerve").add("Angle", 0).getEntry();
+//        GenericEntry poseEntry = Shuffleboard.getTab("Swerve").add("Pose", new Pose2d()).getEntry();
 
         driver.triangle().onTrue(m_swerve.turnToAngleCommand(() -> new Rotation2d(Math.PI)/*Rotation2d.fromDegrees(angleEntry.getDouble(0))*/));
 
-        driver.cross().onTrue(m_swerve.driveToPoseCommand(new Pose2d(0, 0, new Rotation2d())));
+        driver.cross().onTrue(m_swerve.driveToPoseCommand(new Pose2d(1, 1, new Rotation2d(Math.PI / 2))));
     }
 
     public double deadband(double value) {
@@ -125,6 +126,7 @@ public class RobotContainer implements Logged {
 
         Shuffleboard.getTab("Swerve").add("Reset Odometry", new InstantCommand(() -> m_swerve.restartOdometry(new Pose2d()), m_swerve).ignoringDisable(true));
     }
+
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
