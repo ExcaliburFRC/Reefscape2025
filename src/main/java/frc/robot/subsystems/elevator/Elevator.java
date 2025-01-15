@@ -26,9 +26,15 @@ public class Elevator extends SubsystemBase {
                 UPWARD_CONSTAINTS,
                 DOWNWARD_CONSTAINTS
         );
+
+        this.setDefaultCommand(setLengthCommand(MIN_LENGTH));
     }
+
     public Command manualCommand(DoubleSupplier output){
         return m_extensionMechanism.manualCommand(output, this);
+    }
+    public Command setLengthCommand(double length){
+        return m_extensionMechanism.extendCommand(()->length, this);
     }
 
 

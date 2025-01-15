@@ -21,6 +21,8 @@ public class Constants {
     private static final double kg = 0;
     static final Gains ELEVATOR_GAINS = new Gains(kp, ki,kd, ks, kv, ka, kg);
 
+    static final double MIN_LENGTH = 0; //TODO
+
     static final TrapezoidProfile.Constraints UPWARD_CONSTAINTS =
             new TrapezoidProfile.Constraints(
                     0,
