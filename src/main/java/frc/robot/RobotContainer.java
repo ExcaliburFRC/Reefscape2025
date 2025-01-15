@@ -107,6 +107,7 @@ public class RobotContainer implements Logged {
         autoChooser = AutoBuilder.buildAutoChooser();
         autoChooser.addOption("Test Auto", new PathPlannerAuto("testAuto"));
         autoChooser.addOption("Calibration Auto", new PathPlannerAuto("calibrationAuto"));
+        autoChooser.addOption("Test Choreo Auto", new PathPlannerAuto("testChoreoAuto"));
 
         // Another option that allows you to specify the default auto by its name
         // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
