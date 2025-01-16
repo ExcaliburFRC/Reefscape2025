@@ -7,19 +7,10 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.config.PIDConstants;
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.HttpCamera;
-import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
@@ -50,7 +41,7 @@ public class RobotContainer implements Logged {
 
     public Runnable updateOdometry = m_swerve::updateOdometry;
 
-    private SendableChooser<Command> autoChooser;
+    private SendableChooser<Command> m_autoChooser;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -59,7 +50,7 @@ public class RobotContainer implements Logged {
         m_decelerator.put(-1.0, 1.0);
         m_decelerator.put(1.0, 0.25);
 
-        m_swerve.initShuffleboard();
+        m_swerve.initElastic();
 
         initAutoChooser();
         initElastic();
@@ -105,27 +96,23 @@ public class RobotContainer implements Logged {
         NamedCommands.registerCommand("print command", new PrintCommand("pathplanner"));
 
         // Build an auto chooser. This will use Commands.none() as the default option.
-        autoChooser = AutoBuilder.buildAutoChooser();
-        autoChooser.addOption("Test Auto", new PathPlannerAuto("testAuto"));
-        autoChooser.addOption("Test Auto 2", new PathPlannerAuto("testAuto2"));
-        autoChooser.addOption("Calibration Auto", new PathPlannerAuto("calibrationAuto"));
-        autoChooser.addOption("Test Choreo Auto", new PathPlannerAuto("testChoreoAuto"));
+        m_autoChooser = AutoBuilder.buildAutoChooser();
+        m_autoChooser.addOption("Test Auto", new PathPlannerAuto("testAuto"));
+        m_autoChooser.addOption("Test Auto 2", new PathPlannerAuto("testAuto2"));
+        m_autoChooser.addOption("Calibration Auto", new PathPlannerAuto("calibrationAuto"));
+        m_autoChooser.addOption("Test Choreo Auto", new PathPlannerAuto("testChoreoAuto"));
 
         // Another option that allows you to specify the default auto by its name
         // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
 
-        SmartDashboard.putData("Auto Chooser", autoChooser);
+        SmartDashboard.putData("Auto Chooser", m_autoChooser);
     }
 
     private void initElastic() {
         PowerDistribution PDH = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
         SmartDashboard.putData("PDH", PDH);
 
-        SmartDashboard.putData("Field", m_swerve.m_field);
-
         SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance());
-
-        Shuffleboard.getTab("Swerve").add("Reset Odometry", new InstantCommand(() -> m_swerve.restartOdometry(new Pose2d()), m_swerve).ignoringDisable(true));
     }
 
 
@@ -135,6 +122,6 @@ public class RobotContainer implements Logged {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        return m_autoChooser.getSelected();
     }
 }

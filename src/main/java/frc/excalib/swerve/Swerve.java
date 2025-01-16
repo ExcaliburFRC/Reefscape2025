@@ -5,38 +5,30 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.excalib.control.imu.IMU;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.slam.mapper.Odometry;
-import monologue.Annotations;
 import monologue.Logged;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import static frc.excalib.swerve.SwerveAccUtils.getSmartTranslationalVelocitySetPoint;
 import static frc.robot.Constants.SwerveConstants.*;
 import static monologue.Annotations.*;
 
@@ -129,7 +121,7 @@ public class Swerve extends SubsystemBase implements Logged {
     /**
      * A method that turns the robot to a desired angle.
      *
-     * @param angle           The desired angle in radians.
+     * @param angle The desired angle in radians.
      * @return A command that turns the robot to the wanted angle.
      */
     public Command turnToAngleCommand(Supplier<Rotation2d> angle) {
@@ -164,7 +156,7 @@ public class Swerve extends SubsystemBase implements Logged {
      *
      * @param newPose the wanted new Pose2d of the robot.
      */
-    public void restartOdometry(Pose2d newPose) {
+    public void resetOdometry(Pose2d newPose) {
         m_odometry.resetOdometry(m_MODULES.getModulesPositions(), newPose);
     }
 
@@ -223,7 +215,7 @@ public class Swerve extends SubsystemBase implements Logged {
         // Configure AutoBuilder last
         AutoBuilder.configure(
                 this::getPose2D, // Robot pose supplier
-                this::restartOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+                this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
                 this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 (speeds, feedforwards) -> driveRobotRelativeChassisSpeeds(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
@@ -243,27 +235,60 @@ public class Swerve extends SubsystemBase implements Logged {
         );
     }
 
-    public void initShuffleboard() {
-        SmartDashboard.putData("Swerve Drive", new Sendable() {
-            @Override
-            public void initSendable(SendableBuilder builder) {
-                builder.setSmartDashboardType("SwerveDrive");
+    public void initElastic() {
+        SmartDashboard.putData("Swerve Drive", builder -> {
+            builder.setSmartDashboardType("SwerveDrive");
 
-                builder.addDoubleProperty("Front Left Angle", () -> m_MODULES.m_frontLeft.getPosition().getRadians(), null);
-                builder.addDoubleProperty("Front Left Velocity", () -> m_MODULES.m_frontLeft.getVelocity().getDistance(), null);
+            builder.addDoubleProperty("Front Left Angle", () -> m_MODULES.m_frontLeft.getPosition().getRadians(), null);
+            builder.addDoubleProperty("Front Left Velocity", () -> m_MODULES.m_frontLeft.getVelocity().getDistance(), null);
 
-                builder.addDoubleProperty("Front Right Angle", () -> m_MODULES.m_frontRight.getPosition().getRadians(), null);
-                builder.addDoubleProperty("Front Right Velocity", () -> m_MODULES.m_frontLeft.getVelocity().getDistance(), null);
+            builder.addDoubleProperty("Front Right Angle", () -> m_MODULES.m_frontRight.getPosition().getRadians(), null);
+            builder.addDoubleProperty("Front Right Velocity", () -> m_MODULES.m_frontLeft.getVelocity().getDistance(), null);
 
-                builder.addDoubleProperty("Back Left Angle", () -> m_MODULES.m_backLeft.getPosition().getRadians(), null);
-                builder.addDoubleProperty("Back Left Velocity", () -> m_MODULES.m_frontLeft.getVelocity().getDistance(), null);
+            builder.addDoubleProperty("Back Left Angle", () -> m_MODULES.m_backLeft.getPosition().getRadians(), null);
+            builder.addDoubleProperty("Back Left Velocity", () -> m_MODULES.m_frontLeft.getVelocity().getDistance(), null);
 
-                builder.addDoubleProperty("Back Right Angle", () -> m_MODULES.m_backRight.getPosition().getRadians(), null);
-                builder.addDoubleProperty("Back Right Velocity", () -> m_MODULES.m_frontLeft.getVelocity().getDistance(), null);
+            builder.addDoubleProperty("Back Right Angle", () -> m_MODULES.m_backRight.getPosition().getRadians(), null);
+            builder.addDoubleProperty("Back Right Velocity", () -> m_MODULES.m_frontLeft.getVelocity().getDistance(), null);
 
-                builder.addDoubleProperty("Robot Angle", () -> getRotation2D().getRadians(), null);
-            }
+            builder.addDoubleProperty("Robot Angle", () -> getRotation2D().getRadians(), null);
         });
+
+        SmartDashboard.putData("Field", m_field);
+
+        ShuffleboardTab swerveTab = Shuffleboard.getTab("Swerve");
+        GenericEntry odometryXEntry = swerveTab.add("odometryX", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
+        GenericEntry odometryYEntry = swerveTab.add("odometryY", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
+        GenericEntry odometryAngleEntry = swerveTab.add("odometryAngle", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
+
+        swerveTab.add("Reset Odometry",
+                new InstantCommand(
+                        () -> resetOdometry(
+                                new Pose2d(
+                                        odometryXEntry.getDouble(0),
+                                        odometryYEntry.getDouble(0),
+                                        Rotation2d.fromDegrees(odometryAngleEntry.getDouble(0)))
+                        ), this).ignoringDisable(true)
+        );
+
+        SendableChooser<Rotation2d> angleChooser = new SendableChooser<>();
+        angleChooser.setDefaultOption("0", new Rotation2d());
+        angleChooser.addOption("90", new Rotation2d(Math.PI / 2));
+        angleChooser.addOption("180", new Rotation2d(Math.PI));
+        angleChooser.addOption("270", new Rotation2d(3 * Math.PI / 2));
+        swerveTab.add("Angle Chooser", angleChooser);
+        swerveTab.add("Turn To Angle", turnToAngleCommand(angleChooser::getSelected));
+
+        GenericEntry OTFGxEntry = swerveTab.add("OTFGx", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
+        GenericEntry OTFGyYEntry = swerveTab.add("OTFGy", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
+        GenericEntry OTFGAngleEntry = swerveTab.add("OTFGAngle", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
+        swerveTab.add("Drive To Pose", driveToPoseCommand(
+                        new Pose2d(
+                                OTFGxEntry.getDouble(0),
+                                OTFGyYEntry.getDouble(0),
+                                Rotation2d.fromDegrees(OTFGAngleEntry.getDouble(0)))
+                )
+        );
     }
 
     /**
