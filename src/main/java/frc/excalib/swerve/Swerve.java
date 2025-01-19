@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.excalib.control.imu.IMU;
@@ -152,7 +153,7 @@ public class Swerve extends SubsystemBase implements Logged {
         try {
             path = PathPlannerPath.fromPathFile(pathName);
         } catch (IOException | ParseException e) {
-            throw new RuntimeException(e);
+            return new PrintCommand("this path file doesn't exist");
         }
 
         return AutoBuilder.pathfindThenFollowPath(
