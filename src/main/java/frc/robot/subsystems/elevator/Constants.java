@@ -5,7 +5,8 @@ import frc.excalib.control.gains.Gains;
 
 public class Constants {
     //IDs
-    static final int MOTOR_ID = 0; //TODO
+    static final int FIRST_MOTOR_ID = 0; //TODO
+    static final int SECOND_MOTOR_ID = 0; //TODO
 
     //Measurements
     static final double ELEVATOR_ANGLE = Math.PI/2;
