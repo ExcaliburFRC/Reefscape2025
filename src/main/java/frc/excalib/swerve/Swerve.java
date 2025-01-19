@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.excalib.additional_utilities.Elastic;
 import frc.excalib.control.imu.IMU;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.slam.mapper.Odometry;
@@ -35,6 +36,7 @@ import java.util.function.Supplier;
 
 import static edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets.kTextView;
 import static edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior.kCancelSelf;
+import static frc.excalib.additional_utilities.Elastic.Notification.NotificationLevel.WARNING;
 import static frc.robot.Constants.SwerveConstants.*;
 import static monologue.Annotations.*;
 
@@ -153,6 +155,11 @@ public class Swerve extends SubsystemBase implements Logged {
         try {
             path = PathPlannerPath.fromPathFile(pathName);
         } catch (IOException | ParseException e) {
+            Elastic.sendNotification(new Elastic.Notification(
+                    WARNING,
+                    "Path Creating Error",
+                    "the path file " + pathName + " doesn't exist")
+            );
             return new PrintCommand("this path file doesn't exist");
         }
 
