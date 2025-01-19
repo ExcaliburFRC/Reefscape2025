@@ -11,6 +11,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
@@ -22,6 +24,8 @@ import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
 import monologue.Logged;
 
+import static edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior.kCancelIncoming;
+import static edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior.kCancelSelf;
 import static frc.robot.Constants.SwerveConstants.*;
 
 /**
@@ -83,9 +87,15 @@ public class RobotContainer implements Logged {
 //        GenericEntry angleEntry = Shuffleboard.getTab("Swerve").add("Angle", 0).getEntry();
 //        GenericEntry poseEntry = Shuffleboard.getTab("Swerve").add("Pose", new Pose2d()).getEntry();
 
-        driver.triangle().onTrue(m_swerve.turnToAngleCommand(() -> new Rotation2d(Math.PI)/*Rotation2d.fromDegrees(angleEntry.getDouble(0))*/));
+        driver.triangle().onTrue(m_swerve.turnToAngleCommand(
+                () -> new Vector2D(
+                        deadband(-driver.getLeftY()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3)),
+                        deadband(-driver.getLeftX()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3)
+                        )
+                ),
+                () -> new Rotation2d(Math.PI)/*Rotation2d.fromDegrees(angleEntry.getDouble(0))*/));
 
-        driver.cross().onTrue(m_swerve.driveToPoseCommand(new Pose2d(1, 1, new Rotation2d(Math.PI / 2))));
+        driver.cross().onTrue(m_swerve.driveToPoseCommand(new Pose2d(0, 0, new Rotation2d(Math.PI / 2))));
     }
 
     public double deadband(double value) {
@@ -113,6 +123,23 @@ public class RobotContainer implements Logged {
         SmartDashboard.putData("PDH", PDH);
 
         SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance());
+
+        ShuffleboardTab swerveTab = Shuffleboard.getTab("Swerve");
+        SendableChooser<Rotation2d> angleChooser = new SendableChooser<>();
+        angleChooser.setDefaultOption("0", new Rotation2d());
+        angleChooser.addOption("90", new Rotation2d(Math.PI / 2));
+        angleChooser.addOption("180", new Rotation2d(Math.PI));
+        angleChooser.addOption("270", new Rotation2d(3 * Math.PI / 2));
+        swerveTab.add("Angle Chooser", angleChooser);
+        swerveTab.add("Turn To Angle",
+                m_swerve.turnToAngleCommand(
+                        () -> new Vector2D(
+                                deadband(-driver.getLeftY()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3)),
+                                deadband(-driver.getLeftX()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3)
+                                )
+                        ),
+                        angleChooser::getSelected
+                ));
     }
 
 

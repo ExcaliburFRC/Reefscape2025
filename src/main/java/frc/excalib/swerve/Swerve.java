@@ -29,6 +29,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import static edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets.kTextView;
+import static edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior.kCancelSelf;
 import static frc.robot.Constants.SwerveConstants.*;
 import static monologue.Annotations.*;
 
@@ -124,24 +126,22 @@ public class Swerve extends SubsystemBase implements Logged {
      * @param angle The desired angle in radians.
      * @return A command that turns the robot to the wanted angle.
      */
-    public Command turnToAngleCommand(Supplier<Rotation2d> angle) {
+    public Command turnToAngleCommand(Supplier<Vector2D> velocityMPS, Supplier<Rotation2d> angle) {
         PIDController angleController = new PIDController(ANGLE_PID_CONSTANTS.kP, ANGLE_PID_CONSTANTS.kI, ANGLE_PID_CONSTANTS.kD);
         angleController.enableContinuousInput(0, 2 * Math.PI);
         angleController.setTolerance(0.07);
         return driveCommand(
-                () -> new Vector2D(0, 0),
+                velocityMPS,
                 () -> angleController.calculate(getPose2D().getRotation().getRadians(), angle.get().getRadians()),
                 () -> true
         ).until(angleController::atSetpoint);
     }
 
     public Command driveToPoseCommand(Pose2d setPoint) {
-        Command driveToPoseCommand = AutoBuilder.pathfindToPose(
+        return AutoBuilder.pathfindToPose(
                 setPoint,
                 new PathConstraints(MAX_VEL, MAX_FORWARD_ACC, MAX_OMEGA_RAD_PER_SEC, MAX_OMEGA_RAD_PER_SEC, 12.0, false)
         );
-        driveToPoseCommand.addRequirements(this);
-        return driveToPoseCommand;
     }
 
     /**
@@ -256,10 +256,13 @@ public class Swerve extends SubsystemBase implements Logged {
 
         SmartDashboard.putData("Field", m_field);
 
+        SmartDashboard.putData("swerve info", this);
+
         ShuffleboardTab swerveTab = Shuffleboard.getTab("Swerve");
-        GenericEntry odometryXEntry = swerveTab.add("odometryX", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
-        GenericEntry odometryYEntry = swerveTab.add("odometryY", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
-        GenericEntry odometryAngleEntry = swerveTab.add("odometryAngle", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
+
+        GenericEntry odometryXEntry = swerveTab.add("odometryX", 0).withWidget(kTextView).getEntry();
+        GenericEntry odometryYEntry = swerveTab.add("odometryY", 0).withWidget(kTextView).getEntry();
+        GenericEntry odometryAngleEntry = swerveTab.add("odometryAngle", 0).withWidget(kTextView).getEntry();
 
         swerveTab.add("Reset Odometry",
                 new InstantCommand(
@@ -271,17 +274,9 @@ public class Swerve extends SubsystemBase implements Logged {
                         ), this).ignoringDisable(true)
         );
 
-        SendableChooser<Rotation2d> angleChooser = new SendableChooser<>();
-        angleChooser.setDefaultOption("0", new Rotation2d());
-        angleChooser.addOption("90", new Rotation2d(Math.PI / 2));
-        angleChooser.addOption("180", new Rotation2d(Math.PI));
-        angleChooser.addOption("270", new Rotation2d(3 * Math.PI / 2));
-        swerveTab.add("Angle Chooser", angleChooser);
-        swerveTab.add("Turn To Angle", turnToAngleCommand(angleChooser::getSelected));
-
-        GenericEntry OTFGxEntry = swerveTab.add("OTFGx", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
-        GenericEntry OTFGyYEntry = swerveTab.add("OTFGy", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
-        GenericEntry OTFGAngleEntry = swerveTab.add("OTFGAngle", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
+        GenericEntry OTFGxEntry = swerveTab.add("OTFGx", 0).withWidget(kTextView).getEntry();
+        GenericEntry OTFGyYEntry = swerveTab.add("OTFGy", 0).withWidget(kTextView).getEntry();
+        GenericEntry OTFGAngleEntry = swerveTab.add("OTFGAngle", 0).withWidget(kTextView).getEntry();
         swerveTab.add("Drive To Pose", driveToPoseCommand(
                         new Pose2d(
                                 OTFGxEntry.getDouble(0),
