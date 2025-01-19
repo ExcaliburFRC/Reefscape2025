@@ -6,7 +6,6 @@ import frc.excalib.control.gains.Gains;
 public class Constants {
     //IDs
     static final int MOTOR_ID = 0; //TODO
-    static final int LIMIT_SWITCH_CHANNEL = 0; //TODO
 
     //Measurements
     static final double ELEVATOR_ANGLE = Math.PI/2;
@@ -23,13 +22,13 @@ public class Constants {
 
     static final double MIN_LENGTH = 0; //TODO
 
-    static final TrapezoidProfile.Constraints UPWARD_CONSTAINTS =
+    static final TrapezoidProfile.Constraints UPWARD_CONSTRAINTS =
             new TrapezoidProfile.Constraints(
                     0,
                     0
             ); //TODO
 
-    static final TrapezoidProfile.Constraints DOWNWARD_CONSTAINTS =
+    static final TrapezoidProfile.Constraints DOWNWARD_CONSTRAINTS =
             new TrapezoidProfile.Constraints(
                     0,
                     0
