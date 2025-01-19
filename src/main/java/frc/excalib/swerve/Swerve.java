@@ -5,6 +5,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,7 +25,9 @@ import frc.excalib.control.imu.IMU;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.slam.mapper.Odometry;
 import monologue.Logged;
+import org.json.simple.parser.ParseException;
 
+import java.io.IOException;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -140,6 +143,20 @@ public class Swerve extends SubsystemBase implements Logged {
     public Command driveToPoseCommand(Pose2d setPoint) {
         return AutoBuilder.pathfindToPose(
                 setPoint,
+                new PathConstraints(MAX_VEL, MAX_FORWARD_ACC, MAX_OMEGA_RAD_PER_SEC, MAX_OMEGA_RAD_PER_SEC, 12.0, false)
+        );
+    }
+
+    public Command pathfindThenFollowPathCommand(String pathName) {
+        PathPlannerPath path;
+        try {
+            path = PathPlannerPath.fromPathFile(pathName);
+        } catch (IOException | ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        return AutoBuilder.pathfindThenFollowPath(
+                path,
                 new PathConstraints(MAX_VEL, MAX_FORWARD_ACC, MAX_OMEGA_RAD_PER_SEC, MAX_OMEGA_RAD_PER_SEC, 12.0, false)
         );
     }

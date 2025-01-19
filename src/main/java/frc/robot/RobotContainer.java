@@ -95,7 +95,9 @@ public class RobotContainer implements Logged {
                 ),
                 () -> new Rotation2d(Math.PI)/*Rotation2d.fromDegrees(angleEntry.getDouble(0))*/));
 
-        driver.cross().onTrue(m_swerve.driveToPoseCommand(new Pose2d(0, 0, new Rotation2d(Math.PI / 2))));
+        driver.cross().onTrue(m_swerve.driveToPoseCommand(new Pose2d(1, 1, new Rotation2d(Math.PI / 2))));
+
+        driver.square().onTrue(m_swerve.pathfindThenFollowPathCommand("testPath2"));
     }
 
     public double deadband(double value) {
