@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkLowLevel;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.excalib.control.motor.controllers.MotorGroup;
 import frc.excalib.control.motor.controllers.SparkMaxMotor;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
@@ -26,6 +27,8 @@ public class Placer extends SubsystemBase {
     private final CANcoder m_angleEncoder;
     private final DigitalInput m_beambrake = new DigitalInput(BEAMBREAK_CHANNEL);
     private final DoubleSupplier m_radSupplier;
+    private boolean atTolerance = false;
+    private final Trigger atToleranceTrigger = new Trigger(() -> atTolerance);
 
     public Placer() {
         m_firstRotationMotor = new TalonFXMotor(ANGLE_MOTOR_FIRST_ID);
@@ -56,7 +59,9 @@ public class Placer extends SubsystemBase {
         return m_arm.manualCommand(voltage, this);
     }
 
-    public Command goToAngleCommand(DoubleSupplier angle, Consumer<Boolean> toleranceConsumer) {//TODO: toleranceConsumer
-        return m_arm.goToAngleCommand(angle.getAsDouble(), toleranceConsumer, this);
+    public Command goToAngleCommand(DoubleSupplier angle) {
+        return m_arm.goToAngleCommand(angle.getAsDouble(), atTolerance -> {
+            this.atTolerance = atTolerance;
+        }, MAX_OFFSET, this);
     }
 }
