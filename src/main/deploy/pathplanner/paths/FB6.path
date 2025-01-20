@@ -50,7 +50,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Elad",
+  "folder": "CompPaths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 54.0

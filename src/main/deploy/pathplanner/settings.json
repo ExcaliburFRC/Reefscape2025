@@ -3,7 +3,7 @@
   "robotLength": 0.67,
   "holonomicMode": true,
   "pathFolders": [
-    "Elad",
+    "CompPaths",
     "test and calibration paths"
   ],
   "autoFolders": [
