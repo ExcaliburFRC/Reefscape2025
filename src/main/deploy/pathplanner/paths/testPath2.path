@@ -54,7 +54,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "test and calibration paths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 90.0
