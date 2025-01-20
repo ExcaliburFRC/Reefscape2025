@@ -30,5 +30,6 @@ public class Constants {
     public static final Gains ANGLE_GAINS = new Gains(kp, ki, kd, ks, kv, ka, kg);
     public static final double CENTER_OF_MASS_RADIUS = 0;
     public static final double CENTER_OF_MASS_OFFSET_RAD=0;
+    public static final double MAX_OFFSET = 0.2;
 
 }
