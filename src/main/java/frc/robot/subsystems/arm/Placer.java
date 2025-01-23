@@ -4,6 +4,8 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.spark.SparkLowLevel;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.excalib.control.motor.controllers.MotorGroup;
@@ -28,6 +30,7 @@ public class Placer extends SubsystemBase {
     private final DigitalInput m_beambrake = new DigitalInput(BEAMBREAK_CHANNEL);
     private final DoubleSupplier m_radSupplier;
     private boolean atTolerance = false;
+    private final Trigger hasCoralTrigger = new Trigger(m_beambrake::get);
     private final Trigger atToleranceTrigger = new Trigger(() -> atTolerance);
 
     public Placer() {
@@ -55,8 +58,15 @@ public class Placer extends SubsystemBase {
 
     }
 
-    public Command ManualCommand(DoubleSupplier voltage) {
-        return m_arm.manualCommand(voltage, this);
+    public Command manualCommand(DoubleSupplier voltage, DoubleSupplier scoringVoltage, DoubleSupplier intakeVolatge) {
+        ParallelCommandGroup manualCommand = new ParallelCommandGroup(
+                m_arm.manualCommand(voltage),
+                m_intakeWheel.manualCommand(intakeVolatge),
+                m_scoringWheel.manualCommand(scoringVoltage)
+        );
+        manualCommand.addRequirements(this);
+        return manualCommand;
+
     }
 
     public Command goToAngleCommand(DoubleSupplier angle) {
@@ -64,4 +74,14 @@ public class Placer extends SubsystemBase {
             this.atTolerance = atTolerance;
         }, MAX_OFFSET, this);
     }
+
+    public Command removeAlgaeCommand() {
+        return new RunCommand(
+                () -> m_intakeWheel.manualCommand(
+                        () -> REMOVE_ALGAE_VOLTAGE),
+                this
+        );
+    }
+
+
 }
