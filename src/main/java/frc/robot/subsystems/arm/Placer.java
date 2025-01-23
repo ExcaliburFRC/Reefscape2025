@@ -57,11 +57,11 @@ public class Placer extends SubsystemBase {
 
     }
 
-    public Command manualCommand(DoubleSupplier voltage, DoubleSupplier scoringVoltage, DoubleSupplier intakeVolatge) {
+    public Command manualCommand(DoubleSupplier armDC, DoubleSupplier scoringDC, DoubleSupplier intakeDC) {
         ParallelCommandGroup manualCommand = new ParallelCommandGroup(
-                m_arm.manualCommand(voltage),
-                m_intakeWheel.manualCommand(intakeVolatge),
-                m_scoringWheel.manualCommand(scoringVoltage)
+                m_arm.manualCommand(armDC),
+                m_intakeWheel.manualCommand(intakeDC),
+                m_scoringWheel.manualCommand(scoringDC)
         );
         manualCommand.addRequirements(this);
         return manualCommand;
@@ -69,7 +69,7 @@ public class Placer extends SubsystemBase {
     }
 
     public Command goToAngleCommand(DoubleSupplier angle) {
-        return m_arm.goToAngleCommand(angle.getAsDouble(), atTolerance -> {
+        return m_arm.goToAngleCommand(LIMIT.limit(angle.getAsDouble()), atTolerance -> {
             this.atTolerance = atTolerance;
         }, MAX_OFFSET, this);
     }
@@ -77,15 +77,15 @@ public class Placer extends SubsystemBase {
     public Command removeAlgaeCommand() {
         return new RunCommand(
                 () -> m_intakeWheel.manualCommand(
-                        () -> ALGAE_REMOVAL_OUTPUT),
+                        () -> ALGAE_REMOVAL_DC),
                 this
         );
     }
 
-    public Command inputCoralCommand(){
+    public Command inputCoralCommand() {
         Command inputCoralCommand = new ParallelCommandGroup(
-                m_scoringWheel.manualCommand(()-> INTAKE_CORAL_DC),
-                m_intakeWheel.manualCommand(()-> INTAKE_CORAL_DC)
+                m_scoringWheel.manualCommand(() -> INTAKE_CORAL_DC),
+                m_intakeWheel.manualCommand(() -> INTAKE_CORAL_DC)
         ).until(hasCoralTrigger);
 
         inputCoralCommand.addRequirements(this);
@@ -101,7 +101,6 @@ public class Placer extends SubsystemBase {
         outputCoralCommand.addRequirements(this);
         return outputCoralCommand;
     }
-
 
 
 }
