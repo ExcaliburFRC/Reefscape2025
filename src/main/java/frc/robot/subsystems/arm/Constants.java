@@ -32,4 +32,9 @@ public class Constants {
     public static final double CENTER_OF_MASS_OFFSET_RAD=0;
     public static final double MAX_OFFSET = 0.2;
 
+    //VELS
+    public static final double REMOVE_ALGAE_VOLTAGE = 0; //TODO
+    public static final double INTAKE_CORAL_DC = 0; //TODO
+    public static final double OUTPUT_CORAL_DC = 0; //TODO
+
 }
