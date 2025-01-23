@@ -7,19 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "testPath2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "print command"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "testPath3"
+            "pathName": "trigger test"
           }
         }
       ]

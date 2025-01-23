@@ -27,6 +27,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "test and calibration paths",
+  "folder": "test and calibration autos",
   "choreoAuto": false
 }

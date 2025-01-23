@@ -37,6 +37,7 @@ import java.util.function.Supplier;
 import static edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets.kTextView;
 import static edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior.kCancelSelf;
 import static frc.excalib.additional_utilities.Elastic.Notification.NotificationLevel.WARNING;
+import static frc.excalib.swerve.SwerveAccUtils.getSmartTranslationalVelocitySetPoint;
 import static frc.robot.Constants.SwerveConstants.*;
 import static monologue.Annotations.*;
 
@@ -99,8 +100,8 @@ public class Swerve extends SubsystemBase implements Logged {
 
         // Precompute values to avoid redundant calculations
         Supplier<Vector2D> adjustedVelocitySupplier = () -> {
-            Vector2D velocity = velocityMPS.get();
-//            Vector2D velocity = getSmartTranslationalVelocitySetPoint(getVelocity(), velocityMPS.get());
+//            Vector2D velocity = velocityMPS.get();
+            Vector2D velocity = getSmartTranslationalVelocitySetPoint(getVelocity(), velocityMPS.get());
             if (fieldOriented.getAsBoolean()) {
                 Rotation2d yaw = getRotation2D().unaryMinus();
                 return velocity.rotate(yaw);

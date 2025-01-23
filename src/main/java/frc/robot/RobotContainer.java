@@ -7,6 +7,9 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.events.EventTrigger;
+import com.pathplanner.lib.events.PointTowardsZoneEvent;
+import com.pathplanner.lib.events.PointTowardsZoneTrigger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
@@ -107,12 +110,17 @@ public class RobotContainer implements Logged {
     private void initAutoChooser() {
         NamedCommands.registerCommand("print command", new PrintCommand("pathplanner"));
 
+        new EventTrigger("testTrigger").whileTrue(Commands.run(()->System.out.println("Trigger Test")));
+        new PointTowardsZoneTrigger("PointTowardsZoneTrigger").whileTrue(Commands.run(()->System.out.println("Trigger Test😎")));
+
         // Build an auto chooser. This will use Commands.none() as the default option.
         m_autoChooser = AutoBuilder.buildAutoChooser();
         m_autoChooser.addOption("Test Auto", new PathPlannerAuto("testAuto"));
         m_autoChooser.addOption("Test Auto 2", new PathPlannerAuto("testAuto2"));
         m_autoChooser.addOption("Calibration Auto", new PathPlannerAuto("calibrationAuto"));
         m_autoChooser.addOption("Test Choreo Auto", new PathPlannerAuto("testChoreoAuto"));
+        m_autoChooser.addOption("Test Trigger", new PathPlannerAuto("triggerTest"));
+        m_autoChooser.addOption("Heart", new PathPlannerAuto("HeartAuto"));
 
         // Another option that allows you to specify the default auto by its name
         // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
