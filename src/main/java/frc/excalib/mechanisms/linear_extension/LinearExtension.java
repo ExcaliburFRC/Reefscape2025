@@ -4,9 +4,10 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
-import frc.excalib.control.gains.Gains;
+
 import frc.excalib.control.motor.controllers.Motor;
 import frc.excalib.mechanisms.Mechanism;
+import frc.excalib.control.gains.Gains;
 
 import java.util.function.DoubleSupplier;
 
