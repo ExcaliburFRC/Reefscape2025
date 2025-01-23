@@ -1,10 +1,8 @@
 package frc.robot.subsystems.arm;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DigitalInput;
 import frc.excalib.control.gains.Gains;
 import frc.excalib.control.limits.SoftLimit;
-import frc.excalib.control.math.physics.Mass;
 
 public class Constants {
     public static final int ANGLE_MOTOR_FIRST_ID = 0;//TODO
@@ -33,7 +31,7 @@ public class Constants {
     public static final double MAX_OFFSET = 0.2;
 
     //VELS
-    public static final double REMOVE_ALGAE_VOLTAGE = 0; //TODO
+    public static final double ALGAE_REMOVAL_OUTPUT = 0; //TODO
     public static final double INTAKE_CORAL_DC = 0; //TODO
     public static final double OUTPUT_CORAL_DC = 0; //TODO
 
