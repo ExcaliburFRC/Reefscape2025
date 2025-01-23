@@ -14,7 +14,6 @@ import frc.excalib.control.motor.controllers.TalonFXMotor;
 import frc.excalib.mechanisms.Arm.Arm;
 import frc.excalib.mechanisms.Mechanism;
 
-import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 
 import static frc.robot.subsystems.arm.Constants.*;
@@ -78,10 +77,11 @@ public class Placer extends SubsystemBase {
     public Command removeAlgaeCommand() {
         return new RunCommand(
                 () -> m_intakeWheel.manualCommand(
-                        () -> REMOVE_ALGAE_VOLTAGE),
+                        () -> ALGAE_REMOVAL_OUTPUT),
                 this
         );
     }
+
     public Command inputCoralCommand(){
         Command inputCoralCommand = new ParallelCommandGroup(
                 m_scoringWheel.manualCommand(()-> INTAKE_CORAL_DC),
