@@ -92,6 +92,15 @@ public class Placer extends SubsystemBase {
         return inputCoralCommand;
     }
 
+    public Command outputCoralCommand() {
+        Command outputCoralCommand = new ParallelCommandGroup(
+                m_scoringWheel.manualCommand(() -> OUTPUT_CORAL_DC),
+                m_intakeWheel.manualCommand(() -> OUTPUT_CORAL_DC)
+        ).until(hasCoralTrigger);
+
+        outputCoralCommand.addRequirements(this);
+        return outputCoralCommand;
+    }
 
 
 
