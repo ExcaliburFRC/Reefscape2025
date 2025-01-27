@@ -61,7 +61,7 @@ public final class Constants {
         public static final double MAX_MODULE_VEL = 4.45;
         public static final double MAX_FRONT_ACC = 2;
         public static final double MAX_SIDE_ACC = 6;
-        public static final double MAX_SKID_ACC = 6;
+        public static final double MAX_SKID_ACC = 60;
         public static final double MAX_FORWARD_ACC = 9;
         public static final double MAX_VEL = 4.45;
         public static final double MAX_OMEGA_RAD_PER_SEC = 6; //11.5

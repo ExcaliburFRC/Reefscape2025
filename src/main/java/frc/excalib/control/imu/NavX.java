@@ -4,10 +4,13 @@ import com.studica.frc.AHRS;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
+import monologue.Annotations;
+import monologue.Annotations.Log;
+import monologue.Logged;
 
 import static com.studica.frc.AHRS.NavXComType.kMXP_SPI;
 
-public class NavX extends AHRS implements IMU {
+public class NavX extends AHRS implements IMU, Logged {
     private Rotation3d m_offsetRotation;
 
     public NavX(Rotation3d offsetRotation) {
@@ -31,16 +34,19 @@ public class NavX extends AHRS implements IMU {
     }
 
     @Override
+    @Log.NT
     public double getAccX() {
-        return super.getWorldLinearAccelX();
+        return super.getRawAccelX();
     }
 
     @Override
+    @Log.NT
     public double getAccY() {
-        return super.getWorldLinearAccelY();
+        return super.getRawAccelY();
     }
 
     @Override
+    @Log.NT
     public double getAccZ() {
         return super.getWorldLinearAccelZ();
     }

@@ -1,6 +1,7 @@
 package frc.excalib.control.math;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.excalib.control.MathUtils;
 
 /**
  * A class representing a Vector in two dimensions;
@@ -152,5 +153,13 @@ public class Vector2D {
         double magnitude = getDistance();
         this.m_x = magnitude * direction.getCos();
         this.m_y = magnitude * direction.getSin();
+    }
+
+    public Vector2D limit(Vector2D limit) {
+        Vector2D output = new Vector2D(m_x, m_y);
+        output.rotate(limit.getDirection().unaryMinus());
+        output.setX(MathUtils.limitTo(limit.getDistance(), output.m_x));
+        output.setDirection(this.getDirection());
+        return output;
     }
 }

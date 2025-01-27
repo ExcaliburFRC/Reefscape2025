@@ -13,9 +13,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -35,7 +35,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import static edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets.kTextView;
-import static edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior.kCancelSelf;
 import static frc.excalib.additional_utilities.Elastic.Notification.NotificationLevel.WARNING;
 import static frc.excalib.swerve.SwerveAccUtils.getSmartTranslationalVelocitySetPoint;
 import static frc.robot.Constants.SwerveConstants.*;
@@ -49,6 +48,10 @@ public class Swerve extends SubsystemBase implements Logged {
     private final IMU m_imu;
     private final Odometry m_odometry;
     private final SwerveDriveKinematics m_swerveDriveKinematics;
+
+    private double m_lastTime = 0;
+    private Vector2D m_velocity = new Vector2D(0, 0);
+    private Vector2D m_accel = new Vector2D(0, 0);
 
     public final Field2d m_field = new Field2d();
 
@@ -100,8 +103,8 @@ public class Swerve extends SubsystemBase implements Logged {
 
         // Precompute values to avoid redundant calculations
         Supplier<Vector2D> adjustedVelocitySupplier = () -> {
-//            Vector2D velocity = velocityMPS.get();
-            Vector2D velocity = getSmartTranslationalVelocitySetPoint(getVelocity(), velocityMPS.get());
+            Vector2D velocity = velocityMPS.get();
+//            Vector2D velocity = getSmartTranslationalVelocitySetPoint(getVelocity(), velocityMPS.get());
             if (fieldOriented.getAsBoolean()) {
                 Rotation2d yaw = getRotation2D().unaryMinus();
                 return velocity.rotate(yaw);
@@ -213,6 +216,31 @@ public class Swerve extends SubsystemBase implements Logged {
      */
     public Vector2D getVelocity() {
         return m_MODULES.getVelocity();
+    }
+
+    @Log.NT
+    public double getAccelerationDistance() {
+        return m_accel.getDistance();
+    }
+
+    @Log.NT
+    public double getVelocityDirection() {
+        return getVelocity().getDirection().getDegrees();
+    }
+
+    @Log.NT
+    public double getAccDirection() {
+        return m_accel.getDirection().getDegrees();
+    }
+
+    @Log.NT
+    public double getAccX() {
+        return m_imu.getAccX();
+    }
+
+    @Log.NT
+    public double getAccY() {
+        return m_imu.getAccY();
     }
 
     /**
@@ -342,5 +370,9 @@ public class Swerve extends SubsystemBase implements Logged {
     public void periodic() {
         updateOdometry();
         m_field.setRobotPose(getPose2D());
+
+        m_accel = getVelocity().plus(m_velocity.mul(-1)).mul(1 * Math.pow(10, 6) / (RobotController.getFPGATime() - m_lastTime));
+        m_lastTime = RobotController.getFPGATime();
+        m_velocity = getVelocity();
     }
 }

@@ -13,7 +13,9 @@ import com.pathplanner.lib.events.PointTowardsZoneTrigger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -25,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
+import monologue.Annotations;
 import monologue.Logged;
 
 import static edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior.kCancelIncoming;
@@ -38,6 +41,7 @@ import static frc.robot.Constants.SwerveConstants.*;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer implements Logged {
+    private final BuiltInAccelerometer accelerometer = new BuiltInAccelerometer();
     // The robot's subsystems and commands are defined here...
 
     private final Swerve m_swerve = configureSwerve(new Pose2d());
@@ -49,6 +53,8 @@ public class RobotContainer implements Logged {
     public Runnable updateOdometry = m_swerve::updateOdometry;
 
     private SendableChooser<Command> m_autoChooser;
+
+    private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -104,14 +110,14 @@ public class RobotContainer implements Logged {
     }
 
     public double deadband(double value) {
-        return Math.abs(value) < 0.1 ? 0 : value;
+        return Math.abs(value) < 0.15 ? 0 : value;
     }
 
     private void initAutoChooser() {
         NamedCommands.registerCommand("print command", new PrintCommand("pathplanner"));
 
-        new EventTrigger("testTrigger").whileTrue(Commands.run(()->System.out.println("Trigger Test")));
-        new PointTowardsZoneTrigger("PointTowardsZoneTrigger").whileTrue(Commands.run(()->System.out.println("Trigger Test😎")));
+        new EventTrigger("testTrigger").whileTrue(Commands.run(() -> System.out.println("Trigger Test")));
+        new PointTowardsZoneTrigger("PointTowardsZoneTrigger").whileTrue(Commands.run(() -> System.out.println("Trigger Test2")));
 
         // Build an auto chooser. This will use Commands.none() as the default option.
         m_autoChooser = AutoBuilder.buildAutoChooser();
@@ -150,6 +156,11 @@ public class RobotContainer implements Logged {
                         ),
                         angleChooser::getSelected
                 ));
+    }
+
+    @Annotations.Log.NT
+    public double getAcc() {
+        return Math.sqrt(Math.pow(m_accelerometer.getX(), 2) + Math.pow(m_accelerometer.getY(), 2)) * 9.8;
     }
 
 

@@ -30,8 +30,8 @@ public class SwerveAccUtils {
     private static Vector2D applyAccelerationLimits(Vector2D currentVel, Vector2D velocityError) {
         Vector2D wantedAcceleration = velocityError.mul(1 / CYCLE_TIME);
 
-        wantedAcceleration = applyForwardLimit(currentVel, wantedAcceleration);
-        wantedAcceleration = applyTiltLimit(wantedAcceleration);
+//        wantedAcceleration = applyForwardLimit(currentVel, wantedAcceleration);
+//        wantedAcceleration = applyTiltLimit(wantedAcceleration);
         wantedAcceleration = applySkidLimit(wantedAcceleration);
 
         return wantedAcceleration.mul(CYCLE_TIME);
@@ -48,14 +48,7 @@ public class SwerveAccUtils {
                 MAX_FORWARD_ACC *
                         (1 - (currentVel.getDistance() / MAX_VEL));
 
-        Vector2D rotatedWantedAcceleration = wantedAcceleration.rotate(
-                wantedAcceleration.getDirection().minus(currentVel.getDirection()));
-        rotatedWantedAcceleration = new Vector2D(
-                minSize(rotatedWantedAcceleration.getX(), maxAcceleration),
-                rotatedWantedAcceleration.getDirection());
-        wantedAcceleration = rotatedWantedAcceleration.rotate(
-                currentVel.getDirection().minus(wantedAcceleration.getDirection()));
-
+        wantedAcceleration = wantedAcceleration.limit(new Vector2D(maxAcceleration, currentVel.getDirection()));
         return wantedAcceleration;
     }
 
@@ -79,7 +72,7 @@ public class SwerveAccUtils {
      */
     private static Vector2D applySkidLimit(Vector2D wantedAcceleration) {
         return new Vector2D(
-                minSize(wantedAcceleration.getDistance(), MAX_SKID_ACC),
+                Math.min(wantedAcceleration.getDistance(), MAX_SKID_ACC),
                 wantedAcceleration.getDirection()
         );
     }

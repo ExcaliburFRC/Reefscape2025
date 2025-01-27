@@ -44,6 +44,7 @@ public class Robot extends TimedRobot {
 
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
         auroraClient = new AuroraClient(NetworkTableInstance.getDefault());
+//    addPeriodic(m_robotContainer.updateOdometry, 0.01);
     }
 
     /**
@@ -63,8 +64,6 @@ public class Robot extends TimedRobot {
         // and running subsystem periodic() methods.  This must be called from the robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
-
-//    addPeriodic(m_robotContainer.updateOdometry, 0.01);
     }
 
     /**
