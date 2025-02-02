@@ -14,7 +14,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.shuffleboard.*;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.excalib.additional_utilities.Elastic;
+import frc.excalib.commands.ContinuouslyConditionalCommand;
 import frc.excalib.control.imu.IMU;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.slam.mapper.Odometry;
@@ -36,9 +38,8 @@ import java.util.function.Supplier;
 
 import static edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets.kTextView;
 import static frc.excalib.additional_utilities.Elastic.Notification.NotificationLevel.WARNING;
-import static frc.excalib.swerve.SwerveAccUtils.getSmartTranslationalVelocitySetPoint;
 import static frc.robot.Constants.SwerveConstants.*;
-import static monologue.Annotations.*;
+import static monologue.Annotations.Log;
 
 /**
  * A class representing a swerve subsystem.
@@ -150,8 +151,12 @@ public class Swerve extends SubsystemBase implements Logged {
     public Command driveToPoseCommand(Pose2d setPoint) {
         return AutoBuilder.pathfindToPose(
                 setPoint,
-                new PathConstraints(MAX_VEL, MAX_FORWARD_ACC, MAX_OMEGA_RAD_PER_SEC, MAX_OMEGA_RAD_PER_SEC, 12.0, false)
-        );
+                new PathConstraints(MAX_VEL, MAX_FORWARD_ACC,
+                        MAX_OMEGA_RAD_PER_SEC,
+                        MAX_OMEGA_RAD_PER_SEC,
+                        12.0,
+                        false
+                ));
     }
 
     public Command pathfindThenFollowPathCommand(String pathName) {

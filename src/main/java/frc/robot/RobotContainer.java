@@ -8,14 +8,12 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.events.EventTrigger;
-import com.pathplanner.lib.events.PointTowardsZoneEvent;
 import com.pathplanner.lib.events.PointTowardsZoneTrigger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -25,13 +23,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import frc.excalib.commands.ContinuouslyConditionalCommand;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
 import monologue.Annotations;
 import monologue.Logged;
 
-import static edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior.kCancelIncoming;
-import static edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior.kCancelSelf;
 import static frc.robot.Constants.SwerveConstants.*;
 
 /**
@@ -88,8 +85,8 @@ public class RobotContainer implements Logged {
                                 deadband(-driver.getLeftY()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3)),
                                 deadband(-driver.getLeftX()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3))),
                         () -> deadband(-driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC,
-                        () -> true)
-        );
+                        () -> true
+                ));
 
         driver.PS().onTrue(resetSwerveCommand());
 
@@ -104,10 +101,21 @@ public class RobotContainer implements Logged {
                 ),
                 () -> new Rotation2d(Math.PI)/*Rotation2d.fromDegrees(angleEntry.getDouble(0))*/));
 
-        driver.cross().onTrue(m_swerve.driveToPoseCommand(new Pose2d(1, 1, new Rotation2d(Math.PI / 2))));
+        driver.cross().onTrue(
+                new SequentialCommandGroup(
+                        m_swerve.driveToPoseCommand(new Pose2d(1, 0, new Rotation2d())).until(() -> deadband(-driver.getLeftY()) + deadband(-driver.getLeftX()) != 0),
+                        m_swerve.driveCommand(
+                                () -> new Vector2D(
+                                        deadband(-driver.getLeftY()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3)),
+                                        deadband(-driver.getLeftX()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3))),
+                                () -> deadband(-driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC,
+                                () -> true
+                        ).until(() -> deadband(-driver.getLeftY()) + deadband(-driver.getLeftX()) == 0)).repeatedly()
+        );
 
         driver.square().onTrue(m_swerve.pathfindThenFollowPathCommand("testPath2"));
     }
+
 
     public double deadband(double value) {
         return Math.abs(value) < 0.15 ? 0 : value;
@@ -128,7 +136,7 @@ public class RobotContainer implements Logged {
         m_autoChooser.addOption("Test Trigger", new PathPlannerAuto("triggerTest"));
         m_autoChooser.addOption("Heart", new PathPlannerAuto("HeartAuto"));
 
-        // Another option that allows you to specify the default auto by its name
+        // Another option that allows you to specify the default auto by its name\[]
         // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
 
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
