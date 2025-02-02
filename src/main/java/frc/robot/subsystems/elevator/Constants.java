@@ -10,6 +10,7 @@ public class Constants {
 
     //Measurements
     static final double ELEVATOR_ANGLE = Math.PI/2;
+    static final double TOLERANCE = 0;//TODO
 
     //Gains and Constrains
     private static final double kp = 0;
