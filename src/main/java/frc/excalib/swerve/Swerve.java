@@ -149,22 +149,23 @@ public class Swerve extends SubsystemBase implements Logged {
         return AutoBuilder.pathfindToPose(
                 setPoint,
                 MAX_PATH_CONSTRAINTS
-        );
+        ).withName("Pathfinding Command");
     }
 
     public Command driveToPoseWithOverrideCommand(
             Pose2d setPoint,
+            BooleanSupplier override,
             Supplier<Vector2D> velocityMPS,
             DoubleSupplier omegaRadPerSec) {
         Command driveToPoseCommand = driveToPoseCommand(setPoint);
         return new SequentialCommandGroup(
-                driveToPoseCommand.until(() -> velocityMPS.get().getDistance() != 0),
+                driveToPoseCommand.until(() -> velocityMPS.get().getDistance() != 0 && override.getAsBoolean()),
                 driveCommand(
                         velocityMPS,
                         omegaRadPerSec,
                         () -> true
                 ).until(() -> velocityMPS.get().getDistance() == 0)
-        ).repeatedly().until(driveToPoseCommand::isFinished);
+        ).repeatedly().until(driveToPoseCommand::isFinished).withName("Pathfinding With Override Command");
     }
 
     /**
@@ -243,8 +244,8 @@ public class Swerve extends SubsystemBase implements Logged {
      * @return The robot's acceleration as a Vector2D.
      */
     @Log.NT(key = "Acceleration")
-    public Vector2D getAcceleration() {
-        return new Vector2D(m_imu.getAccX(), m_imu.getAccY());
+    public double getAccelerationDistance() {
+        return new Vector2D(m_imu.getAccX(), m_imu.getAccY()).getDistance();
     }
 
     /**

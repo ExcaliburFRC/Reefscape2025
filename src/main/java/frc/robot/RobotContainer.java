@@ -86,6 +86,7 @@ public class RobotContainer implements Logged {
         driver.cross().onTrue(
                 m_swerve.driveToPoseWithOverrideCommand(
                         new Pose2d(1, 0, new Rotation2d()),
+                        driver.R2(),
                         () -> new Vector2D(
                                 deadband(-driver.getLeftY()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3)),
                                 deadband(-driver.getLeftX()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3))),
