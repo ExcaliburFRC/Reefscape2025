@@ -34,6 +34,7 @@ public class SwerveModule implements Logged {
     private final double m_MAX_VEL;
     private final Rotation2d m_moduleAnglePlus90;
     private final Vector2D m_setPoint = new Vector2D(0, 0);
+    private double m_lastDirection;
 
     /**
      * A constructor for the SwerveModule
@@ -99,11 +100,10 @@ public class SwerveModule implements Logged {
     }
 
     public Command setVelocityCommand(Supplier<Vector2D> moduleVelocity) {
+        Vector2D velocity = moduleVelocity.get();
+        double speed = velocity.getDistance();
         return new ParallelCommandGroup(
                 m_driveWheel.setDynamicVelocityCommand(() -> {
-                    Vector2D velocity = moduleVelocity.get();
-                    double speed = velocity.getDistance();
-
                     if (speed < 0.1) {
                         return 0.0;
                     }
@@ -112,9 +112,6 @@ public class SwerveModule implements Logged {
                     return optimize ? -speed : speed;
                 }),
                 m_turret.setPositionCommand(() -> {
-                    Vector2D velocity = moduleVelocity.get();
-                    double speed = velocity.getDistance();
-
                     if (speed < 0.1) {
                         return m_turret.getPosition();
                     }
