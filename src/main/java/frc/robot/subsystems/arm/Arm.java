@@ -11,6 +11,7 @@ import frc.excalib.control.motor.controllers.TalonFXMotor;
 import frc.excalib.mechanisms.Mechanism;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import static frc.robot.subsystems.arm.Constants.*;
 import static java.lang.Math.*;
@@ -21,9 +22,9 @@ public class Arm extends SubsystemBase {
     private final frc.excalib.mechanisms.Arm.Arm m_arm;
     private final CANcoder m_angleEncoder;
     private final DoubleSupplier m_radSupplier;
-    private boolean atTolerance = false;
-    private final Trigger hasCoralTrigger = new Trigger(m_beambrake::get);
-    private final Trigger atToleranceTrigger = new Trigger(() -> atTolerance);
+    private boolean isAtTolerance = false;
+    public final Trigger toleranceTrigger;
+    private double setpointAngle = 0;
 
     public Arm() {
         m_firstRotationMotor = new TalonFXMotor(ANGLE_MOTOR_FIRST_ID);
