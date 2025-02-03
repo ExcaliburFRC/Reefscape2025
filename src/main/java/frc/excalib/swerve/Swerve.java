@@ -4,7 +4,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -13,18 +12,13 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.excalib.additional_utilities.Elastic;
-import frc.excalib.commands.ContinuouslyConditionalCommand;
 import frc.excalib.control.imu.IMU;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.slam.mapper.Odometry;
@@ -49,10 +43,6 @@ public class Swerve extends SubsystemBase implements Logged {
     private final IMU m_imu;
     private final Odometry m_odometry;
     private final SwerveDriveKinematics m_swerveDriveKinematics;
-
-    private double m_lastTime = 0;
-    private Vector2D m_velocity = new Vector2D(0, 0);
-    private Vector2D m_accel = new Vector2D(0, 0);
 
     public final Field2d m_field = new Field2d();
 
@@ -87,6 +77,7 @@ public class Swerve extends SubsystemBase implements Logged {
         );
 
         initAutoBuilder();
+        initElastic();
     }
 
     /**
@@ -134,31 +125,54 @@ public class Swerve extends SubsystemBase implements Logged {
     /**
      * A method that turns the robot to a desired angle.
      *
-     * @param angle The desired angle in radians.
+     * @param angleSetPoint The desired angle in radians.
      * @return A command that turns the robot to the wanted angle.
      */
-    public Command turnToAngleCommand(Supplier<Vector2D> velocityMPS, Supplier<Rotation2d> angle) {
+    public Command turnToAngleCommand(Supplier<Vector2D> velocityMPS, Supplier<Rotation2d> angleSetPoint) {
         PIDController angleController = new PIDController(ANGLE_PID_CONSTANTS.kP, ANGLE_PID_CONSTANTS.kI, ANGLE_PID_CONSTANTS.kD);
         angleController.enableContinuousInput(0, 2 * Math.PI);
         angleController.setTolerance(0.07);
         return driveCommand(
                 velocityMPS,
-                () -> angleController.calculate(getPose2D().getRotation().getRadians(), angle.get().getRadians()),
+                () -> angleController.calculate(getPose2D().getRotation().getRadians(), angleSetPoint.get().getRadians()),
                 () -> true
         ).until(angleController::atSetpoint);
     }
 
+    /**
+     * A method that drives the robot to a desired pose.
+     *
+     * @param setPoint The desired pose.
+     * @return A command that drives the robot to the wanted pose.
+     */
     public Command driveToPoseCommand(Pose2d setPoint) {
         return AutoBuilder.pathfindToPose(
                 setPoint,
-                new PathConstraints(MAX_VEL, MAX_FORWARD_ACC,
-                        MAX_OMEGA_RAD_PER_SEC,
-                        MAX_OMEGA_RAD_PER_SEC,
-                        12.0,
-                        false
-                ));
+                MAX_PATH_CONSTRAINTS
+        );
     }
 
+    public Command driveToPoseWithOverrideCommand(
+            Pose2d setPoint,
+            Supplier<Vector2D> velocityMPS,
+            DoubleSupplier omegaRadPerSec) {
+        Command driveToPoseCommand = driveToPoseCommand(setPoint);
+        return new SequentialCommandGroup(
+                driveToPoseCommand.until(() -> velocityMPS.get().getDistance() != 0),
+                driveCommand(
+                        velocityMPS,
+                        omegaRadPerSec,
+                        () -> true
+                ).until(() -> velocityMPS.get().getDistance() == 0)
+        ).repeatedly().until(driveToPoseCommand::isFinished);
+    }
+
+    /**
+     * A method that drives the robot to the starting pose of a path, then follows the path.
+     *
+     * @param pathName The path which the robot needs to follow.
+     * @return A command that turns the robot to the wanted angle.
+     */
     public Command pathfindThenFollowPathCommand(String pathName) {
         PathPlannerPath path;
         try {
@@ -174,7 +188,7 @@ public class Swerve extends SubsystemBase implements Logged {
 
         return AutoBuilder.pathfindThenFollowPath(
                 path,
-                new PathConstraints(MAX_VEL, MAX_FORWARD_ACC, MAX_OMEGA_RAD_PER_SEC, MAX_OMEGA_RAD_PER_SEC, 12.0, false)
+                MAX_PATH_CONSTRAINTS
         );
     }
 
@@ -199,7 +213,7 @@ public class Swerve extends SubsystemBase implements Logged {
      *
      * @return The current rotation of the robot.
      */
-    @Log.NT
+    @Log.NT(key = "Robot Rotation")
     public Rotation2d getRotation2D() {
         return m_imu.getZRotation();
     }
@@ -209,7 +223,7 @@ public class Swerve extends SubsystemBase implements Logged {
      *
      * @return The current pose of the robot.
      */
-    @Log.NT
+    @Log.NT(key = "Robot Pose")
     public Pose2d getPose2D() {
         return m_odometry.getRobotPose();
     }
@@ -223,29 +237,14 @@ public class Swerve extends SubsystemBase implements Logged {
         return m_MODULES.getVelocity();
     }
 
-    @Log.NT
-    public double getAccelerationDistance() {
-        return m_accel.getDistance();
-    }
-
-    @Log.NT
-    public double getVelocityDirection() {
-        return getVelocity().getDirection().getDegrees();
-    }
-
-    @Log.NT
-    public double getAccDirection() {
-        return m_accel.getDirection().getDegrees();
-    }
-
-    @Log.NT
-    public double getAccX() {
-        return m_imu.getAccX();
-    }
-
-    @Log.NT
-    public double getAccY() {
-        return m_imu.getAccY();
+    /**
+     * Gets the current acceleration of the robot.
+     *
+     * @return The robot's acceleration as a Vector2D.
+     */
+    @Log.NT(key = "Acceleration")
+    public Vector2D getAcceleration() {
+        return new Vector2D(m_imu.getAccX(), m_imu.getAccY());
     }
 
     /**
@@ -294,6 +293,9 @@ public class Swerve extends SubsystemBase implements Logged {
         );
     }
 
+    /**
+     * A function that initialize the Swerve tab for Elastic.
+     */
     public void initElastic() {
         SmartDashboard.putData("Swerve Drive", builder -> {
             builder.setSmartDashboardType("SwerveDrive");
@@ -334,12 +336,13 @@ public class Swerve extends SubsystemBase implements Logged {
         );
 
         GenericEntry OTFGxEntry = swerveTab.add("OTFGx", 0).withWidget(kTextView).getEntry();
-        GenericEntry OTFGyYEntry = swerveTab.add("OTFGy", 0).withWidget(kTextView).getEntry();
+        GenericEntry OTFGyEntry = swerveTab.add("OTFGy", 0).withWidget(kTextView).getEntry();
         GenericEntry OTFGAngleEntry = swerveTab.add("OTFGAngle", 0).withWidget(kTextView).getEntry();
-        swerveTab.add("Drive To Pose", driveToPoseCommand(
+        swerveTab.add("Drive To Pose",
+                driveToPoseCommand(
                         new Pose2d(
                                 OTFGxEntry.getDouble(0),
-                                OTFGyYEntry.getDouble(0),
+                                OTFGyEntry.getDouble(0),
                                 Rotation2d.fromDegrees(OTFGAngleEntry.getDouble(0)))
                 )
         );
@@ -375,9 +378,5 @@ public class Swerve extends SubsystemBase implements Logged {
     public void periodic() {
         updateOdometry();
         m_field.setRobotPose(getPose2D());
-
-        m_accel = getVelocity().plus(m_velocity.mul(-1)).mul(1 * Math.pow(10, 6) / (RobotController.getFPGATime() - m_lastTime));
-        m_lastTime = RobotController.getFPGATime();
-        m_velocity = getVelocity();
     }
 }

@@ -22,11 +22,8 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import frc.excalib.commands.ContinuouslyConditionalCommand;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
-import monologue.Annotations;
 import monologue.Logged;
 
 import static frc.robot.Constants.SwerveConstants.*;
@@ -51,16 +48,12 @@ public class RobotContainer implements Logged {
 
     private SendableChooser<Command> m_autoChooser;
 
-    private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
-
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
         m_decelerator.put(-1.0, 1.0);
         m_decelerator.put(1.0, 0.25);
-
-        m_swerve.initElastic();
 
         initAutoChooser();
         initElastic();
@@ -88,32 +81,17 @@ public class RobotContainer implements Logged {
                         () -> true
                 ));
 
-        driver.PS().onTrue(resetSwerveCommand());
-
-//        GenericEntry angleEntry = Shuffleboard.getTab("Swerve").add("Angle", 0).getEntry();
-//        GenericEntry poseEntry = Shuffleboard.getTab("Swerve").add("Pose", new Pose2d()).getEntry();
-
-        driver.triangle().onTrue(m_swerve.turnToAngleCommand(
-                () -> new Vector2D(
-                        deadband(-driver.getLeftY()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3)),
-                        deadband(-driver.getLeftX()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3)
-                        )
-                ),
-                () -> new Rotation2d(Math.PI)/*Rotation2d.fromDegrees(angleEntry.getDouble(0))*/));
+        driver.PS().onTrue(resetAngleCommand());
 
         driver.cross().onTrue(
-                new SequentialCommandGroup(
-                        m_swerve.driveToPoseCommand(new Pose2d(1, 0, new Rotation2d())).until(() -> deadband(-driver.getLeftY()) + deadband(-driver.getLeftX()) != 0),
-                        m_swerve.driveCommand(
-                                () -> new Vector2D(
-                                        deadband(-driver.getLeftY()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3)),
-                                        deadband(-driver.getLeftX()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3))),
-                                () -> deadband(-driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC,
-                                () -> true
-                        ).until(() -> deadband(-driver.getLeftY()) + deadband(-driver.getLeftX()) == 0)).repeatedly()
+                m_swerve.driveToPoseWithOverrideCommand(
+                        new Pose2d(1, 0, new Rotation2d()),
+                        () -> new Vector2D(
+                                deadband(-driver.getLeftY()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3)),
+                                deadband(-driver.getLeftX()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3))),
+                        () -> deadband(-driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC
+                )
         );
-
-        driver.square().onTrue(m_swerve.pathfindThenFollowPathCommand("testPath2"));
     }
 
 
@@ -135,9 +113,6 @@ public class RobotContainer implements Logged {
         m_autoChooser.addOption("Test Choreo Auto", new PathPlannerAuto("testChoreoAuto"));
         m_autoChooser.addOption("Test Trigger", new PathPlannerAuto("triggerTest"));
         m_autoChooser.addOption("Heart", new PathPlannerAuto("HeartAuto"));
-
-        // Another option that allows you to specify the default auto by its name\[]
-        // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
 
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
     }
@@ -165,12 +140,6 @@ public class RobotContainer implements Logged {
                         angleChooser::getSelected
                 ));
     }
-
-    @Annotations.Log.NT
-    public double getAcc() {
-        return Math.sqrt(Math.pow(m_accelerometer.getX(), 2) + Math.pow(m_accelerometer.getY(), 2)) * 9.8;
-    }
-
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.

@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -66,6 +67,15 @@ public final class Constants {
         public static final double MAX_VEL = 4.45;
         public static final double MAX_OMEGA_RAD_PER_SEC = 6; //11.5
 
+        public static final PathConstraints MAX_PATH_CONSTRAINTS = new PathConstraints(
+                MAX_VEL,
+                MAX_FORWARD_ACC,
+                MAX_OMEGA_RAD_PER_SEC,
+                MAX_OMEGA_RAD_PER_SEC, //TODO: find angular acc max value
+                12.0,
+                false
+        );
+
         private static final CANcoder FRONT_LEFT_ABS_ENCODER = new CANcoder(13);
         public static final CANcoder FRONT_RIGHT_ABS_ENCODER = new CANcoder(10);
         private static final CANcoder BACK_LEFT_ABS_ENCODER = new CANcoder(12);
@@ -77,7 +87,7 @@ public final class Constants {
 
         public static final NavX GYRO = new NavX(new Rotation3d());
 
-        public static Command resetSwerveCommand() {
+        public static Command resetAngleCommand() {
             return new InstantCommand(GYRO::resetIMU).ignoringDisable(true);
         }
 
