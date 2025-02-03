@@ -121,29 +121,27 @@ public class ModulesHolder implements Logged {
      */
     public Command setVelocitiesCommand(Supplier<Vector2D> translationalVel, DoubleSupplier omega) {
         return new ParallelCommandGroup(
-                m_frontLeft.setVelocityCommand(() -> computeModuleVelocity(m_frontLeft, translationalVel, omega)),
-                m_frontRight.setVelocityCommand(() -> computeModuleVelocity(m_frontRight, translationalVel, omega)),
-                m_backLeft.setVelocityCommand(() -> computeModuleVelocity(m_backLeft, translationalVel, omega)),
-                m_backRight.setVelocityCommand(() -> computeModuleVelocity(m_backRight, translationalVel, omega))
+                m_frontLeft.setVelocityCommand(
+                        translationalVel,
+                        omega,
+                        () -> calcVelocityRatioLimit(translationalVel.get(), omega.getAsDouble())
+                ),
+                m_frontRight.setVelocityCommand(
+                        translationalVel,
+                        omega,
+                        () -> calcVelocityRatioLimit(translationalVel.get(), omega.getAsDouble())
+                ),
+                m_backLeft.setVelocityCommand(
+                        translationalVel,
+                        omega,
+                        () -> calcVelocityRatioLimit(translationalVel.get(), omega.getAsDouble())
+                ),
+                m_backRight.setVelocityCommand(
+                        translationalVel,
+                        omega,
+                        () -> calcVelocityRatioLimit(translationalVel.get(), omega.getAsDouble())
+                )
         );
-    }
-
-    /**
-     * Computes the desired velocity for a module.
-     *
-     * @param module The swerve module.
-     * @param tVel   The desired translation velocity supplier.
-     * @param omega  The desired rotation rate supplier.
-     * @return The computed module velocity.
-     */
-    private Vector2D computeModuleVelocity(SwerveModule module, Supplier<Vector2D> tVel, DoubleSupplier omega) {
-        Vector2D translationVelocity = tVel.get();
-        double omegaRadPerSec = omega.getAsDouble();
-
-        // Since calcVelocityRatio is the same for all modules, compute it once
-        double velocityRatioLimit = calcVelocityRatioLimit(translationVelocity, omegaRadPerSec);
-
-        return module.getSigmaVelocity(translationVelocity, omegaRadPerSec, velocityRatioLimit);
     }
 
     public void setModulesStates(SwerveModuleState[] states) {
