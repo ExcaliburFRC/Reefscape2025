@@ -7,10 +7,12 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -21,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.excalib.additional_utilities.Elastic;
 import frc.excalib.control.imu.IMU;
 import frc.excalib.control.math.Vector2D;
+import frc.excalib.slam.mapper.AuroraClient;
 import frc.excalib.slam.mapper.Odometry;
 import monologue.Logged;
 import org.json.simple.parser.ParseException;
@@ -42,6 +45,8 @@ public class Swerve extends SubsystemBase implements Logged {
     private final ModulesHolder m_MODULES;
     private final IMU m_imu;
     private final Odometry m_odometry;
+    private final AuroraClient m_auroraClient;
+
     private final SwerveDriveKinematics m_swerveDriveKinematics;
 
     public final Field2d m_field = new Field2d();
@@ -69,12 +74,9 @@ public class Swerve extends SubsystemBase implements Logged {
                 initialPosition
         );
 
-        m_swerveDriveKinematics = new SwerveDriveKinematics(
-                FRONT_LEFT_TRANSLATION,
-                FRONT_RIGHT_TRANSLATION,
-                BACK_LEFT_TRANSLATION,
-                BACK_RIGHT_TRANSLATION
-        );
+        m_auroraClient = new AuroraClient(NetworkTableInstance.getDefault());
+
+        m_swerveDriveKinematics = m_MODULES.getSwerveDriveKinematics();
 
         initAutoBuilder();
         initElastic();
@@ -378,6 +380,17 @@ public class Swerve extends SubsystemBase implements Logged {
     @Override
     public void periodic() {
         updateOdometry();
+
+        Pose3d visionPose3d = m_auroraClient.getPose();
+        if (visionPose3d != null) {
+            Pose2d visionPose2d = new Pose2d(
+                    visionPose3d.getX(), visionPose3d.getY(),
+                    visionPose3d.getRotation().toRotation2d()
+            );
+
+            resetOdometry(visionPose2d);
+        }
+
         m_field.setRobotPose(getPose2D());
     }
 }

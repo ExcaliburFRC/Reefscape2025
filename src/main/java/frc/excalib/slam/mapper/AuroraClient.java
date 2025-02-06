@@ -5,32 +5,27 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.*;
 
 public class AuroraClient {
-    private final NetworkTableInstance instance;
-    private final NetworkTable table;
-    private final NetworkTableEntry xEntry, yEntry, zEntry, rollEntry, pitchEntry, yawEntry;
+    private final NetworkTableInstance m_instance;
+    private final NetworkTable m_table;
+    private final NetworkTableEntry m_xEntry, m_yEntry, m_zEntry, m_rollEntry, m_pitchEntry, m_yawEntry;
 
     public AuroraClient(NetworkTableInstance instance) {
-        this.instance = instance;
-        table = instance.getTable("Aurora/Localization");
-        xEntry = table.getEntry("X");
-        yEntry = table.getEntry("Y");
-        zEntry = table.getEntry("Z");
-        rollEntry = table.getEntry("Roll");
-        pitchEntry = table.getEntry("Pitch");
-        yawEntry = table.getEntry("Yaw");
+        m_instance = instance;
+        m_table = m_instance.getTable("Aurora/Localization");
+        m_xEntry = m_table.getEntry("X");
+        m_yEntry = m_table.getEntry("Y");
+        m_zEntry = m_table.getEntry("Z");
+        m_rollEntry = m_table.getEntry("Roll");
+        m_pitchEntry = m_table.getEntry("Pitch");
+        m_yawEntry = m_table.getEntry("Yaw");
     }
 
 
     public Pose3d getPose() {
         Pose3d pose = new Pose3d(
-                xEntry.getDouble(-1),
-                yEntry.getDouble(-1),
-                zEntry.getDouble(-1),
-                new Rotation3d(
-                        rollEntry.getDouble(100),
-                        pitchEntry.getDouble(100),
-                        yawEntry.getDouble(100)));
-
+                getX(), getY(), getZ(),
+                new Rotation3d(getRoll(), getPitch(), getYaw())
+        );
         if (pose.getX() == -1 ||
                 pose.getY() == -1 ||
                 pose.getZ() == -1 ||
@@ -40,27 +35,27 @@ public class AuroraClient {
         return pose;
     }
 
-    public double getX () {
-        if (xEntry==null) System.out.println("yehuda");
-        return xEntry.getDouble(-1);
+    public double getX() {
+        return m_xEntry.getDouble(-1);
     }
 
-    public double getY () {
-        return yEntry.getDouble(-1);
+    public double getY() {
+        return m_yEntry.getDouble(-1);
     }
 
-    public double getZ () {
-        return zEntry.getDouble(-1);
-    }
-    public double getRoll () {
-        return rollEntry.getDouble(100);
+    public double getZ() {
+        return m_zEntry.getDouble(-1);
     }
 
-    public double getPitch () {
-        return pitchEntry.getDouble(100);
+    public double getRoll() {
+        return m_rollEntry.getDouble(100);
     }
 
-    public double getYaw () {
-        return yawEntry.getDouble(100);
+    public double getPitch() {
+        return m_pitchEntry.getDouble(100);
+    }
+
+    public double getYaw() {
+        return m_yawEntry.getDouble(100);
     }
 }
