@@ -28,13 +28,14 @@ public class Constants {
 
 
     //Physical Proprieties
-    public static final Translation2d COM_SUPPLIER = new Translation2d(0, 0);
-    public static final double MASS = 0; // TODO
-    public static final double CENTER_OF_MASS_RADIUS = 0; // TODO
-    public static final double CENTER_OF_MASS_OFFSET_RAD = 0; // TODO
+    public static final double MASS = 1;
     public static final double MAX_OFFSET = 0; // TODO
     private static final double MIN_LIMIT = 0.0; // TODO
     private static final double MAX_LIMIT = 0.0; // TODO
+    public static final Translation2d COM_SUPPLIER = new Translation2d(0, 0);
+    public static final double ROTATIONS_TO_RAD = 2 * Math.PI;
+
+    //Limits
     public static final SoftLimit LIMIT = new SoftLimit(() -> MIN_LIMIT, () -> MAX_LIMIT);
 
     //Velocities and DutyCycles

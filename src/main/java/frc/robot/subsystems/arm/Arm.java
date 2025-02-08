@@ -2,6 +2,8 @@ package frc.robot.subsystems.arm;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.spark.SparkLowLevel;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -33,12 +35,15 @@ public class Arm extends SubsystemBase {
         m_motorGroup = new MotorGroup(m_firstRotationMotor, m_secondRotationMotor);
 
         m_angleEncoder = new CANcoder(ANGLE_CANCODER_ID);
-        m_radSupplier = () -> m_angleEncoder.getPosition().getValueAsDouble() * 2 * PI;
+        m_radSupplier = () -> m_angleEncoder.getPosition().getValueAsDouble() * ROTATIONS_TO_RAD;
         m_arm = new frc.excalib.mechanisms.Arm.Arm(
                 m_motorGroup,
                 m_radSupplier,
                 LIMIT,
-                () -> COM_SUPPLIER,
+                () -> new Translation2d(
+                        1,
+                        new Rotation2d(m_radSupplier.getAsDouble()
+                        )),
                 ANGLE_GAINS,
                 MASS
         );
