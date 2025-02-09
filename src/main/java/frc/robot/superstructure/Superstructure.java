@@ -1,7 +1,6 @@
 package frc.robot.superstructure;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -27,7 +26,7 @@ public class Superstructure {
     public Command setStateCommand(State state, BooleanSupplier activateWheels) {
         Command command = new SequentialCommandGroup(
                 m_elevator.setLengthCommand(state.m_elevatorHeight),
-                m_arm.changeSetPointCommand(state.m_placerAngle),
+                m_arm.changeSetpointCommand(state.m_placerAngle),
                 new WaitUntilCommand(this.toleranceTrigger.and(activateWheels)),
                 m_gripper.manualCommand(state.m_innerWheelsVoltage, state.m_outWheelsVoltage)
         );

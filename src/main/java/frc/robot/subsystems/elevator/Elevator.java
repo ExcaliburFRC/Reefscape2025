@@ -17,7 +17,7 @@ public class Elevator extends SubsystemBase {
     private final TalonFXMotor m_firstMotor, m_secondMotor;
     private final MotorGroup m_motorGroup;
     private final LinearExtension m_extensionMechanism;
-    private double lengthSetPoint;
+    private double lengthSetpoint;
     public final Trigger toleranceTrigger;
 
     public Elevator() {
@@ -25,7 +25,6 @@ public class Elevator extends SubsystemBase {
         m_secondMotor = new TalonFXMotor(SECOND_MOTOR_ID);
         m_secondMotor.setInverted(REVERSE);
         m_motorGroup = new MotorGroup(m_firstMotor, m_secondMotor);
-
 
         m_extensionMechanism = new LinearExtension(
                 m_motorGroup,
@@ -35,10 +34,9 @@ public class Elevator extends SubsystemBase {
                 UPWARD_CONSTRAINTS,
                 DOWNWARD_CONSTRAINTS
         );
+
         toleranceTrigger = new Trigger(
-                () -> Math.abs(
-                        this.lengthSetPoint - m_extensionMechanism.logPosition()
-                ) < TOLERANCE
+                () -> Math.abs(this.lengthSetpoint - m_extensionMechanism.logPosition()) < TOLERANCE
         );
         this.setDefaultCommand(goToDefaultLengthCommand());
     }
@@ -50,16 +48,16 @@ public class Elevator extends SubsystemBase {
     public Command goToDefaultLengthCommand() {
         return m_extensionMechanism.extendCommand(
                 this::getSetpoint,
-                this);
+                this
+        );
     }
 
     public Command setLengthCommand(double length) {
         return new InstantCommand(
-                () -> this.lengthSetPoint = length, this);
+                () -> this.lengthSetpoint = length, this);
     }
 
     private double getSetpoint() {
-        return lengthSetPoint;
-
+        return lengthSetpoint;
     }
 }
