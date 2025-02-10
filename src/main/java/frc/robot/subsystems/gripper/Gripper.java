@@ -13,20 +13,27 @@ import frc.excalib.mechanisms.Mechanism;
 import static frc.robot.subsystems.arm.Constants.*;
 
 public class Gripper extends SubsystemBase {
-    private final SparkMaxMotor m_scoringMotor, m_intakeMotor;
-    private final Mechanism m_scoringWheel, m_intakeWheel;
-    private final DigitalInput m_beambrake = new DigitalInput(BEAMBREAK_CHANNEL);//TODO
-    public final Trigger hasCoralTrigger = new Trigger(m_beambrake::get);
+    private final SparkMaxMotor m_outerMotor, m_innerMotor;
+    private final Mechanism m_outerWheel, m_innerWheel;
+    private final DigitalInput m_beambrake = new DigitalInput(BEAMBREAK_CHANNEL);
+    public final Trigger m_coralTrigger = new Trigger(m_beambrake::get);
 
     public Gripper() {
-        m_scoringMotor = new SparkMaxMotor(SHOOTER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
-        m_intakeMotor = new SparkMaxMotor(INTAKE_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
-        m_scoringWheel = new Mechanism(m_scoringMotor);
-        m_intakeWheel = new Mechanism(m_intakeMotor);
+        m_outerMotor = new SparkMaxMotor(SHOOTER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
+        m_innerMotor = new SparkMaxMotor(INTAKE_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
+        m_outerWheel = new Mechanism(m_outerMotor);
+        m_innerWheel = new Mechanism(m_innerMotor);
 
     }
 
-    public Command manualCommand(double scoringVoltage, double intakeVoltage) {
-        return new ParallelCommandGroup(new RunCommand(() -> m_intakeWheel.setVoltage(intakeVoltage)), new RunCommand(() -> m_scoringWheel.setVoltage(scoringVoltage)));
+    public Command manualCommand(double innerVoltage, double outerVoltage) {
+        return new ParallelCommandGroup(
+                new RunCommand(
+                        () -> m_innerWheel.setVoltage(outerVoltage)
+                ),
+                new RunCommand(
+                        () -> m_outerWheel.setVoltage(innerVoltage)
+                )
+        );
     }
 }

@@ -1,19 +1,12 @@
 package frc.robot.subsystems.arm;
 
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.revrobotics.spark.SparkLowLevel;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.excalib.control.motor.controllers.MotorGroup;
-import frc.excalib.control.motor.controllers.SparkMaxMotor;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
-import frc.excalib.mechanisms.Mechanism;
 
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 import static frc.robot.subsystems.arm.Constants.*;
 import static java.lang.Math.*;
@@ -35,40 +28,42 @@ public class Arm extends SubsystemBase {
         m_motorGroup = new MotorGroup(m_firstRotationMotor, m_secondRotationMotor);
 
         m_angleEncoder = new CANcoder(ANGLE_CANCODER_ID);
-        m_radSupplier = () -> m_angleEncoder.getPosition().getValueAsDouble() * ROTATIONS_TO_RAD;
+        m_radSupplier = () -> m_angleEncoder.getPosition().getValueAsDouble() * 2 * PI;
         m_arm = new frc.excalib.mechanisms.Arm.Arm(
                 m_motorGroup,
                 m_radSupplier,
                 LIMIT,
-                () -> new Translation2d(
-                        1,
-                        new Rotation2d(m_radSupplier.getAsDouble()
-                        )),
+                () -> COM_SUPPLIER,
                 ANGLE_GAINS,
                 MASS
         );
         this.toleranceTrigger = new Trigger(() -> this.isAtTolerance);
-        this.setDefaultCommand(goToSetPointAngleCommand());
+        this.setDefaultCommand(goToSetpointAngleCommand());
     }
 
     /**
-     * @param armDC
-     * @return
+     * @param output
+     * @return a command that will run the arm with the given DoubleSupplier
      */
-    public Command manualCommand(DoubleSupplier armDC) {
-        return m_arm.manualCommand(armDC, this);
+    public Command manualCommand(DoubleSupplier output) {
+        return m_arm.manualCommand(output, this);
     }
 
-    public Command changeSetPointCommand(double setPoint) {
+    public Command changeSetpointCommand(double setpoint) {
         return new InstantCommand(() -> {
-            this.setpointAngle = setPoint;
+            this.setpointAngle = setpoint;
         });
     }
 
-    public Command goToSetPointAngleCommand() {
-        return m_arm.anglePositionControlCommand(() -> this.setpointAngle, (isAtTolerance) -> {
-            this.isAtTolerance = isAtTolerance;
-        }, MAX_OFFSET, this);
+    public Command goToSetpointAngleCommand() {
+        return m_arm.anglePositionControlCommand(
+                () -> this.setpointAngle,
+                (isAtTolerance) -> {
+                    this.isAtTolerance = isAtTolerance;
+                },
+                MAX_OFFSET,
+                this
+        );
     }
 }
 
