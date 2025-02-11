@@ -1,7 +1,6 @@
 package frc.excalib.control.math;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.excalib.control.MathUtils;
 
 /**
  * A class representing a Vector in two dimensions;
