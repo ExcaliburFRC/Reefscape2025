@@ -14,16 +14,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.excalib.slam.mapper.AuroraClient;
 import monologue.Monologue;
 
-/**
- * The methods in this class are called automatically corresponding to each mode, as described in
- * the TimedRobot documentation. If you change the name of this class or the package after creating
- * this project, you must also update the Main.java file in the project.
- */
 public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
     private final RobotContainer m_robotContainer;
-    private AuroraClient auroraClient;
+    private AuroraClient m_auroraClient ;
 
     /**
      * This function is run when the robot is first started up and should be used for any
@@ -31,8 +26,8 @@ public class Robot extends TimedRobot {
      */
     public Robot() {
 
-        // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-        // autonomous chooser on the dashboard.
+        // Instantiate our RobotContainer.
+        // This will perform all our button bindings, and put our autonomous chooser on the dashboard.
         m_robotContainer = new RobotContainer();
     }
 
@@ -43,8 +38,7 @@ public class Robot extends TimedRobot {
         Monologue.setupMonologue(m_robotContainer, "Robot", fileOnly, lazyLogging);
 
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
-        auroraClient = new AuroraClient(NetworkTableInstance.getDefault());
-//    addPeriodic(m_robotContainer.updateOdometry, 0.01);
+        m_auroraClient = new AuroraClient(NetworkTableInstance.getDefault());
     }
 
     /**
@@ -57,12 +51,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         Monologue.setFileOnly(DriverStation.isFMSAttached());
-        // This method needs to be called periodically, or no logging annotations will process properly.
         Monologue.updateAll();
-        // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-        // commands, running already-scheduled commands, removing finished or interrupted commands,
-        // and running subsystem periodic() methods.  This must be called from the robot's periodic
-        // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
     }
 
@@ -99,10 +88,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        // This makes sure that the autonomous stops running when
-        // teleop starts running. If you want the autonomous to
-        // continue until interrupted by another command, remove
-        // this line or comment it out.
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
