@@ -62,7 +62,7 @@ public class RobotContainer implements Logged {
                         () -> true
                 ));
 
-        m_driver.PS().onTrue(resetAngleCommand());
+        m_driver.PS().onTrue(m_swerve.resetAngleCommand());
 
         m_driver.cross().onTrue(
                 m_swerve.driveToPoseWithOverrideCommand(

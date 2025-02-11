@@ -14,7 +14,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.excalib.control.gains.Gains;
+import frc.excalib.control.imu.IMU;
 import frc.excalib.control.imu.NavX;
+import frc.excalib.control.imu.Pigeon;
 import frc.excalib.control.motor.controllers.SparkMaxMotor;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
 import frc.excalib.swerve.ModulesHolder;
@@ -33,15 +35,18 @@ import static com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless;
  */
 public final class Constants {
     public static class SwerveConstants {
-        public static final int FRONT_LEFT_DRIVE_ID = 4;
-        public static final int BACK_LEFT_DRIVE_ID = 3;
-        public static final int FRONT_RIGHT_DRIVE_ID = 1;
-        public static final int BACK_RIGHT_DRIVE_ID = 2;
+        public static final int FRONT_LEFT_DRIVE_ID = 4; //TODO
+        public static final int BACK_LEFT_DRIVE_ID = 3; //TODO
+        public static final int FRONT_RIGHT_DRIVE_ID = 1; //TODO
+        public static final int BACK_RIGHT_DRIVE_ID = 2; //TODO
 
-        public static final int FRONT_LEFT_ROTATION_ID = 13;
-        public static final int BACK_LEFT_ROTATION_ID = 12;
-        public static final int FRONT_RIGHT_ROTATION_ID = 10;
-        public static final int BACK_RIGHT_ROTATION_ID = 11;
+        public static final int FRONT_LEFT_ROTATION_ID = 13; //TODO
+        public static final int BACK_LEFT_ROTATION_ID = 12; //TODO
+        public static final int FRONT_RIGHT_ROTATION_ID = 10; //TODO
+        public static final int BACK_RIGHT_ROTATION_ID = 11; //TODO
+
+        public static final int GYRO_ID = 0; //TODO
+        public static final String SWERVE_CANBUS = "CTRESwerve";
 
         private static final double PID_TOLERANCE = 0.2;
 
@@ -49,27 +54,27 @@ public final class Constants {
         public static final Translation2d FRONT_LEFT_TRANSLATION =
                 new Translation2d(
                         TRACK_WIDTH / 2, TRACK_WIDTH / 2
-                );
+                ); //TODO
         public static final Translation2d FRONT_RIGHT_TRANSLATION =
                 new Translation2d(
                         TRACK_WIDTH / 2, -TRACK_WIDTH / 2
-                );
+                ); //TODO
         public static final Translation2d BACK_LEFT_TRANSLATION =
                 new Translation2d(
                         -TRACK_WIDTH / 2, TRACK_WIDTH / 2
-                );
+                ); //TODO
         public static final Translation2d BACK_RIGHT_TRANSLATION =
                 new Translation2d(
                         -TRACK_WIDTH / 2, -TRACK_WIDTH / 2
-                );
+                ); //TODO
 
-        public static final double MAX_MODULE_VEL = 4.45;
-        public static final double MAX_FRONT_ACC = 2;
-        public static final double MAX_SIDE_ACC = 6;
-        public static final double MAX_SKID_ACC = 60;
-        public static final double MAX_FORWARD_ACC = 9;
-        public static final double MAX_VEL = 4.45;
-        public static final double MAX_OMEGA_RAD_PER_SEC = 6;
+        public static final double MAX_MODULE_VEL = 4.45; //TODO
+        public static final double MAX_FRONT_ACC = 2; //TODO
+        public static final double MAX_SIDE_ACC = 6; //TODO
+        public static final double MAX_SKID_ACC = 60; //TODO
+        public static final double MAX_FORWARD_ACC = 9; //TODO
+        public static final double MAX_VEL = 4.45; //TODO
+        public static final double MAX_OMEGA_RAD_PER_SEC = 6; //TODO
 
         public static final PathConstraints MAX_PATH_CONSTRAINTS = new PathConstraints(
                 MAX_VEL,
@@ -80,33 +85,30 @@ public final class Constants {
                 false
         );
 
-        private static final CANcoder FRONT_LEFT_ABS_ENCODER = new CANcoder(13);
-        public static final CANcoder FRONT_RIGHT_ABS_ENCODER = new CANcoder(10);
-        private static final CANcoder BACK_LEFT_ABS_ENCODER = new CANcoder(12);
-        private static final CANcoder BACK_RIGHT_ABS_ENCODER = new CANcoder(11);
+        private static final CANcoder FRONT_LEFT_ABS_ENCODER = new CANcoder(13); //TODO
+        public static final CANcoder FRONT_RIGHT_ABS_ENCODER = new CANcoder(10); //TODO
+        private static final CANcoder BACK_LEFT_ABS_ENCODER = new CANcoder(12); //TODO
+        private static final CANcoder BACK_RIGHT_ABS_ENCODER = new CANcoder(11); //TODO
+
         private static final double VELOCITY_CONVERSION_FACTOR = Units.inchesToMeters(4) * Math.PI / 6.12;
         private static final double POSITION_CONVERSION_FACTOR = Units.inchesToMeters(4) * Math.PI / 6.12;
         private static final double ROTATION_VELOCITY_CONVERSION_FACTOR = (2 * Math.PI) / (21.4285714);
-        public static final PIDConstants ANGLE_PID_CONSTANTS = new PIDConstants(1.4, 0.0, 0.0);
 
-        public static final NavX GYRO = new NavX(new Rotation3d());
+        public static final PIDConstants TRANSLATION_PID_CONSTANTS = new PIDConstants(5.0, 0.0, 1.0); //TODO
+        public static final PIDConstants ANGLE_PID_CONSTANTS = new PIDConstants(1.4, 0.0, 0.0); //TODO
+
+        private static final IMU GYRO = new Pigeon(GYRO_ID, SWERVE_CANBUS, new Rotation3d()); //TODO: sort offset
 
         public static final double DEADBAND_VALUE = 0.15;
 
-        public static Command resetAngleCommand() {
-            return new InstantCommand(GYRO::resetIMU).ignoringDisable(true);
-        }
-
-
         public static Swerve configureSwerve(Pose2d initialPose) {
-
             return new Swerve(
                     new ModulesHolder(
                             new SwerveModule(
-                                    new TalonFXMotor(FRONT_LEFT_DRIVE_ID),
+                                    new TalonFXMotor(FRONT_LEFT_DRIVE_ID, SWERVE_CANBUS),
                                     new SparkMaxMotor(FRONT_LEFT_ROTATION_ID, kBrushless),
-                                    new Gains(6, 0, 0, 0.10993, 2.6738, 0.20684, 0),
-                                    new Gains(0, 0, 0, 0.0092262, 2.22144, 0.61204, 0),
+                                    new Gains(6, 0, 0, 0.10993, 2.6738, 0.20684, 0), //TODO
+                                    new Gains(0, 0, 0, 0.0092262, 2.22144, 0.61204, 0), //TODO
                                     PID_TOLERANCE,
                                     FRONT_LEFT_TRANSLATION,
                                     () -> FRONT_LEFT_ABS_ENCODER.getAbsolutePosition().getValueAsDouble() * 2 * Math.PI,
@@ -116,10 +118,10 @@ public final class Constants {
                                     ROTATION_VELOCITY_CONVERSION_FACTOR
                             ),
                             new SwerveModule(
-                                    new TalonFXMotor(FRONT_RIGHT_DRIVE_ID),
+                                    new TalonFXMotor(FRONT_RIGHT_DRIVE_ID, SWERVE_CANBUS),
                                     new SparkMaxMotor(FRONT_RIGHT_ROTATION_ID, kBrushless),
-                                    new Gains(6, 0, 0, 0.10993, 2.6738, 0.20684, 0),
-                                    new Gains(0, 0, 0, 0.0092262, 2.22144, 0.61204, 0),
+                                    new Gains(6, 0, 0, 0.10993, 2.6738, 0.20684, 0), //TODO
+                                    new Gains(0, 0, 0, 0.0092262, 2.22144, 0.61204, 0), //TODO
                                     PID_TOLERANCE,
                                     FRONT_RIGHT_TRANSLATION,
                                     () -> FRONT_RIGHT_ABS_ENCODER.getAbsolutePosition().getValueAsDouble() * 2 * Math.PI,
@@ -129,10 +131,10 @@ public final class Constants {
                                     ROTATION_VELOCITY_CONVERSION_FACTOR
                             ),
                             new SwerveModule(
-                                    new TalonFXMotor(BACK_LEFT_DRIVE_ID),
+                                    new TalonFXMotor(BACK_LEFT_DRIVE_ID, SWERVE_CANBUS),
                                     new SparkMaxMotor(BACK_LEFT_ROTATION_ID, kBrushless),
-                                    new Gains(6, 0, 0, 0.10993, 2.6738, 0.20684, 0),
-                                    new Gains(0, 0, 0, 0.0092262, 2.22144, 0.61204, 0),
+                                    new Gains(6, 0, 0, 0.10993, 2.6738, 0.20684, 0), //TODO
+                                    new Gains(0, 0, 0, 0.0092262, 2.22144, 0.61204, 0), //TODO
                                     PID_TOLERANCE,
                                     BACK_LEFT_TRANSLATION,
                                     () -> BACK_LEFT_ABS_ENCODER.getAbsolutePosition().getValueAsDouble() * 2 * Math.PI,
@@ -142,10 +144,10 @@ public final class Constants {
                                     ROTATION_VELOCITY_CONVERSION_FACTOR
                             ),
                             new SwerveModule(
-                                    new TalonFXMotor(BACK_RIGHT_DRIVE_ID),
+                                    new TalonFXMotor(BACK_RIGHT_DRIVE_ID, SWERVE_CANBUS),
                                     new SparkMaxMotor(BACK_RIGHT_ROTATION_ID, kBrushless),
-                                    new Gains(6, 0, 0, 0.10993, 2.6738, 0.20684, 0),
-                                    new Gains(0, 0, 0, 0.0092262, 2.22144, 0.61204, 0),
+                                    new Gains(6, 0, 0, 0.10993, 2.6738, 0.20684, 0), //TODO
+                                    new Gains(0, 0, 0, 0.0092262, 2.22144, 0.61204, 0), //TODO
                                     PID_TOLERANCE,
                                     BACK_RIGHT_TRANSLATION,
                                     () -> BACK_RIGHT_ABS_ENCODER.getAbsolutePosition().getValueAsDouble() * 2 * Math.PI,
