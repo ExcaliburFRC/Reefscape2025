@@ -36,17 +36,17 @@ public class Pigeon extends Pigeon2 implements IMU {
 
     @Override
     public double getAccX() {
-        return super.getAccelerationX().getValueAsDouble();
+        return super.getAccelerationX().getValueAsDouble() * 9.8421;
     }
 
     @Override
     public double getAccY() {
-        return super.getAccelerationY().getValueAsDouble();
+        return super.getAccelerationY().getValueAsDouble() * 9.8421;
     }
 
     @Override
     public double getAccZ() {
-        return super.getAccelerationZ().getValueAsDouble();
+        return super.getAccelerationZ().getValueAsDouble() * 9.8421;
     }
 
     @Override
