@@ -262,74 +262,6 @@
                 }
               }
             ]
-          },
-          {
-            "title": "Drive To Pose",
-            "x": 256.0,
-            "y": 384.0,
-            "width": 256.0,
-            "height": 384.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "x",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/Shuffleboard/Swerve/OTFGx",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "y",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/Shuffleboard/Swerve/OTFGy",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "angle",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/Shuffleboard/Swerve/OTFGAngle",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "Drive To Pose",
-                "x": 768.0,
-                "y": 512.0,
-                "width": 384.0,
-                "height": 128.0,
-                "type": "Command",
-                "properties": {
-                  "topic": "/Shuffleboard/Swerve/Drive To Pose",
-                  "period": 0.06,
-                  "show_type": true
-                }
-              }
-            ]
           }
         ],
         "containers": [
@@ -370,10 +302,10 @@
           },
           {
             "title": "Field",
-            "x": 640.0,
-            "y": 384.0,
-            "width": 1024.0,
-            "height": 512.0,
+            "x": 768.0,
+            "y": 256.0,
+            "width": 768.0,
+            "height": 384.0,
             "type": "Field",
             "properties": {
               "topic": "/SmartDashboard/Field",
@@ -389,17 +321,27 @@
             }
           },
           {
-            "title": "X",
-            "x": 1024.0,
-            "y": 256.0,
-            "width": 128.0,
+            "title": "swerve info",
+            "x": 1152.0,
+            "y": 0.0,
+            "width": 256.0,
             "height": 128.0,
-            "type": "Text Display",
+            "type": "Subsystem",
             "properties": {
-              "topic": "/Shuffleboard/Swerve/X",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
+              "topic": "/SmartDashboard/swerve info",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Command Scheduler",
+            "x": 512.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 384.0,
+            "type": "Scheduler",
+            "properties": {
+              "topic": "/SmartDashboard/Command Scheduler",
+              "period": 0.06
             }
           }
         ]

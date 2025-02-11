@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -45,26 +46,39 @@ public final class Constants {
         private static final double PID_TOLERANCE = 0.2;
 
         public static final double TRACK_WIDTH = 0.51; // m
-        public static final Translation2d FRONT_LEFT_TRANSLATION = new Translation2d(
-                TRACK_WIDTH / 2, TRACK_WIDTH / 2
-        );
-        public static final Translation2d FRONT_RIGHT_TRANSLATION = new Translation2d(
-                TRACK_WIDTH / 2, -TRACK_WIDTH / 2
-        );
-        public static final Translation2d BACK_LEFT_TRANSLATION = new Translation2d(
-                -TRACK_WIDTH / 2, TRACK_WIDTH / 2
-        );
-        public static final Translation2d BACK_RIGHT_TRANSLATION = new Translation2d(
-                -TRACK_WIDTH / 2, -TRACK_WIDTH / 2
-        );
+        public static final Translation2d FRONT_LEFT_TRANSLATION =
+                new Translation2d(
+                        TRACK_WIDTH / 2, TRACK_WIDTH / 2
+                );
+        public static final Translation2d FRONT_RIGHT_TRANSLATION =
+                new Translation2d(
+                        TRACK_WIDTH / 2, -TRACK_WIDTH / 2
+                );
+        public static final Translation2d BACK_LEFT_TRANSLATION =
+                new Translation2d(
+                        -TRACK_WIDTH / 2, TRACK_WIDTH / 2
+                );
+        public static final Translation2d BACK_RIGHT_TRANSLATION =
+                new Translation2d(
+                        -TRACK_WIDTH / 2, -TRACK_WIDTH / 2
+                );
 
         public static final double MAX_MODULE_VEL = 4.45;
         public static final double MAX_FRONT_ACC = 2;
         public static final double MAX_SIDE_ACC = 6;
-        public static final double MAX_SKID_ACC = 6;
+        public static final double MAX_SKID_ACC = 60;
         public static final double MAX_FORWARD_ACC = 9;
         public static final double MAX_VEL = 4.45;
-        public static final double MAX_OMEGA_RAD_PER_SEC = 6; //11.5
+        public static final double MAX_OMEGA_RAD_PER_SEC = 6;
+
+        public static final PathConstraints MAX_PATH_CONSTRAINTS = new PathConstraints(
+                MAX_VEL,
+                MAX_FORWARD_ACC,
+                MAX_OMEGA_RAD_PER_SEC,
+                MAX_OMEGA_RAD_PER_SEC, //TODO: find angular acc max value
+                12.0,
+                false
+        );
 
         private static final CANcoder FRONT_LEFT_ABS_ENCODER = new CANcoder(13);
         public static final CANcoder FRONT_RIGHT_ABS_ENCODER = new CANcoder(10);
@@ -73,11 +87,13 @@ public final class Constants {
         private static final double VELOCITY_CONVERSION_FACTOR = Units.inchesToMeters(4) * Math.PI / 6.12;
         private static final double POSITION_CONVERSION_FACTOR = Units.inchesToMeters(4) * Math.PI / 6.12;
         private static final double ROTATION_VELOCITY_CONVERSION_FACTOR = (2 * Math.PI) / (21.4285714);
-        public static final PIDConstants ANGLE_PID_CONSTANTS =  new PIDConstants(1.4, 0.0, 0.0);
+        public static final PIDConstants ANGLE_PID_CONSTANTS = new PIDConstants(1.4, 0.0, 0.0);
 
         public static final NavX GYRO = new NavX(new Rotation3d());
 
-        public static Command resetSwerveCommand() {
+        public static final double DEADBAND_VALUE = 0.15;
+
+        public static Command resetAngleCommand() {
             return new InstantCommand(GYRO::resetIMU).ignoringDisable(true);
         }
 

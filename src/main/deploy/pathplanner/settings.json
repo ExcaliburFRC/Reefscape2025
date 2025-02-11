@@ -2,8 +2,13 @@
   "robotWidth": 0.67,
   "robotLength": 0.67,
   "holonomicMode": true,
-  "pathFolders": [],
-  "autoFolders": [],
+  "pathFolders": [
+    "CompPaths",
+    "test and calibration paths"
+  ],
+  "autoFolders": [
+    "test and calibration autos"
+  ],
   "defaultMaxVel": 4.45,
   "defaultMaxAccel": 9.0,
   "defaultMaxAngVel": 658.9,

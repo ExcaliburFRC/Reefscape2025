@@ -7,35 +7,32 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.events.EventTrigger;
+import com.pathplanner.lib.events.PointTowardsZoneTrigger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
 import monologue.Logged;
 
 import static frc.robot.Constants.SwerveConstants.*;
 
-/**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
- */
 public class RobotContainer implements Logged {
+    private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
     // The robot's subsystems and commands are defined here...
 
     private final Swerve m_swerve = configureSwerve(new Pose2d());
 
-    private final CommandPS5Controller driver = new CommandPS5Controller(0);
+    private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
 
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
 
@@ -43,14 +40,9 @@ public class RobotContainer implements Logged {
 
     private SendableChooser<Command> m_autoChooser;
 
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
     public RobotContainer() {
         m_decelerator.put(-1.0, 1.0);
         m_decelerator.put(1.0, 0.25);
-
-        m_swerve.initElastic();
 
         initAutoChooser();
         initElastic();
@@ -59,41 +51,41 @@ public class RobotContainer implements Logged {
         configureBindings();
     }
 
-    /**
-     * Use this method to define your trigger->command mappings. Triggers can be created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-     * predicate, or via the named factories in {@link
-     * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-     * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-     * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-     * joysticks}.
-     */
+
     private void configureBindings() {
         m_swerve.setDefaultCommand(
                 m_swerve.driveCommand(
                         () -> new Vector2D(
-                                deadband(-driver.getLeftY()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3)),
-                                deadband(-driver.getLeftX()) * MAX_VEL * m_decelerator.get(driver.getRawAxis(3))),
-                        () -> deadband(-driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC,
-                        () -> true)
+                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
+                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
+                        () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC,
+                        () -> true
+                ));
+
+        m_driver.PS().onTrue(resetAngleCommand());
+
+        m_driver.cross().onTrue(
+                m_swerve.driveToPoseWithOverrideCommand(
+                        new Pose2d(1, 0, new Rotation2d()),
+                        m_driver.R2(),
+                        () -> new Vector2D(
+                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
+                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
+                        () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC
+                )
         );
-
-        driver.PS().onTrue(resetSwerveCommand());
-
-//        GenericEntry angleEntry = Shuffleboard.getTab("Swerve").add("Angle", 0).getEntry();
-//        GenericEntry poseEntry = Shuffleboard.getTab("Swerve").add("Pose", new Pose2d()).getEntry();
-
-        driver.triangle().onTrue(m_swerve.turnToAngleCommand(() -> new Rotation2d(Math.PI)/*Rotation2d.fromDegrees(angleEntry.getDouble(0))*/));
-
-        driver.cross().onTrue(m_swerve.driveToPoseCommand(new Pose2d(1, 1, new Rotation2d(Math.PI / 2))));
     }
 
+
     public double deadband(double value) {
-        return Math.abs(value) < 0.1 ? 0 : value;
+        return Math.abs(value) < DEADBAND_VALUE ? 0 : value;
     }
 
     private void initAutoChooser() {
         NamedCommands.registerCommand("print command", new PrintCommand("pathplanner"));
+
+        new EventTrigger("testTrigger").whileTrue(Commands.run(() -> System.out.println("Trigger Test")));
+        new PointTowardsZoneTrigger("PointTowardsZoneTrigger").whileTrue(Commands.run(() -> System.out.println("Trigger Test2")));
 
         // Build an auto chooser. This will use Commands.none() as the default option.
         m_autoChooser = AutoBuilder.buildAutoChooser();
@@ -101,9 +93,8 @@ public class RobotContainer implements Logged {
         m_autoChooser.addOption("Test Auto 2", new PathPlannerAuto("testAuto2"));
         m_autoChooser.addOption("Calibration Auto", new PathPlannerAuto("calibrationAuto"));
         m_autoChooser.addOption("Test Choreo Auto", new PathPlannerAuto("testChoreoAuto"));
-
-        // Another option that allows you to specify the default auto by its name
-        // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
+        m_autoChooser.addOption("Test Trigger", new PathPlannerAuto("triggerTest"));
+        m_autoChooser.addOption("Heart", new PathPlannerAuto("HeartAuto"));
 
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
     }
@@ -113,14 +104,30 @@ public class RobotContainer implements Logged {
         SmartDashboard.putData("PDH", PDH);
 
         SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance());
+
+        ShuffleboardTab swerveTab = Shuffleboard.getTab("Swerve");
+        SendableChooser<Rotation2d> angleChooser = new SendableChooser<>();
+
+        // angle chooser options
+        angleChooser.setDefaultOption("0", new Rotation2d());
+        angleChooser.addOption("90", new Rotation2d(Math.PI / 2));
+        angleChooser.addOption("180", new Rotation2d(Math.PI));
+        angleChooser.addOption("270", new Rotation2d(3 * Math.PI / 2));
+
+        swerveTab.add("Angle Chooser", angleChooser);
+
+        swerveTab.add("Turn To Angle",
+                m_swerve.turnToAngleCommand(
+                        () -> new Vector2D(
+                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
+                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)
+                                )
+                        ),
+                        angleChooser::getSelected
+                ));
     }
 
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
     public Command getAutonomousCommand() {
         return m_autoChooser.getSelected();
     }
