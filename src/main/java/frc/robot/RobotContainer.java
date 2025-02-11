@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
+import frc.robot.superstructure.State;
+import frc.robot.superstructure.Superstructure;
 import monologue.Logged;
 
 import static frc.robot.Constants.SwerveConstants.*;

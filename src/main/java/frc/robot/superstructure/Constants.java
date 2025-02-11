@@ -40,4 +40,10 @@ public class Constants {
     public static final double ALGAE3_PLACER_ANGLE = 0;
     public static final double ALGAE3_INNER_WHEELS_VOLTAGE = 0;
     public static final double ALGAE3_OUT_WHEELS_VOLTAGE = 0;
+
+    // Default Constants
+    public static final double DEFAULT_ELEVATOR_HEIGHT = 0;
+    public static final double DEFAULT_PLACER_ANGLE = 0;
+    public static final double DEFAULT_INNER_WHEELS_VOLTAGE = 0;
+    public static final double DEFAULT_OUT_WHEELS_VOLTAGE = 0;
 }
