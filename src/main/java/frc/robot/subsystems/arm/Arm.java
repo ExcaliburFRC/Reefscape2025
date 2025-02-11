@@ -1,8 +1,12 @@
 package frc.robot.subsystems.arm;
 
 import com.ctre.phoenix6.hardware.CANcoder;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.excalib.control.limits.ContinuousSoftLimit;
+import frc.excalib.control.limits.SoftLimit;
 import frc.excalib.control.motor.controllers.MotorGroup;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
 
@@ -12,33 +16,40 @@ import static frc.robot.subsystems.arm.Constants.*;
 import static java.lang.Math.*;
 
 public class Arm extends SubsystemBase {
-    private final TalonFXMotor m_firstRotationMotor, m_secondRotationMotor;
+    private final TalonFXMotor m_firstMotor, m_secondMotor;
     private final MotorGroup m_motorGroup;
     private final frc.excalib.mechanisms.Arm.Arm m_arm;
-    private final CANcoder m_angleEncoder;
-    private final DoubleSupplier m_radSupplier;
+    private final CANcoder m_encoder;
+    public final DoubleSupplier m_radSupplier;
     private boolean isAtTolerance = false;
-    public final Trigger toleranceTrigger;
+    public final Trigger m_toleranceTrigger;
     private double setpointAngle = 0;
 
     public Arm() {
-        m_firstRotationMotor = new TalonFXMotor(ANGLE_MOTOR_FIRST_ID);
-        m_secondRotationMotor = new TalonFXMotor(ANGLE_MOTOR_SECOND_ID);
+        m_firstMotor = new TalonFXMotor(FIRST_MOTOR_ID);
+        m_secondMotor = new TalonFXMotor(SECOND_MOTOR_ID);
 
-        m_motorGroup = new MotorGroup(m_firstRotationMotor, m_secondRotationMotor);
+        m_motorGroup = new MotorGroup(m_firstMotor, m_secondMotor);
+        m_motorGroup.setVelocityConversionFactor(RPM_TO_RAD_PER_SEC);
 
-        m_angleEncoder = new CANcoder(ANGLE_CANCODER_ID);
-        m_radSupplier = () -> m_angleEncoder.getPosition().getValueAsDouble() * 2 * PI;
+        m_encoder = new CANcoder(CAN_CODER_ID);
+        m_radSupplier = () -> m_encoder.getPosition().getValueAsDouble() * ROTATIONS_TO_RAD;
+
         m_arm = new frc.excalib.mechanisms.Arm.Arm(
                 m_motorGroup,
                 m_radSupplier,
-                LIMIT,
-                () -> COM_SUPPLIER,
+                new SoftLimit(() -> -MAX_VEL_RAD_PER_SEC, () -> MAX_RAD_LIMIT),
+                () -> new Translation2d(1, new Rotation2d(m_radSupplier.getAsDouble())),
                 ANGLE_GAINS,
                 MASS
         );
-        this.toleranceTrigger = new Trigger(() -> this.isAtTolerance);
-        this.setDefaultCommand(goToSetpointAngleCommand());
+        elevatorHeightSupplier = () -> 0;
+        this.m_toleranceTrigger = new Trigger(() -> this.isAtTolerance);
+        this.m_softLimit = new ContinuousSoftLimit(() ->
+                elevatorHeightSupplier.getAsDouble() > ELEVATOR_HEIGHT_LIMIT_TRIGGER ?
+                        EXTENDED_MIN_RAD_LIMIT :
+                        CLOSED_MIN_RAD_LIMIT, () -> MAX_RAD_LIMIT);
+        this.setDefaultCommand(defaultCommand());
     }
 
     /**
@@ -55,15 +66,20 @@ public class Arm extends SubsystemBase {
         });
     }
 
-    public Command goToSetpointAngleCommand() {
+    private Command defaultCommand() {
         return m_arm.anglePositionControlCommand(
-                () -> this.setpointAngle,
+                () -> m_softLimit.getSetPoint(m_arm.logPosition(), this.setpointAngle),
                 (isAtTolerance) -> {
                     this.isAtTolerance = isAtTolerance;
                 },
-                MAX_OFFSET,
+                TOLERANCE,
                 this
         );
     }
+
+    public void setElevatorHeightSupplier(DoubleSupplier elevatorHeightSupplier) {
+        this.elevatorHeightSupplier = elevatorHeightSupplier;
+    }
+
 }
 

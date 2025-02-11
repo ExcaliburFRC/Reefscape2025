@@ -18,29 +18,22 @@ public class LinearExtension extends Mechanism {
     private final PIDController m_PIDController;
     private final Gains m_gains;
 
-    private final TrapezoidProfile.Constraints m_upwardseConstraints, m_downwardsConstraints;
-
-    public LinearExtension(Motor motor, DoubleSupplier positionSupplier, DoubleSupplier angleSupplier, Gains gains, TrapezoidProfile.Constraints upwardseConstraints, TrapezoidProfile.Constraints downwardseConstraints) {
+    private final TrapezoidProfile.Constraints m_constraints;
+    public LinearExtension(Motor motor, DoubleSupplier positionSupplier, DoubleSupplier angleSupplier, Gains gains, TrapezoidProfile.Constraints constraints) {
         super(motor);
 
         m_positionSupplier = positionSupplier;
         m_angleSupplier = angleSupplier;
         m_gains = gains;
         m_PIDController = new PIDController(gains.kp, gains.ki, gains.kd);
-        m_upwardseConstraints = upwardseConstraints;
-        m_downwardsConstraints = downwardseConstraints;
+        m_constraints = constraints;
 
 
     }
 
     public Command extendCommand(DoubleSupplier lengthSetPoint, SubsystemBase... requirements) {
-        Supplier<TrapezoidProfile.Constraints> constraintsSupplier =
-                () -> (
-                        lengthSetPoint.getAsDouble() > m_positionSupplier.getAsDouble() ?
-                                m_upwardseConstraints :
-                                m_downwardsConstraints);
         return new RunCommand(() -> {
-            TrapezoidProfile profile = new TrapezoidProfile(constraintsSupplier.get());
+            TrapezoidProfile profile = new TrapezoidProfile(m_constraints);
             TrapezoidProfile.State state =
                     profile.calculate(
                             0.02,
