@@ -32,7 +32,6 @@ public class Mechanism implements Logged {
     public Mechanism(Motor motor) {
         m_motor = motor;
         m_DEFAULT_IDLE_STATE = m_motor.getIdleState();
-
     }
 
     /**
@@ -53,18 +52,19 @@ public class Mechanism implements Logged {
      * @param outputSupplier the dynamic setpoint for the mechanism (voltage)
      * @return a command which controls the mechanism manually
      */
-    public Command manualCommand(DoubleSupplier outputSupplier) {
+    public Command manualCommand(DoubleSupplier outputSupplier, SubsystemBase... requirements) {
         return Commands.runEnd(
                 () -> setOutput(outputSupplier.getAsDouble()),
-                () -> setOutput(0)
+                () -> setOutput(0),
+                requirements
         );
     }
 
     /**
      * @return an instant command to stop the motor
      */
-    public Command stopMotorCommand() {
-        return new InstantCommand(() -> setOutput(0));
+    public Command stopMotorCommand(SubsystemBase... requirements) {
+        return new InstantCommand(() -> setOutput(0), requirements);
     }
 
     /**
@@ -99,10 +99,11 @@ public class Mechanism implements Logged {
     /**
      * @return a command which puts the mechanism on coast mode
      */
-    public Command coastCommand() {
+    public Command coastCommand(SubsystemBase... requirements) {
         return new StartEndCommand(
                 () -> m_motor.setIdleState(IdleState.COAST),
-                () -> m_motor.setIdleState(m_DEFAULT_IDLE_STATE)
+                () -> m_motor.setIdleState(m_DEFAULT_IDLE_STATE),
+                requirements
         ).ignoringDisable(true);
     }
 

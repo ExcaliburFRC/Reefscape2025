@@ -2,7 +2,7 @@ package frc.excalib.swerve;
 
 import frc.excalib.control.math.Vector2D;
 
-import static frc.excalib.control.MathUtils.minSize;
+import static frc.excalib.control.math.MathUtils.minSize;
 import static frc.robot.Constants.SwerveConstants.*;
 
 public class SwerveAccUtils {

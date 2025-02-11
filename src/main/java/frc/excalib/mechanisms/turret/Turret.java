@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.excalib.control.gains.Gains;
 import frc.excalib.control.limits.ContinuousSoftLimit;
 import frc.excalib.control.motor.controllers.Motor;
@@ -47,8 +48,8 @@ public final class Turret extends Mechanism {
      * @param wantedPosition a Rotation2d dynamic setpoint
      * @return a Command that moves the turret tho the given setpoint
      */
-    public Command setPositionCommand(Supplier<Rotation2d> wantedPosition){
-        return new RunCommand(()-> setPosition(wantedPosition.get()));
+    public Command setPositionCommand(Supplier<Rotation2d> wantedPosition, SubsystemBase... requirements){
+        return new RunCommand(()-> setPosition(wantedPosition.get()), requirements);
     }
 
     /**
@@ -72,7 +73,7 @@ public final class Turret extends Mechanism {
     /**
      * @return an Instant Command to stop the turret
      */
-    public Command stopTurret() {
-        return new InstantCommand(super.m_motor::stopMotor);
+    public Command stopTurret(SubsystemBase... requirements) {
+        return new InstantCommand(super.m_motor::stopMotor, requirements);
     }
 }

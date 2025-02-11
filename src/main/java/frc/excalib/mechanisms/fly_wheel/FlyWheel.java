@@ -6,7 +6,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.excalib.control.gains.Gains;
 import frc.excalib.control.motor.controllers.Motor;
 import frc.excalib.mechanisms.Mechanism;
@@ -25,10 +25,10 @@ public class FlyWheel extends Mechanism {
     private final SimpleMotorFeedforward m_FF_CONTROLLER;
 
     /**
-     * @param motor the FlyWheel Motor
+     * @param motor           the FlyWheel Motor
      * @param maxAcceleration the max acceleration of the FlyWheel
-     * @param maxJerk the max jerk of the FlyWheel
-     * @param gains the FF and PID gains
+     * @param maxJerk         the max jerk of the FlyWheel
+     * @param gains           the FF and PID gains
      */
     public FlyWheel(Motor motor, double maxAcceleration, double maxJerk, Gains gains) {
         super(motor);
@@ -40,22 +40,23 @@ public class FlyWheel extends Mechanism {
     }
 
     /**
-     *
      * @param velocitySupplier a dynamic velocity setpoint.
      * @return a command that controls the FlyWheels velocity with high precision
      */
-    public Command smartVelocityCommand(DoubleSupplier velocitySupplier) {
-        return new TrapezoidProfileCommand(
-                new TrapezoidProfile(new TrapezoidProfile.Constraints(maxAcceleration, maxJerk)),
-                state -> {
+    public Command smartVelocityCommand(DoubleSupplier velocitySupplier, SubsystemBase... requirements) {
+        return new RunCommand(
+                () -> {
+                    TrapezoidProfile profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(maxAcceleration, maxJerk));
+                    TrapezoidProfile.State state = profile.calculate(
+                            0.02,
+                            new TrapezoidProfile.State(super.m_motor.getMotorVelocity(), getAcceleration()),
+                            new TrapezoidProfile.State(velocitySupplier.getAsDouble(), 0));
                     double ff = m_gains.ks * Math.signum(state.position) +
-                            1 / 20.0 * state.position +
+                            m_gains.kv * state.position +
                             m_gains.ka * state.velocity;
                     double pid = m_pidController.calculate(super.m_motor.getMotorVelocity(), state.position);
-                    setVoltage(0.2);
-                },
-                () -> new TrapezoidProfile.State(velocitySupplier.getAsDouble(), 0),
-                () -> new TrapezoidProfile.State(super.m_motor.getMotorVelocity(), getAcceleration()));
+                    setVoltage(pid + ff);
+                });
     }
 
     /**
@@ -72,8 +73,8 @@ public class FlyWheel extends Mechanism {
      * @param velocity the dynamic velocity setpoint
      * @return a command which controls the FlyWheels velocity
      */
-    public Command setDynamicVelocityCommand(DoubleSupplier velocity) {
-        return new RunCommand(() -> setDynamicVelocity(velocity.getAsDouble()));
+    public Command setDynamicVelocityCommand(DoubleSupplier velocity, SubsystemBase... requirements) {
+        return new RunCommand(() -> setDynamicVelocity(velocity.getAsDouble()), requirements);
     }
 
     /**
