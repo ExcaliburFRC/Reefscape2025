@@ -4,9 +4,9 @@ import frc.excalib.control.gains.Gains;
 
 public class Constants {
     //IDS and Channels
-    public static final int FIRST_MOTOR_ID = 0;//TODO
-    public static final int SECOND_MOTOR_ID = 0;//TODO
-    public static final int CAN_CODER_ID = 0;
+    public static final int FIRST_MOTOR_ID = 30;
+    public static final int SECOND_MOTOR_ID = 31;
+    public static final int CAN_CODER_ID = 32;
 
     //Gains for PID and FF
     private static final int kp = 0; // TODO

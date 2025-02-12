@@ -35,17 +35,17 @@ import static com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless;
  */
 public final class Constants {
     public static class SwerveConstants {
-        public static final int FRONT_LEFT_DRIVE_ID = 4; //TODO
-        public static final int BACK_LEFT_DRIVE_ID = 3; //TODO
-        public static final int FRONT_RIGHT_DRIVE_ID = 1; //TODO
-        public static final int BACK_RIGHT_DRIVE_ID = 2; //TODO
+        public static final int FRONT_LEFT_DRIVE_ID = 11;
+        public static final int FRONT_RIGHT_DRIVE_ID = 13;
+        public static final int BACK_RIGHT_DRIVE_ID = 15;
+        public static final int BACK_LEFT_DRIVE_ID = 17;
 
-        public static final int FRONT_LEFT_ROTATION_ID = 13; //TODO
-        public static final int BACK_LEFT_ROTATION_ID = 12; //TODO
-        public static final int FRONT_RIGHT_ROTATION_ID = 10; //TODO
-        public static final int BACK_RIGHT_ROTATION_ID = 11; //TODO
+        public static final int FRONT_LEFT_ROTATION_ID = 10;
+        public static final int FRONT_RIGHT_ROTATION_ID = 11;
+        public static final int BACK_RIGHT_ROTATION_ID = 12;
+        public static final int BACK_LEFT_ROTATION_ID = 13;
 
-        public static final int GYRO_ID = 0; //TODO
+        public static final int GYRO_ID = 50;
         public static final String SWERVE_CANBUS = "CTRESwerve";
 
         private static final double PID_TOLERANCE = 0.2;
@@ -85,10 +85,10 @@ public final class Constants {
                 false
         );
 
-        private static final CANcoder FRONT_LEFT_ABS_ENCODER = new CANcoder(13); //TODO
-        public static final CANcoder FRONT_RIGHT_ABS_ENCODER = new CANcoder(10); //TODO
-        private static final CANcoder BACK_LEFT_ABS_ENCODER = new CANcoder(12); //TODO
-        private static final CANcoder BACK_RIGHT_ABS_ENCODER = new CANcoder(11); //TODO
+        private static final CANcoder FRONT_LEFT_ABS_ENCODER = new CANcoder(10);
+        public static final CANcoder FRONT_RIGHT_ABS_ENCODER = new CANcoder(12);
+        private static final CANcoder BACK_RIGHT_ABS_ENCODER = new CANcoder(14);
+        private static final CANcoder BACK_LEFT_ABS_ENCODER = new CANcoder(16);
 
         private static final double VELOCITY_CONVERSION_FACTOR = Units.inchesToMeters(4) * Math.PI / 6.12;
         private static final double POSITION_CONVERSION_FACTOR = Units.inchesToMeters(4) * Math.PI / 6.12;
