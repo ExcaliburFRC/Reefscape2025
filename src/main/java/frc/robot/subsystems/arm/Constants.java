@@ -9,25 +9,26 @@ public class Constants {
     public static final int CAN_CODER_ID = 32;
 
     //Gains for PID and FF
-    private static final int kp = 0; // TODO
-    private static final int ki = 0; // TODO
-    private static final int kd = 0; // TODO
-    private static final int ka = 0; // TODO
-    private static final int kv = 0; // TODO
-    private static final int kg = 0; // TODO
-    private static final int ks = 0; // TODO
+    private static final double kp = 7; // TODO
+    private static final double ki = 0; // TODO
+    private static final double kd = 0; // TODO
+    private static final double ka = 0; // TODO
+    private static final double kv = 1.6548; // TODO
+    private static final double kg = 0.3675; // TODO
+    private static final double ks = 0; // TODO
     public static final Gains ANGLE_GAINS = new Gains(kp, ki, kd, ks, kv, ka, kg);
 
 
     //Physical Proprieties
-    public static final double MASS = 1; //TODO
+    public static final double MASS = 1;
     public static final double TOLERANCE = 0; // TODO
     public static final double ROTATIONS_TO_RAD = 2 * Math.PI;
-    private static final double CONVERSION = 0;
-    public static final double RPM_TO_RAD_PER_SEC = CONVERSION * ROTATIONS_TO_RAD / 60.0;
+    private static final double CONVERSION = 55.56;
+    public static final double POSITION_CONVERSION_FACTOR = 1 / 7.5498750273499192965754627065202;
+    public static final double RPS_TO_RAD_PER_SEC = 1 / 7.5498750273499192965754627065202;
     public static double ELEVATOR_HEIGHT_LIMIT_TRIGGER = 0.36;
     public static double MAX_RAD_LIMIT = 0;
     public static double EXTENDED_MIN_RAD_LIMIT = 0;
     public static double CLOSED_MIN_RAD_LIMIT = 0;
-    public static double MAX_VEL_RAD_PER_SEC = 0;
+    public static double MAX_VOL_RAD_PER_SEC = 3.5;
 }

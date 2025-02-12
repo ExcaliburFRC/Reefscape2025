@@ -1,20 +1,29 @@
 package frc.robot.subsystems.arm;
 
 import com.ctre.phoenix6.hardware.CANcoder;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.excalib.control.limits.ContinuousSoftLimit;
 import frc.excalib.control.limits.SoftLimit;
+import frc.excalib.control.math.physics.Mass;
 import frc.excalib.control.motor.controllers.MotorGroup;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
+import frc.excalib.control.motor.motor_specs.IdleState;
+import monologue.Logged;
 
 import java.util.function.DoubleSupplier;
 
+import static frc.excalib.control.motor.motor_specs.DirectionState.FORWARD;
+import static frc.excalib.control.motor.motor_specs.DirectionState.REVERSE;
+import static frc.excalib.control.motor.motor_specs.IdleState.BRAKE;
 import static frc.robot.subsystems.arm.Constants.*;
+import static monologue.Annotations.*;
 
-public class Arm extends SubsystemBase {
+public class Arm extends SubsystemBase implements Logged {
     private final TalonFXMotor m_firstMotor, m_secondMotor;
     private final MotorGroup m_motorGroup;
     private final frc.excalib.mechanisms.Arm.Arm m_arm;
@@ -26,23 +35,34 @@ public class Arm extends SubsystemBase {
     private DoubleSupplier elevatorHeightSupplier;
     private ContinuousSoftLimit m_softLimit;
 
+    private final ShuffleboardTab m_superstructureTab = Shuffleboard.getTab("Superstructure");
+    private final GenericEntry m_armAngleEntry = m_superstructureTab.add("Arm Angle", -1).getEntry();
+    private final GenericEntry m_armAtSetpointEntry = m_superstructureTab.add("Arm At Setpoint", false).getEntry();
+    private final GenericEntry m_armSetpoint = m_superstructureTab.add("Arm Setpoint", -1).getEntry();
+
     public Arm() {
         m_firstMotor = new TalonFXMotor(FIRST_MOTOR_ID);
+        m_firstMotor.setIdleState(BRAKE);
+        m_firstMotor.setInverted(REVERSE);
         m_secondMotor = new TalonFXMotor(SECOND_MOTOR_ID);
+        m_secondMotor.setIdleState(BRAKE);
+        m_secondMotor.setInverted(FORWARD);
 
         m_motorGroup = new MotorGroup(m_firstMotor, m_secondMotor);
-        m_motorGroup.setVelocityConversionFactor(RPM_TO_RAD_PER_SEC);
+        m_motorGroup.setVelocityConversionFactor(RPS_TO_RAD_PER_SEC);
+        m_motorGroup.setPositionConversionFactor(POSITION_CONVERSION_FACTOR);
 
         m_encoder = new CANcoder(CAN_CODER_ID);
         m_radSupplier = () -> m_encoder.getPosition().getValueAsDouble() * ROTATIONS_TO_RAD;
 
+        m_motorGroup.setMotorPosition(m_radSupplier.getAsDouble());
+
         m_arm = new frc.excalib.mechanisms.Arm.Arm(
                 m_motorGroup,
                 m_radSupplier,
-                new SoftLimit(() -> -MAX_VEL_RAD_PER_SEC, () -> MAX_RAD_LIMIT),
-                () -> new Translation2d(1, new Rotation2d(m_radSupplier.getAsDouble())),
+                new SoftLimit(() -> -MAX_VOL_RAD_PER_SEC, () -> MAX_VOL_RAD_PER_SEC),
                 ANGLE_GAINS,
-                MASS
+                new Mass(() -> Math.cos(m_radSupplier.getAsDouble()), () -> Math.sin(m_radSupplier.getAsDouble()), MASS)
         );
         elevatorHeightSupplier = () -> 0;
         this.m_toleranceTrigger = new Trigger(() -> this.isAtTolerance);
@@ -50,6 +70,9 @@ public class Arm extends SubsystemBase {
                 elevatorHeightSupplier.getAsDouble() > ELEVATOR_HEIGHT_LIMIT_TRIGGER ?
                         EXTENDED_MIN_RAD_LIMIT :
                         CLOSED_MIN_RAD_LIMIT, () -> MAX_RAD_LIMIT);
+
+        m_firstMotor.setCurrentLimit(0, 25);
+        m_secondMotor.setCurrentLimit(0, 25);
         this.setDefaultCommand(defaultCommand());
     }
 
@@ -62,14 +85,16 @@ public class Arm extends SubsystemBase {
     }
 
     public Command changeSetpointCommand(double setpoint) {
-        return new InstantCommand(() -> {
+        return new RunCommand(() -> {
             this.setpointAngle = setpoint;
-        });
+            System.out.println("wated setpoint " +setpoint + " current setpoint "+ this.setpointAngle);
+        }).until(()->this.setpointAngle == setpoint);
     }
 
     private Command defaultCommand() {
         return m_arm.anglePositionControlCommand(
-                () -> m_softLimit.getSetPoint(m_arm.logPosition(), this.setpointAngle),
+//                () -> m_softLimit.getSetPoint(m_arm.logPosition(), this.setpointAngle),
+                () -> this.setpointAngle,
                 (isAtTolerance) -> {
                     this.isAtTolerance = isAtTolerance;
                 },
@@ -82,5 +107,38 @@ public class Arm extends SubsystemBase {
         this.elevatorHeightSupplier = elevatorHeightSupplier;
     }
 
+    @Log.NT
+    public double getAngle() {
+        return m_radSupplier.getAsDouble();
+    }
+
+    @Log.NT
+    public boolean atSetpoint() {
+        return m_toleranceTrigger.getAsBoolean();
+    }
+
+    @Log.NT
+    public double getSetpoint() {
+        return setpointAngle;
+    }
+
+    @Override
+    public void periodic() {
+        m_armAngleEntry.setDouble(getAngle());
+        m_armSetpoint.setDouble(getSetpoint());
+        m_armAtSetpointEntry.setBoolean(atSetpoint());
+    }
+
+    public Command coastCommand() {
+        return new StartEndCommand(
+                () -> m_motorGroup.setIdleState(IdleState.COAST),
+                () -> m_motorGroup.setIdleState(BRAKE)
+        ).ignoringDisable(true).withName("Coast Command");
+    }
+
+    public Command sysIdCommand(boolean dynamic, SysIdRoutine.Direction direction) {
+        if (dynamic) return m_arm.sysIdDynamic(direction, this, m_arm.ANGLE_SUPPLIER, false);
+        return m_arm.sysIdQuasistatic(direction, this, m_arm.ANGLE_SUPPLIER, false);
+    }
 }
 
