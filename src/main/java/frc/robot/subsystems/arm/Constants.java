@@ -20,12 +20,12 @@ public class Constants {
 
 
     //Physical Proprieties
-    public static final double MASS = 1;
+    public static final double MASS = 1; //TODO
     public static final double TOLERANCE = 0; // TODO
     public static final double ROTATIONS_TO_RAD = 2 * Math.PI;
     private static final double CONVERSION = 0;
     public static final double RPM_TO_RAD_PER_SEC = CONVERSION * ROTATIONS_TO_RAD / 60.0;
-    public static double ELEVATOR_HEIGHT_LIMIT_TRIGGER = 0;
+    public static double ELEVATOR_HEIGHT_LIMIT_TRIGGER = 0.36;
     public static double MAX_RAD_LIMIT = 0;
     public static double EXTENDED_MIN_RAD_LIMIT = 0;
     public static double CLOSED_MIN_RAD_LIMIT = 0;

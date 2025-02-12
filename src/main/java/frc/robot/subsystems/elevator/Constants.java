@@ -11,7 +11,7 @@ public class Constants {
     //Measurements
     static final double ELEVATOR_ANGLE = Math.PI/2;
     static final double TOLERANCE = 0;//TODO
-    static final double ROTATIONS_TO_METERS = 0;
+    static final double ROTATIONS_TO_METERS = 0; //TODO
 
     //Gains and Constrains
     private static final double kp = 0;
@@ -23,11 +23,11 @@ public class Constants {
     private static final double kg = 0;
     static final Gains ELEVATOR_GAINS = new Gains(kp, ki,kd, ks, kv, ka, kg);
 
-    static final double MIN_HEIGHT = 0; //TODO
-    static final double MAX_HEIGHT = 0; //TODO
-    static final double LOWER_MAX_HEIGHT = 0;//TODO
-    static final double UPPER_MIN_HEIGHT = 0;//TODO
-    static final double ARM_COLLISION_RAD = 0;//TODO
+    static final double MIN_HEIGHT = 0;
+    static final double MAX_HEIGHT = 0.7;
+    static final double LOWER_MAX_HEIGHT = 0.2;
+    static final double UPPER_MIN_HEIGHT = 0.46;
+    static final double ARM_COLLISION_RAD = 0; //TODO: get gripper defualt angle
 
 
     static final TrapezoidProfile.Constraints CONSTRAINTS =

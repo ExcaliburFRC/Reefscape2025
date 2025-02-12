@@ -11,11 +11,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.excalib.control.gains.Gains;
 import frc.excalib.control.imu.IMU;
-import frc.excalib.control.imu.NavX;
 import frc.excalib.control.imu.Pigeon;
 import frc.excalib.control.motor.controllers.SparkMaxMotor;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
@@ -48,25 +45,25 @@ public final class Constants {
         public static final int GYRO_ID = 50;
         public static final String SWERVE_CANBUS = "CTRESwerve";
 
-        private static final double PID_TOLERANCE = 0.2;
+        private static final double PID_TOLERANCE = 0.2; //TODO
 
-        public static final double TRACK_WIDTH = 0.51; // m
+        public static final double TRACK_WIDTH = 0.57; // m
         public static final Translation2d FRONT_LEFT_TRANSLATION =
                 new Translation2d(
                         TRACK_WIDTH / 2, TRACK_WIDTH / 2
-                ); //TODO
+                );
         public static final Translation2d FRONT_RIGHT_TRANSLATION =
                 new Translation2d(
                         TRACK_WIDTH / 2, -TRACK_WIDTH / 2
-                ); //TODO
+                );
         public static final Translation2d BACK_LEFT_TRANSLATION =
                 new Translation2d(
                         -TRACK_WIDTH / 2, TRACK_WIDTH / 2
-                ); //TODO
+                );
         public static final Translation2d BACK_RIGHT_TRANSLATION =
                 new Translation2d(
                         -TRACK_WIDTH / 2, -TRACK_WIDTH / 2
-                ); //TODO
+                );
 
         public static final double MAX_MODULE_VEL = 4.45; //TODO
         public static final double MAX_FRONT_ACC = 2; //TODO
@@ -75,12 +72,13 @@ public final class Constants {
         public static final double MAX_FORWARD_ACC = 9; //TODO
         public static final double MAX_VEL = 4.45; //TODO
         public static final double MAX_OMEGA_RAD_PER_SEC = 6; //TODO
+        public static final double MAX_OMEGA_RAD_PER_SEC_SQUARE = 6; //TODO
 
         public static final PathConstraints MAX_PATH_CONSTRAINTS = new PathConstraints(
                 MAX_VEL,
                 MAX_FORWARD_ACC,
                 MAX_OMEGA_RAD_PER_SEC,
-                MAX_OMEGA_RAD_PER_SEC, //TODO: find angular acc max value
+                MAX_OMEGA_RAD_PER_SEC_SQUARE,
                 12.0,
                 false
         );
