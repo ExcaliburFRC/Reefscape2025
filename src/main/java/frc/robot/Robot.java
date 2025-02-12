@@ -38,7 +38,6 @@ public class Robot extends TimedRobot {
         Monologue.setupMonologue(m_robotContainer, "Robot", fileOnly, lazyLogging);
 
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
-        m_auroraClient = new AuroraClient(NetworkTableInstance.getDefault());
     }
 
     /**
