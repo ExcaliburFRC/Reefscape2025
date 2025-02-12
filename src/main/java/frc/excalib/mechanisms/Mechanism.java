@@ -1,9 +1,6 @@
 package frc.excalib.mechanisms;
 
-import edu.wpi.first.units.measure.MutAngle;
-import edu.wpi.first.units.measure.MutAngularVelocity;
-import edu.wpi.first.units.measure.MutVoltage;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.excalib.control.gains.SysidConfig;
@@ -23,7 +20,9 @@ public class Mechanism implements Logged {
     protected final Motor m_motor;
     protected final MutVoltage m_appliedVoltage = Volts.mutable(0);
     protected final MutAngle m_radians = Radians.mutable(0);
+    protected final MutDistance m_meter = Meters.mutable(0);
     protected final MutAngularVelocity m_velocity = RadiansPerSecond.mutable(0);
+    protected final MutLinearVelocity m_Linearvelocity = MetersPerSecond.mutable(0);
     private final IdleState m_DEFAULT_IDLE_STATE;
 
     /**
@@ -83,9 +82,9 @@ public class Mechanism implements Logged {
         return m_motor.getMotorPosition();
     }
 
-    private SysIdRoutine getSysIdRoutine(SubsystemBase subsystem, DoubleSupplier sensorInput) {
+    private SysIdRoutine getAngularSysIdRoutine(SubsystemBase subsystem, DoubleSupplier sensorInput, SysidConfig config) {
         return new SysIdRoutine(
-                new SysidConfig(0.5, 7, 20),
+                config,
                 new SysIdRoutine.Mechanism(
                         (Voltage volts) -> m_motor.setVoltage(volts.in(Volts)),
                         log -> log.motor("motor")
@@ -93,6 +92,19 @@ public class Mechanism implements Logged {
                                         m_motor.getVoltage(), Volts))
                                 .angularPosition(m_radians.mut_replace(sensorInput.getAsDouble(), Radians))
                                 .angularVelocity(m_velocity.mut_replace(logVelocity(), RadiansPerSecond)),
+                        subsystem));
+    }
+
+    private SysIdRoutine getLinearSysIdRoutine(SubsystemBase subsystem, DoubleSupplier sensorInput, SysidConfig config) {
+        return new SysIdRoutine(
+                config,
+                new SysIdRoutine.Mechanism(
+                        (Voltage volts) -> m_motor.setVoltage(volts.in(Volts)),
+                        log -> log.motor("motor")
+                                .voltage(m_appliedVoltage.mut_replace(
+                                        m_motor.getVoltage(), Volts))
+                                .linearPosition(m_meter.mut_replace(sensorInput.getAsDouble(), Meters))
+                                .linearVelocity(m_Linearvelocity.mut_replace(logVelocity(), MetersPerSecond)),
                         subsystem));
     }
 
@@ -107,11 +119,13 @@ public class Mechanism implements Logged {
         ).ignoringDisable(true);
     }
 
-    public Command sysIdQuasistatic(SysIdRoutine.Direction direction, SubsystemBase subsystem, DoubleSupplier positionSupplier) {
-        return getSysIdRoutine(subsystem, positionSupplier).quasistatic(direction);
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction, SubsystemBase subsystem, DoubleSupplier positionSupplier, boolean isLinear) {
+        if (isLinear) return getLinearSysIdRoutine(subsystem, positionSupplier, new SysidConfig(0.5,4,15)).quasistatic(direction);
+        return getAngularSysIdRoutine(subsystem, positionSupplier, new SysidConfig(0.5,4,15)).quasistatic(direction);
     }
 
-    public Command sysIdDynamic(SysIdRoutine.Direction direction, SubsystemBase subsystem, DoubleSupplier positionSupplier) {
-        return getSysIdRoutine(subsystem, positionSupplier).dynamic(direction);
+    public Command sysIdDynamic(SysIdRoutine.Direction direction, SubsystemBase subsystem, DoubleSupplier positionSupplier, boolean isLinear) {
+        if (isLinear) return getLinearSysIdRoutine(subsystem, positionSupplier, new SysidConfig(0.5,4,15)).dynamic(direction);
+        return getAngularSysIdRoutine(subsystem, positionSupplier, new SysidConfig(0.5,4,15)).dynamic(direction).withName("quadForward");
     }
 }

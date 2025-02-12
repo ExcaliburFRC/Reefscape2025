@@ -47,5 +47,4 @@ public class Mass {
                 other.mass + this.mass
         );
     }
-
 }

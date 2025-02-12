@@ -26,6 +26,7 @@ public class Elevator extends SubsystemBase {
 
     public Elevator() {
         m_firstMotor = new TalonFXMotor(FIRST_MOTOR_ID);
+        m_firstMotor.setInverted(REVERSE);
         m_secondMotor = new TalonFXMotor(SECOND_MOTOR_ID);
 
         m_motorGroup = new MotorGroup(m_firstMotor, m_secondMotor);

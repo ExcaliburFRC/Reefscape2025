@@ -38,5 +38,5 @@ public interface Motor {
 
     void setCurrentLimit(int stallLimit, int freeLimit);
 
-
+    void setMotorPosition(double position);
 }

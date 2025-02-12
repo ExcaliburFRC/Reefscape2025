@@ -49,7 +49,7 @@ public class LinearExtension extends Mechanism {
                             m_gains.kg * Math.sin(m_angleSupplier.getAsDouble());
             setVoltage(ff + pidValue);
 
-        });
+        }, requirements);
     }
 
     public double logVoltage() {

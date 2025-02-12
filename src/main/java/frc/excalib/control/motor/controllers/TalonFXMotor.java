@@ -86,7 +86,6 @@ public class TalonFXMotor extends TalonFX implements Motor {
     @Override
     public void setPositionConversionFactor(double conversionFactor) {
         m_positionConversionFactor = conversionFactor;
-
     }
 
     @Override
@@ -102,6 +101,11 @@ public class TalonFXMotor extends TalonFX implements Motor {
         limitConfigs.StatorCurrentLimitEnable = true;
 
         talonFXConfigurator.apply(limitConfigs);
+    }
+
+    @Override
+    public void setMotorPosition(double position) {
+        super.setPosition(position / m_positionConversionFactor);
     }
 
     @Override

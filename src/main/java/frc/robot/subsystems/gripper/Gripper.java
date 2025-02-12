@@ -11,10 +11,15 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.excalib.control.motor.controllers.FlexMotor;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
 import frc.excalib.mechanisms.Mechanism;
+import monologue.Annotations;
+import monologue.Logged;
+
+import java.util.function.DoubleSupplier;
 
 import static frc.robot.subsystems.gripper.Constants.*;
+import static monologue.Annotations.*;
 
-public class Gripper extends SubsystemBase {
+public class Gripper extends SubsystemBase implements Logged {
     private final FlexMotor m_outerMotor;
     private final TalonFXMotor m_innerMotor;
     private final Mechanism m_outerWheel, m_innerWheel;
@@ -29,14 +34,21 @@ public class Gripper extends SubsystemBase {
 
     }
 
-    public Command manualCommand(double innerVoltage, double outerVoltage) {
-        return new ParallelCommandGroup(
+    public Command manualCommand(DoubleSupplier innerVoltage, DoubleSupplier outerVoltage) {
+        Command manualCommand = new ParallelCommandGroup(
                 new RunCommand(
-                        () -> m_innerWheel.setVoltage(innerVoltage)
+                        () -> m_innerWheel.setVoltage(innerVoltage.getAsDouble())
                 ),
                 new RunCommand(
-                        () -> m_outerWheel.setVoltage(outerVoltage)
+                        () -> m_outerWheel.setVoltage(outerVoltage.getAsDouble())
                 )
         );
+        manualCommand.addRequirements(this);
+        return manualCommand;
+    }
+
+    @Log.NT
+    public boolean hasCoral(){
+        return m_coralTrigger.getAsBoolean();
     }
 }

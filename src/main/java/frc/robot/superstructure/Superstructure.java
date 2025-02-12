@@ -1,5 +1,9 @@
 package frc.robot.superstructure;
 
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -39,8 +43,8 @@ public class Superstructure {
                         this.toleranceTrigger.and(activateWheels)
                 ),
                 m_gripper.manualCommand(
-                        state.m_innerWheelsVoltage,
-                        state.m_outWheelsVoltage
+                        () -> state.m_innerWheelsVoltage,
+                        () -> state.m_outWheelsVoltage
                 )
         );
         return setStateCommand;
@@ -49,8 +53,8 @@ public class Superstructure {
     public Command intakeCommand(BooleanSupplier atPose) {
         return new SequentialCommandGroup(
                 m_gripper.manualCommand(
-                        State.DEFAULT.m_innerWheelsVoltage,
-                        State.DEFAULT.m_outWheelsVoltage
+                        () -> State.DEFAULT.m_innerWheelsVoltage,
+                        () -> State.DEFAULT.m_outWheelsVoltage
                 ).withTimeout(0.1),
                 setStateCommand(State.INTAKE, atPose).until(
                         m_gripper.m_coralTrigger
@@ -86,9 +90,8 @@ public class Superstructure {
         }
         State state = (level == 2) ? State.ALGAE2 : State.ALGAE3;
         return new SequentialCommandGroup(
-                m_gripper.manualCommand(state.m_innerWheelsVoltage, state.m_outWheelsVoltage),
+                m_gripper.manualCommand(() -> state.m_innerWheelsVoltage, () -> state.m_outWheelsVoltage),
                 setStateCommand(state, () -> true)
         ).until(atPose);
     }
-
 }

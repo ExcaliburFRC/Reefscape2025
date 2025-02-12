@@ -136,4 +136,11 @@ public class MotorGroup implements Motor {
             motor.setCurrentLimit(stallLimit, freeLimit);
         }
     }
+
+    @Override
+    public void setMotorPosition(double position) {
+        for (Motor motor : m_motors) {
+            motor.setMotorPosition(position);
+        }
+    }
 }

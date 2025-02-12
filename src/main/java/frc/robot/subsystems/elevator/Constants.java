@@ -11,9 +11,9 @@ public class Constants {
     //Measurements
     static final double ELEVATOR_ANGLE = Math.PI/2;
     static final double TOLERANCE = 0;//TODO
-    static final double ROTATIONS_TO_METERS = 0; //TODO
+    static final double ROTATIONS_TO_METERS = 8.506941 * 0.11;
 
-    //Gains and Constrains
+    //Gains and Constrains TODO
     private static final double kp = 0;
     private static final double ki = 0;
     private static final double kd = 0;

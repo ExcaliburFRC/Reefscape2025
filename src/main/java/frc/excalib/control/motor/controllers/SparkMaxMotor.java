@@ -119,6 +119,11 @@ public class SparkMaxMotor extends SparkMax implements Motor {
         configure();
     }
 
+    @Override
+    public void setMotorPosition(double position) {
+        super.getEncoder().setPosition(position);
+    }
+
     private void configure() {
         super.configure(m_config, kResetSafeParameters, kPersistParameters);
     }
