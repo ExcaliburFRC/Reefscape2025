@@ -10,7 +10,6 @@ import frc.excalib.control.motor.controllers.Motor;
 import frc.excalib.mechanisms.Mechanism;
 
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 public class LinearExtension extends Mechanism {
     private final DoubleSupplier m_positionSupplier;
@@ -19,16 +18,14 @@ public class LinearExtension extends Mechanism {
     private final Gains m_gains;
 
     private final TrapezoidProfile.Constraints m_constraints;
+
     public LinearExtension(Motor motor, DoubleSupplier positionSupplier, DoubleSupplier angleSupplier, Gains gains, TrapezoidProfile.Constraints constraints) {
         super(motor);
-
         m_positionSupplier = positionSupplier;
         m_angleSupplier = angleSupplier;
         m_gains = gains;
         m_PIDController = new PIDController(gains.kp, gains.ki, gains.kd);
         m_constraints = constraints;
-
-
     }
 
     public Command extendCommand(DoubleSupplier lengthSetPoint, SubsystemBase... requirements) {
@@ -47,8 +44,10 @@ public class LinearExtension extends Mechanism {
                     m_gains.ks * Math.signum(state.velocity) +
                             m_gains.kv * state.velocity +
                             m_gains.kg * Math.sin(m_angleSupplier.getAsDouble());
-            setVoltage(ff + pidValue);
-
+            double output = ff + pidValue;
+            System.out.println("output: " + output);
+            System.out.println("error: " + (state.position - logPosition()));
+            setVoltage(output);
         }, requirements);
     }
 

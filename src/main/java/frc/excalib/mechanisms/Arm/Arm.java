@@ -1,8 +1,6 @@
 package frc.excalib.mechanisms.Arm;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -14,7 +12,6 @@ import frc.excalib.mechanisms.Mechanism;
 
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 /**
  * This class represents an Arm Mechanism
@@ -25,7 +22,6 @@ public class Arm extends Mechanism {
     public final DoubleSupplier ANGLE_SUPPLIER;
     public final double m_kv, m_ks, m_kg;
     public final SoftLimit m_VELOCITY_LIMIT;
-    private final ArmFeedforward m_armFeedforwardController;
 
     public Arm(Motor motor,
                DoubleSupplier angleSupplier,
@@ -40,7 +36,6 @@ public class Arm extends Mechanism {
         m_ks = gains.ks;
         m_PIDController = new PIDController(gains.kp, gains.ki, gains.kd);
         m_mass = mass;
-        m_armFeedforwardController = new ArmFeedforward(gains.ks, gains.kg, gains.kv, gains.ka);
     }
 
     /**
@@ -55,12 +50,10 @@ public class Arm extends Mechanism {
             double error = setPointSupplier.getAsDouble() - ANGLE_SUPPLIER.getAsDouble();
             double velocitySetpoint = error / dutyCycle;
             velocitySetpoint = m_VELOCITY_LIMIT.limit(velocitySetpoint);
-//            double ff = m_armFeedforwardController.calculate(setPointSupplier.getAsDouble(), velocitySetpoint);
             double phyOutput =
                     m_ks * Math.signum(velocitySetpoint) + m_kg * m_mass.getCenterOfMass().getX();
             double pid = m_PIDController.calculate(ANGLE_SUPPLIER.getAsDouble(), setPointSupplier.getAsDouble());
             double output = phyOutput + pid;
-            System.out.println("aaa " + setPointSupplier.getAsDouble());
             super.setVoltage(m_VELOCITY_LIMIT.limit(output));
             toleranceConsumer.accept(Math.abs(error) < maxOffSet);
         }, requirements);

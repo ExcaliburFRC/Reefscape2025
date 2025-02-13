@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.elevator.Elevator;
 import monologue.Logged;
 
 import static frc.robot.Constants.SwerveConstants.DEADBAND_VALUE;
@@ -33,6 +34,8 @@ public class RobotContainer implements Logged {
 
     //    private final Gripper m_gripper = new Gripper();
     private final Arm m_arm = new Arm();
+
+    private final Elevator m_elevator = new Elevator();
 
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
 
@@ -88,6 +91,16 @@ public class RobotContainer implements Logged {
         m_driver.triangle().onTrue(m_arm.changeSetpointCommand(Math.PI / 2));
 
         m_driver.touchpad().whileTrue(m_arm.coastCommand());
+
+        m_driver.R1().onTrue(m_elevator.changeSetpointCommand(0.01));
+        m_driver.R2().onTrue(m_elevator.changeSetpointCommand(0.3));
+        m_driver.L1().onTrue(m_elevator.changeSetpointCommand(0.45));
+        m_driver.L2().onTrue(m_elevator.changeSetpointCommand(0.6));
+
+//        m_driver.povRight().whileTrue(m_elevator.sysIdCommand(false, kForward, new SysidConfig(0.3, 1.5, 30)));
+//        m_driver.povDown().whileTrue(m_elevator.sysIdCommand(false, kReverse, new SysidConfig(0.3, 1.5, 30)));
+//        m_driver.povLeft().whileTrue(m_elevator.sysIdCommand(true, kForward, new SysidConfig(0.3, 1.5, 30)));
+//        m_driver.povUp().whileTrue(m_elevator.sysIdCommand(true, kReverse, new SysidConfig(0.3, 1.5, 30)));
     }
 
     public double deadband(double value) {
