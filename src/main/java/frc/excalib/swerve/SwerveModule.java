@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.excalib.control.gains.Gains;
+import frc.excalib.control.gains.SysidConfig;
 import frc.excalib.control.limits.ContinuousSoftLimit;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.control.motor.controllers.Motor;
@@ -196,11 +197,11 @@ public class SwerveModule implements Logged {
     }
 
 
-    public Command angleSysIdDynamic(SysIdRoutine.Direction direction, Swerve swerve) {
-        return m_driveWheel.sysIdDynamic(direction, swerve, m_driveWheel::logPosition, false);
+    public Command angleSysIdDynamic(SysIdRoutine.Direction direction, Swerve swerve, SysidConfig sysidConfig) {
+        return m_driveWheel.sysIdDynamic(direction, swerve, m_driveWheel::logPosition, sysidConfig, false);
     }
 
-    public Command angleSysIdQuas(SysIdRoutine.Direction direction, Swerve swerve) {
-        return m_driveWheel.sysIdQuasistatic(direction, swerve, m_driveWheel::logPosition, false);
+    public Command angleSysIdQuas(SysIdRoutine.Direction direction, Swerve swerve, SysidConfig sysidConfig) {
+        return m_driveWheel.sysIdQuasistatic(direction, swerve, m_driveWheel::logPosition, sysidConfig, false);
     }
 }

@@ -82,18 +82,6 @@ public class Mechanism implements Logged {
         return m_motor.getMotorPosition();
     }
 
-    private SysIdRoutine getAngularSysIdRoutine(SubsystemBase subsystem, DoubleSupplier sensorInput, SysidConfig config) {
-        return new SysIdRoutine(
-                config,
-                new SysIdRoutine.Mechanism(
-                        (Voltage volts) -> m_motor.setVoltage(volts.in(Volts)),
-                        log -> log.motor("motor")
-                                .voltage(m_appliedVoltage.mut_replace(
-                                        m_motor.getVoltage(), Volts))
-                                .angularPosition(m_radians.mut_replace(sensorInput.getAsDouble(), Radians))
-                                .angularVelocity(m_velocity.mut_replace(logVelocity(), RadiansPerSecond)),
-                        subsystem));
-    }
 
     private SysIdRoutine getLinearSysIdRoutine(SubsystemBase subsystem, DoubleSupplier sensorInput, SysidConfig config) {
         return new SysIdRoutine(
@@ -108,6 +96,19 @@ public class Mechanism implements Logged {
                         subsystem));
     }
 
+    private SysIdRoutine getAngularSysIdRoutine(SubsystemBase subsystem, DoubleSupplier sensorInput, SysidConfig config) {
+        return new SysIdRoutine(
+                config,
+                new SysIdRoutine.Mechanism(
+                        (Voltage volts) -> m_motor.setVoltage(volts.in(Volts)),
+                        log -> log.motor("motor")
+                                .voltage(m_appliedVoltage.mut_replace(
+                                        m_motor.getVoltage(), Volts))
+                                .angularPosition(m_radians.mut_replace(sensorInput.getAsDouble(), Radians))
+                                .angularVelocity(m_velocity.mut_replace(logVelocity(), RadiansPerSecond)),
+                        subsystem));
+    }
+
     /**
      * @return a command which puts the mechanism on coast mode
      */
@@ -119,13 +120,23 @@ public class Mechanism implements Logged {
         ).ignoringDisable(true);
     }
 
-    public Command sysIdQuasistatic(SysIdRoutine.Direction direction, SubsystemBase subsystem, DoubleSupplier positionSupplier, boolean isLinear) {
-        if (isLinear) return getLinearSysIdRoutine(subsystem, positionSupplier, new SysidConfig(0.5,4,15)).quasistatic(direction);
-        return getAngularSysIdRoutine(subsystem, positionSupplier, new SysidConfig(0.5,4,15)).quasistatic(direction);
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction,
+                                    SubsystemBase subsystem,
+                                    DoubleSupplier positionSupplier,
+                                    SysidConfig config,
+                                    boolean isLinear
+    ) {
+        if (isLinear) return getLinearSysIdRoutine(subsystem, positionSupplier, config).quasistatic(direction);
+        return getAngularSysIdRoutine(subsystem, positionSupplier, config).quasistatic(direction);
     }
 
-    public Command sysIdDynamic(SysIdRoutine.Direction direction, SubsystemBase subsystem, DoubleSupplier positionSupplier, boolean isLinear) {
-        if (isLinear) return getLinearSysIdRoutine(subsystem, positionSupplier, new SysidConfig(0.5,4,15)).dynamic(direction);
-        return getAngularSysIdRoutine(subsystem, positionSupplier, new SysidConfig(0.5,4,15)).dynamic(direction).withName("quadForward");
+    public Command sysIdDynamic(SysIdRoutine.Direction direction,
+                                SubsystemBase subsystem,
+                                DoubleSupplier positionSupplier,
+                                SysidConfig config,
+                                boolean isLinear) {
+        if (isLinear)
+            return getLinearSysIdRoutine(subsystem, positionSupplier, config).dynamic(direction);
+        return getAngularSysIdRoutine(subsystem, positionSupplier, config).dynamic(direction).withName("quadForward");
     }
 }

@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.excalib.additional_utilities.Elastic;
+import frc.excalib.control.gains.SysidConfig;
 import frc.excalib.control.imu.IMU;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.slam.mapper.AuroraClient;
@@ -363,7 +364,7 @@ public class Swerve extends SubsystemBase implements Logged {
      * @param dynamic Whether to perform a dynamic or quasistatic test.
      * @return The command to perform the sysid routine.
      */
-    public Command driveSysId(int module, Direction dir, boolean dynamic) {
+    public Command driveSysId(int module, Direction dir, SysidConfig sysidConfig, boolean dynamic) {
         SwerveModule selectedModule;
 
         switch (module) {
@@ -377,8 +378,8 @@ public class Swerve extends SubsystemBase implements Logged {
         }
 
         return dynamic ?
-                selectedModule.angleSysIdDynamic(dir, this)
-                : selectedModule.angleSysIdQuas(dir, this);
+                selectedModule.angleSysIdDynamic(dir, this, sysidConfig)
+                : selectedModule.angleSysIdQuas(dir, this, sysidConfig);
     }
 
     @Override

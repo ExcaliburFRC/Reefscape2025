@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.excalib.control.gains.SysidConfig;
 import frc.excalib.control.limits.ContinuousSoftLimit;
 import frc.excalib.control.limits.SoftLimit;
 import frc.excalib.control.math.physics.Mass;
@@ -87,8 +88,8 @@ public class Arm extends SubsystemBase implements Logged {
     public Command changeSetpointCommand(double setpoint) {
         return new RunCommand(() -> {
             this.setpointAngle = setpoint;
-            System.out.println("wated setpoint " +setpoint + " current setpoint "+ this.setpointAngle);
-        }).until(()->this.setpointAngle == setpoint);
+            System.out.println("wated setpoint " + setpoint + " current setpoint " + this.setpointAngle);
+        }).until(() -> this.setpointAngle == setpoint);
     }
 
     private Command defaultCommand() {
@@ -136,9 +137,9 @@ public class Arm extends SubsystemBase implements Logged {
         m_armAtSetpointEntry.setBoolean(atSetpoint());
     }
 
-    public Command sysIdCommand(boolean dynamic, SysIdRoutine.Direction direction) {
-        if (dynamic) return m_arm.sysIdDynamic(direction, this, m_arm.ANGLE_SUPPLIER, false);
-        return m_arm.sysIdQuasistatic(direction, this, m_arm.ANGLE_SUPPLIER, false);
+    public Command sysIdCommand(boolean dynamic, SysIdRoutine.Direction direction, SysidConfig sysidConfig) {
+        if (dynamic) return m_arm.sysIdDynamic(direction, this, m_arm.ANGLE_SUPPLIER, sysidConfig, false);
+        return m_arm.sysIdQuasistatic(direction, this, m_arm.ANGLE_SUPPLIER, sysidConfig, false);
     }
 }
 
