@@ -21,7 +21,7 @@ import static frc.excalib.control.motor.motor_specs.DirectionState.FORWARD;
 import static frc.excalib.control.motor.motor_specs.DirectionState.REVERSE;
 import static frc.excalib.control.motor.motor_specs.IdleState.BRAKE;
 import static frc.robot.subsystems.arm.Constants.*;
-import static monologue.Annotations.*;
+import static monologue.Annotations.Log;
 
 public class Arm extends SubsystemBase implements Logged {
     private final TalonFXMotor m_firstMotor, m_secondMotor;
@@ -107,6 +107,13 @@ public class Arm extends SubsystemBase implements Logged {
         this.elevatorHeightSupplier = elevatorHeightSupplier;
     }
 
+    public Command coastCommand() {
+        return new StartEndCommand(
+                () -> m_motorGroup.setIdleState(IdleState.COAST),
+                () -> m_motorGroup.setIdleState(BRAKE)
+        ).ignoringDisable(true).withName("Coast Command");
+    }
+
     @Log.NT
     public double getAngle() {
         return m_radSupplier.getAsDouble();
@@ -127,13 +134,6 @@ public class Arm extends SubsystemBase implements Logged {
         m_armAngleEntry.setDouble(getAngle());
         m_armSetpoint.setDouble(getSetpoint());
         m_armAtSetpointEntry.setBoolean(atSetpoint());
-    }
-
-    public Command coastCommand() {
-        return new StartEndCommand(
-                () -> m_motorGroup.setIdleState(IdleState.COAST),
-                () -> m_motorGroup.setIdleState(BRAKE)
-        ).ignoringDisable(true).withName("Coast Command");
     }
 
     public Command sysIdCommand(boolean dynamic, SysIdRoutine.Direction direction) {

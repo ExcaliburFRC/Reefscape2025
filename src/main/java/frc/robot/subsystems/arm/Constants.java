@@ -9,12 +9,12 @@ public class Constants {
     public static final int CAN_CODER_ID = 32;
 
     //Gains for PID and FF
-    private static final double kp = 7; // TODO
+    private static final double kp = 7;
     private static final double ki = 0; // TODO
     private static final double kd = 0; // TODO
     private static final double ka = 0; // TODO
     private static final double kv = 1.6548; // TODO
-    private static final double kg = 0.3675; // TODO
+    private static final double kg = 0.3;
     private static final double ks = 0; // TODO
     public static final Gains ANGLE_GAINS = new Gains(kp, ki, kd, ks, kv, ka, kg);
 

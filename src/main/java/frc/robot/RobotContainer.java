@@ -7,7 +7,6 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
 import com.pathplanner.lib.events.PointTowardsZoneTrigger;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
@@ -16,25 +15,26 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.excalib.control.math.Vector2D;
-import frc.excalib.swerve.Swerve;
-import frc.robot.subsystems.gripper.Gripper;
+import frc.robot.subsystems.arm.Arm;
 import monologue.Logged;
 
-import static frc.robot.Constants.SwerveConstants.*;
+import static frc.robot.Constants.SwerveConstants.DEADBAND_VALUE;
 
 public class RobotContainer implements Logged {
     private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
     // The robot's subsystems and commands are defined here...
 
-    private final Swerve m_swerve = Constants.SwerveConstants.configureSwerve(new Pose2d());
+//    private final Swerve m_swerve = Constants.SwerveConstants.configureSwerve(new Pose2d());
+
+    //    private final Gripper m_gripper = new Gripper();
+    private final Arm m_arm = new Arm();
 
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
-
-    private final Gripper m_gripper = new Gripper();
 
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
 
@@ -55,18 +55,16 @@ public class RobotContainer implements Logged {
 
 
     private void configureBindings() {
-
-
-        m_swerve.setDefaultCommand(
-                m_swerve.driveCommand(
-                        () -> new Vector2D(
-                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
-                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
-                        () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC,
-                        () -> true
-                ));
-
-        m_driver.PS().onTrue(m_swerve.resetAngleCommand());
+//        m_swerve.setDefaultCommand(
+//                m_swerve.driveCommand(
+//                        () -> new Vector2D(
+//                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
+//                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
+//                        () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC,
+//                        () -> true
+//                ));
+//
+//        m_driver.PS().onTrue(m_swerve.resetAngleCommand());
         /*
         m_driver.cross().onTrue(
                 m_swerve.driveToPoseWithOverrideCommand(
@@ -79,11 +77,17 @@ public class RobotContainer implements Logged {
                 )
         );*/
 
-        m_driver.circle().toggleOnTrue(m_swerve.driveSysId(1, SysIdRoutine.Direction.kForward, false));
-        m_driver.cross().toggleOnTrue(m_swerve.driveSysId(1, SysIdRoutine.Direction.kReverse, false));
-        m_driver.triangle().toggleOnTrue(m_swerve.driveSysId(1, SysIdRoutine.Direction.kForward, true));
-        m_driver.square().toggleOnTrue(m_swerve.driveSysId(1, SysIdRoutine.Direction.kReverse, true));
+//        m_driver.circle().toggleOnTrue(m_swerve.driveSysId(1, SysIdRoutine.Direction.kForward, false));
+//        m_driver.cross().toggleOnTrue(m_swerve.driveSysId(1, SysIdRoutine.Direction.kReverse, false));
+//        m_driver.triangle().toggleOnTrue(m_swerve.driveSysId(1, SysIdRoutine.Direction.kForward, true));
+//        m_driver.square().toggleOnTrue(m_swerve.driveSysId(1, SysIdRoutine.Direction.kReverse, true));
 
+        m_driver.cross().onTrue(m_arm.changeSetpointCommand(-Math.PI / 2));
+        m_driver.circle().onTrue(m_arm.changeSetpointCommand(-Math.PI / 4));
+        m_driver.square().onTrue(m_arm.changeSetpointCommand(0));
+        m_driver.triangle().onTrue(m_arm.changeSetpointCommand(Math.PI / 2));
+
+        m_driver.touchpad().whileTrue(m_arm.coastCommand());
     }
 
     public double deadband(double value) {
