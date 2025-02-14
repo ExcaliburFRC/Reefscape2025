@@ -15,17 +15,19 @@ public class LinearExtension extends Mechanism {
     private final DoubleSupplier m_positionSupplier;
     private final DoubleSupplier m_angleSupplier;
     private final PIDController m_PIDController;
+    private final double m_tolerance;
     private final Gains m_gains;
 
     private final TrapezoidProfile.Constraints m_constraints;
 
-    public LinearExtension(Motor motor, DoubleSupplier positionSupplier, DoubleSupplier angleSupplier, Gains gains, TrapezoidProfile.Constraints constraints) {
+    public LinearExtension(Motor motor, DoubleSupplier positionSupplier, DoubleSupplier angleSupplier, Gains gains, TrapezoidProfile.Constraints constraints, double tolerance) {
         super(motor);
         m_positionSupplier = positionSupplier;
         m_angleSupplier = angleSupplier;
         m_gains = gains;
         m_PIDController = new PIDController(gains.kp, gains.ki, gains.kd);
         m_constraints = constraints;
+        m_tolerance = tolerance;
     }
 
     public Command extendCommand(DoubleSupplier lengthSetPoint, SubsystemBase... requirements) {
@@ -41,12 +43,14 @@ public class LinearExtension extends Mechanism {
                     );
             double pidValue = m_PIDController.calculate(m_positionSupplier.getAsDouble(), state.position);
             double ff =
-                    m_gains.ks * Math.signum(state.velocity) +
-                            m_gains.kv * state.velocity +
-                            m_gains.kg * Math.sin(m_angleSupplier.getAsDouble());
+                    (Math.abs(m_positionSupplier.getAsDouble() - lengthSetPoint.getAsDouble()) > m_tolerance) ?
+
+                                    m_gains.ks * Math.signum(state.velocity) +
+                                    m_gains.kv * state.velocity +
+                                    m_gains.kg * Math.sin(m_angleSupplier.getAsDouble()) :
+
+                                    m_gains.kg * Math.sin(m_angleSupplier.getAsDouble());
             double output = ff + pidValue;
-            System.out.println("output: " + output);
-            System.out.println("error: " + (state.position - logPosition()));
             setVoltage(output);
         }, requirements);
     }

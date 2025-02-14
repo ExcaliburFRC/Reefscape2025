@@ -1,14 +1,13 @@
 package frc.robot.subsystems.elevator;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.excalib.control.gains.SysidConfig;
 import frc.excalib.control.limits.SoftLimit;
 import frc.excalib.control.motor.controllers.MotorGroup;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
+import frc.excalib.control.motor.motor_specs.IdleState;
 import frc.excalib.mechanisms.linear_extension.LinearExtension;
 import monologue.Logged;
 
@@ -29,7 +28,7 @@ public class Elevator extends SubsystemBase implements Logged {
     private SoftLimit m_softLimit;
     private double m_prevVel = 0;
     private double m_accel = 0;
-
+    private final Trigger closedTrigger;
     public Elevator() {
         m_firstMotor = new TalonFXMotor(FIRST_MOTOR_ID);
         m_firstMotor.setInverted(REVERSE);
@@ -40,13 +39,16 @@ public class Elevator extends SubsystemBase implements Logged {
         m_motorGroup.setVelocityConversionFactor(ROTATIONS_TO_METERS);
 
         m_setpoint = 0.003;
+         this.closedTrigger = new Trigger(() -> getCurrent() > STALL_THRESHOLD && m_setpoint == MIN_HEIGHT && Math.abs(getHeight()) < 0.1).debounce(0.35);
+         this.closedTrigger.onTrue(new InstantCommand(()-> m_motorGroup.setMotorPosition(0)).andThen(new PrintCommand("reset elevator")));
 
         m_extensionMechanism = new LinearExtension(
                 m_motorGroup,
                 this.m_motorGroup::getMotorPosition,
                 () -> ELEVATOR_ANGLE,
                 ELEVATOR_GAINS,
-                CONSTRAINTS
+                CONSTRAINTS,
+                TOLERANCE
         );
         m_heightSupplier = m_extensionMechanism::logPosition;
         m_toleranceTrigger = new Trigger(
@@ -55,10 +57,10 @@ public class Elevator extends SubsystemBase implements Logged {
         this.armRadSupplier = () -> 0;
         this.m_softLimit = new SoftLimit(() -> {
             if (armRadSupplier.getAsDouble() > ARM_COLLISION_RAD) return MIN_HEIGHT;
-            return m_heightSupplier.getAsDouble() > UPPER_MIN_HEIGHT? UPPER_MIN_HEIGHT : MIN_HEIGHT;
+            return m_heightSupplier.getAsDouble() > UPPER_MIN_HEIGHT ? UPPER_MIN_HEIGHT : MIN_HEIGHT;
         }, () -> {
             if (armRadSupplier.getAsDouble() > ARM_COLLISION_RAD) return MAX_HEIGHT;
-            return m_heightSupplier.getAsDouble() < LOWER_MAX_HEIGHT? LOWER_MAX_HEIGHT : MAX_HEIGHT;
+            return m_heightSupplier.getAsDouble() < LOWER_MAX_HEIGHT ? LOWER_MAX_HEIGHT : MAX_HEIGHT;
         });
         this.setDefaultCommand(defaultCommand());
     }
@@ -75,9 +77,14 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public Command changeSetpointCommand(double length) {
-        return new InstantCommand(
-                () -> this.m_setpoint = length, this
-        );
+        return new InstantCommand(() -> this.m_setpoint = length);
+    }
+
+    public Command coastCommand(){
+        return new StartEndCommand(
+                ()-> m_motorGroup.setIdleState(IdleState.COAST),
+                ()-> m_motorGroup.setIdleState(IdleState.BRAKE)
+        ).ignoringDisable(true);
     }
 
     @Log.NT
@@ -98,6 +105,11 @@ public class Elevator extends SubsystemBase implements Logged {
     @Log.NT
     public double getAccel() {
         return m_accel;
+    }
+
+    @Log.NT
+    public double getCurrent() {
+        return m_motorGroup.getCurrent();
     }
 
     public void setArmRadSupplier(DoubleSupplier armRadSupplier) {

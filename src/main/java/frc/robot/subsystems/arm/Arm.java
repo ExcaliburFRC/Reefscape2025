@@ -14,6 +14,7 @@ import frc.excalib.control.math.physics.Mass;
 import frc.excalib.control.motor.controllers.MotorGroup;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
 import frc.excalib.control.motor.motor_specs.IdleState;
+import frc.robot.superstructure.State;
 import monologue.Logged;
 
 import java.util.function.DoubleSupplier;
@@ -21,6 +22,7 @@ import java.util.function.DoubleSupplier;
 import static frc.excalib.control.motor.motor_specs.DirectionState.FORWARD;
 import static frc.excalib.control.motor.motor_specs.DirectionState.REVERSE;
 import static frc.excalib.control.motor.motor_specs.IdleState.BRAKE;
+import static frc.excalib.control.motor.motor_specs.IdleState.COAST;
 import static frc.robot.subsystems.arm.Constants.*;
 import static monologue.Annotations.Log;
 
@@ -32,7 +34,7 @@ public class Arm extends SubsystemBase implements Logged {
     public final DoubleSupplier m_radSupplier;
     private boolean isAtTolerance = false;
     public final Trigger m_toleranceTrigger;
-    private double setpointAngle = 0;
+    private double setpointAngle = State.DEFAULT.m_placerAngle;
     private DoubleSupplier elevatorHeightSupplier;
     private ContinuousSoftLimit m_softLimit;
 
@@ -43,7 +45,6 @@ public class Arm extends SubsystemBase implements Logged {
 
     public Arm() {
         m_firstMotor = new TalonFXMotor(FIRST_MOTOR_ID);
-        m_firstMotor.setIdleState(BRAKE);
         m_firstMotor.setInverted(REVERSE);
         m_secondMotor = new TalonFXMotor(SECOND_MOTOR_ID);
         m_secondMotor.setIdleState(BRAKE);
@@ -110,7 +111,7 @@ public class Arm extends SubsystemBase implements Logged {
 
     public Command coastCommand() {
         return new StartEndCommand(
-                () -> m_motorGroup.setIdleState(IdleState.COAST),
+                () -> m_motorGroup.setIdleState(COAST),
                 () -> m_motorGroup.setIdleState(BRAKE)
         ).ignoringDisable(true).withName("Coast Command");
     }

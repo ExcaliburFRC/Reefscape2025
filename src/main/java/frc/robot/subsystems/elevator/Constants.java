@@ -10,11 +10,11 @@ public class Constants {
 
     //Measurements
     static final double ELEVATOR_ANGLE = Math.PI/2;
-    static final double TOLERANCE = 0; //TODO
+    static final double TOLERANCE = 0.01;
     static final double ROTATIONS_TO_METERS = 0.011767896627459766;
 
     //Gains and Constrains TODO
-    private static final double kp = 0.01;
+    private static final double kp = 0;
     private static final double ki = 0;
     private static final double kd = 0;
     private static final double ks = 0.11663;
@@ -24,6 +24,7 @@ public class Constants {
     static final Gains ELEVATOR_GAINS = new Gains(kp, ki,kd, ks, kv, ka, kg);
 
     static final double MIN_HEIGHT = 0;
+    static final double STALL_THRESHOLD = 2;
     static final double MAX_HEIGHT = 0.7;
     static final double LOWER_MAX_HEIGHT = 0.2;
     static final double UPPER_MIN_HEIGHT = 0.46;
