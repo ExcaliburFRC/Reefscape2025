@@ -1,6 +1,11 @@
-package frc;
+package frc.excalib.slam.mapper;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.DriverStation;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -58,12 +63,37 @@ public class AuroraClient {
     }
 
     // Getter methods for retrieving pose data
-    public float getX() { return x; }
-    public float getY() { return y; }
-    public float getZ() { return z; }
-    public float getRoll() { return roll; }
-    public float getPitch() { return pitch; }
-    public float getYaw() { return yaw; }
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public float getZ() {
+        return z;
+    }
+
+    public float getRoll() {
+        return roll;
+    }
+
+    public float getPitch() {
+        return pitch;
+    }
+
+    public float getYaw() {
+        return yaw;
+    }
+
+    public Pose3d getPose3d() {
+        return new Pose3d(x, y, z, new Rotation3d(roll, pitch, yaw));
+    }
+
+    public Pose2d getPose2d() {
+        return new Pose2d(x, y, new Rotation2d(yaw));
+    }
 
     // Stops the server
     public void stop() {
