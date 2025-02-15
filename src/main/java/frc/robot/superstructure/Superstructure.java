@@ -37,7 +37,7 @@ public class Superstructure implements Logged {
                         state.m_elevatorHeight
                 ),
                 m_arm.changeSetpointCommand(
-                        state.m_placerAngle
+                        state.m_armAngle
                 ),
                 new WaitUntilCommand(
                         this.toleranceTrigger.and(activateWheels)

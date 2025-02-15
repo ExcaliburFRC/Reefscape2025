@@ -34,7 +34,7 @@ public class Arm extends SubsystemBase implements Logged {
     public final DoubleSupplier m_radSupplier;
     private boolean isAtTolerance = false;
     public final Trigger m_toleranceTrigger;
-    private double setpointAngle = State.DEFAULT.m_placerAngle;
+    private double setpointAngle = State.DEFAULT.m_armAngle;
     private DoubleSupplier elevatorHeightSupplier;
     private ContinuousSoftLimit m_softLimit;
 
