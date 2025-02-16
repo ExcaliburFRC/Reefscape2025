@@ -31,11 +31,12 @@ public class Superstructure implements Logged {
 
     public Command setStateCommand(State state, BooleanSupplier activateWheels) {
         return new SequentialCommandGroup(
-                m_elevator.changeSetpointCommand(
-                        state.m_elevatorHeight
-                ),
                 m_arm.changeSetpointCommand(
                         state.m_armAngle
+                ),
+                new WaitUntilCommand(m_arm::atSetpoint),
+                m_elevator.changeSetpointCommand(
+                        state.m_elevatorHeight
                 ),
                 new WaitUntilCommand(
                         this.toleranceTrigger.and(activateWheels)
@@ -99,4 +100,5 @@ public class Superstructure implements Logged {
     public boolean hasCoral() {
         return m_gripper.hasCoral();
     }
+
 }

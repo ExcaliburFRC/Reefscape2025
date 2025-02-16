@@ -16,10 +16,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
@@ -105,7 +102,8 @@ public class RobotContainer implements Logged {
 
         m_driver.options().onTrue(m_superstructure.setStateCommand(State.DEFAULT, m_superstructure::hasCoral));
         m_driver.R2().onTrue(m_superstructure.intakeCommand(()-> true));
-        m_driver.square().onTrue(m_superstructure.scoreCoralCommand(3, m_driver.R1()));
+        m_driver.square().onTrue(m_superstructure.scoreCoralCommand(
+                3, m_driver.R1()));
         m_driver.circle().onTrue(m_superstructure.scoreCoralCommand(2, m_driver.R1()));
     }
 
