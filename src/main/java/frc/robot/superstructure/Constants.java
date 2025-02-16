@@ -3,9 +3,8 @@ package frc.robot.superstructure;
 import static java.lang.Math.PI;
 
 public class Constants {
-    public static final double INTAKE_ELEVATOR_HEIGHT = 0.13;
-    public static final double INTAKE_ARM_ANGLE = -1.93;
-//    public static final double INTAKE_ARM_ANGLE = -PI / 4.0;
+    public static final double INTAKE_ELEVATOR_HEIGHT = 0.17;
+    public static final double INTAKE_ARM_ANGLE = -1.73;
     public static final double INTAKE_INNER_WHEELS_VOLTAGE = -2;
     public static final double INTAKE_OUT_WHEELS_VOLTAGE = -2;
     // L1 Constants

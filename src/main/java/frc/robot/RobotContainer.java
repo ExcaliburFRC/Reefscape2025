@@ -21,12 +21,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.excalib.control.gains.SysidConfig;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
-import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.superstructure.State;
 import frc.robot.superstructure.Superstructure;
 import monologue.Logged;
@@ -93,7 +89,8 @@ public class RobotContainer implements Logged {
 //        m_driver.povLeft().onTrue(m_arm.changeSetpointCommand(-Math.PI / 4));
 //        m_driver.povRight().onTrue(m_arm.changeSetpointCommand(0));
 //        m_driver.povUp().onTrue(m_arm.changeSetpointCommand(Math.PI / 2));
-//
+//[]\
+
         m_driver.touchpad().toggleOnTrue(m_superstructure.toggleIdleMode());
 //
 //        m_driver.cross().onTrue(m_elevator.changeSetpointCommand(0));
@@ -106,7 +103,7 @@ public class RobotContainer implements Logged {
 //        m_driver.povLeft().whileTrue(m_elevator.sysIdCommand(true, kForward, new SysidConfig(0.3, 1.5, 30)));
 //        m_driver.povUp().whileTrue(m_elevator.sysIdCommand(true, kReverse, new SysidConfig(0.3, 1.5, 30)));
 
-        m_driver.options().onTrue(m_superstructure.setStateCommand(State.DEFAULT, ()-> true));
+        m_driver.options().onTrue(m_superstructure.setStateCommand(State.DEFAULT, m_superstructure::hasCoral));
         m_driver.R2().onTrue(m_superstructure.intakeCommand(()-> true));
         m_driver.square().onTrue(m_superstructure.scoreCoralCommand(3, m_driver.R1()));
         m_driver.circle().onTrue(m_superstructure.scoreCoralCommand(2, m_driver.R1()));

@@ -4,7 +4,10 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.excalib.control.gains.SysidConfig;
@@ -13,7 +16,6 @@ import frc.excalib.control.limits.SoftLimit;
 import frc.excalib.control.math.physics.Mass;
 import frc.excalib.control.motor.controllers.MotorGroup;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
-import frc.excalib.control.motor.motor_specs.IdleState;
 import frc.robot.superstructure.State;
 import monologue.Logged;
 
@@ -55,7 +57,7 @@ public class Arm extends SubsystemBase implements Logged {
         m_motorGroup.setPositionConversionFactor(POSITION_CONVERSION_FACTOR);
 
         m_encoder = new CANcoder(CAN_CODER_ID);
-        m_radSupplier = () -> m_encoder.getPosition().getValueAsDouble() * ROTATIONS_TO_RAD;
+        m_radSupplier = () -> -m_encoder.getPosition().getValueAsDouble() * ROTATIONS_TO_RAD;
 
         m_motorGroup.setMotorPosition(m_radSupplier.getAsDouble());
 
