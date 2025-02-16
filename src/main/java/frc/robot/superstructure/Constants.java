@@ -15,19 +15,19 @@ public class Constants {
 
     // L2 Constants
     public static final double L2_ELEVATOR_HEIGHT = 0;
-    public static final double L2_ARM_ANGLE = 0.85;
-    public static final double L2_INNER_WHEELS_VOLTAGE = 8;
+    public static final double L2_ARM_ANGLE = 0.955;
+    public static final double L2_INNER_WHEELS_VOLTAGE = 6;
     public static final double L2_OUT_WHEELS_VOLTAGE = 0;
 
     // L3 Constants
-    public static final double L3_ELEVATOR_HEIGHT = 0.08;
-    public static final double L3_ARM_ANGLE = 1.62; //1.743
+    public static final double L3_ELEVATOR_HEIGHT = 0.15;
+    public static final double L3_ARM_ANGLE = 1.45;
     public static final double L3_INNER_WHEELS_VOLTAGE = 8;
     public static final double L3_OUT_WHEELS_VOLTAGE = 0;
 
     // L4 Constants
-    public static final double L4_ELEVATOR_HEIGHT = 0;
-    public static final double L4_ARM_ANGLE = 0;
+    public static final double L4_ELEVATOR_HEIGHT = 0.65;
+    public static final double L4_ARM_ANGLE = PI / 2;
     public static final double L4_INNER_WHEELS_VOLTAGE = 0;
     public static final double L4_OUT_WHEELS_VOLTAGE = 0;
 

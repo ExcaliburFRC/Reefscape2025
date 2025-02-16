@@ -24,7 +24,7 @@ public class Constants {
     static final Gains ELEVATOR_GAINS = new Gains(kp, ki,kd, ks, kv, ka, kg);
 
     static final double MIN_HEIGHT = 0;
-    static final double STALL_THRESHOLD = 2;
+    static final double STALL_THRESHOLD = 1;
     static final double MAX_HEIGHT = 0.7;
     static final double LOWER_MAX_HEIGHT = 0.2;
     static final double UPPER_MIN_HEIGHT = 0.46;

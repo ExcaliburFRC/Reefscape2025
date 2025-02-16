@@ -1,9 +1,6 @@
 package frc.robot.subsystems.elevator;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.excalib.control.gains.SysidConfig;
@@ -32,7 +29,7 @@ public class Elevator extends SubsystemBase implements Logged {
     private SoftLimit m_softLimit;
     private double m_prevVel = 0;
     private double m_accel = 0;
-//    private final Trigger closedTrigger;
+    private final Trigger closedTrigger;
 
     public Elevator() {
         m_firstMotor = new TalonFXMotor(FIRST_MOTOR_ID);
@@ -44,9 +41,9 @@ public class Elevator extends SubsystemBase implements Logged {
         m_motorGroup.setPositionConversionFactor(ROTATIONS_TO_METERS);
         m_motorGroup.setVelocityConversionFactor(ROTATIONS_TO_METERS);
 
-        m_setpoint = 0.003;
-//        this.closedTrigger = new Trigger(() -> getCurrent() > STALL_THRESHOLD && m_setpoint == MIN_HEIGHT && Math.abs(getHeight()) < 0.1).debounce(0.35);
-//        this.closedTrigger.onTrue(new InstantCommand(() -> m_motorGroup.setMotorPosition(0)).andThen(new PrintCommand("reset elevator")));
+        m_setpoint = 0;
+        this.closedTrigger = new Trigger(() -> getCurrent() > STALL_THRESHOLD && m_setpoint == MIN_HEIGHT && Math.abs(getHeight()) <= 0.1);
+        this.closedTrigger.onTrue(new InstantCommand(() -> m_motorGroup.setMotorPosition(0)).andThen(new PrintCommand("reset elevator")));
 
         m_extensionMechanism = new LinearExtension(
                 m_motorGroup,

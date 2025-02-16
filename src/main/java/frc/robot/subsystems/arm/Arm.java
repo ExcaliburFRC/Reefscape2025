@@ -57,7 +57,7 @@ public class Arm extends SubsystemBase implements Logged {
         m_motorGroup.setPositionConversionFactor(POSITION_CONVERSION_FACTOR);
 
         m_encoder = new CANcoder(CAN_CODER_ID);
-        m_radSupplier = () -> -m_encoder.getPosition().getValueAsDouble() * ROTATIONS_TO_RAD;
+        m_radSupplier = () -> m_encoder.getPosition().getValueAsDouble() * ROTATIONS_TO_RAD;
 
         m_motorGroup.setMotorPosition(m_radSupplier.getAsDouble());
 

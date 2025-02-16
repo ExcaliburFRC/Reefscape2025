@@ -100,11 +100,11 @@ public class RobotContainer implements Logged {
 //        m_driver.povLeft().whileTrue(m_elevator.sysIdCommand(true, kForward, new SysidConfig(0.3, 1.5, 30)));
 //        m_driver.povUp().whileTrue(m_elevator.sysIdCommand(true, kReverse, new SysidConfig(0.3, 1.5, 30)));
 
-        m_driver.options().onTrue(m_superstructure.setStateCommand(State.DEFAULT, m_superstructure::hasCoral));
+        m_driver.options().onTrue(m_superstructure.setStateCommand(State.DEFAULT, ()-> false));
         m_driver.R2().onTrue(m_superstructure.intakeCommand(()-> true));
-        m_driver.square().onTrue(m_superstructure.scoreCoralCommand(
-                3, m_driver.R1()));
+        m_driver.square().onTrue(m_superstructure.scoreCoralCommand(3, m_driver.R1()));
         m_driver.circle().onTrue(m_superstructure.scoreCoralCommand(2, m_driver.R1()));
+        m_driver.triangle().onTrue(m_superstructure.scoreCoralCommand(4, m_driver.triangle()));
     }
 
     public double deadband(double value) {

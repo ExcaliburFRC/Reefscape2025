@@ -68,7 +68,7 @@ public class Superstructure implements Logged {
             }
         }
         return setStateCommand(state, release).until(
-                m_gripper.m_coralTrigger.negate().debounce(2)).andThen(
+                m_gripper.m_coralTrigger.negate().debounce(1)).andThen(
                 setStateCommand(State.DEFAULT, () -> true)
         );
     }
