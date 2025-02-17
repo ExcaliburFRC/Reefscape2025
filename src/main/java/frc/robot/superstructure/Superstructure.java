@@ -13,6 +13,8 @@ import monologue.Logged;
 
 import java.util.function.BooleanSupplier;
 
+import static edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior.*;
+
 public class Superstructure implements Logged {
     private final Elevator m_elevator;
     private final Arm m_arm;
@@ -30,22 +32,39 @@ public class Superstructure implements Logged {
     }
 
     public Command setStateCommand(State state, BooleanSupplier activateWheels) {
-        return new SequentialCommandGroup(
-                m_arm.changeSetpointCommand(
-                        state.m_armAngle
-                ),
-                new WaitUntilCommand(m_arm::atSetpoint),
-                m_elevator.changeSetpointCommand(
-                        state.m_elevatorHeight
-                ),
-                new WaitUntilCommand(
-                        this.toleranceTrigger.and(activateWheels)
-                ),
-                m_gripper.manualCommand(
-                        state.m_innerWheelsVoltage,
-                        state.m_outWheelsVoltage
-                )
-        );
+        return m_gripper.hasCoral() ?
+                new SequentialCommandGroup(
+                        m_arm.changeSetpointCommand(
+                                state.m_armAngle
+                        ),
+                        new WaitUntilCommand(m_arm::atSetpoint),
+                        m_elevator.changeSetpointCommand(
+
+                                state.m_elevatorHeight
+                        ),
+                        new WaitUntilCommand(
+                                this.toleranceTrigger.and(activateWheels)
+                        ),
+                        m_gripper.manualCommand(
+                                state.m_innerWheelsVoltage,
+                                state.m_outWheelsVoltage
+                        )
+                ).withInterruptBehavior(kCancelSelf) :
+                new SequentialCommandGroup(
+                        m_elevator.changeSetpointCommand(
+                                state.m_elevatorHeight
+                        ),
+                        new WaitUntilCommand(m_elevator::atSetpoint),
+                        m_arm.changeSetpointCommand(
+                                state.m_armAngle
+                        ),
+                        new WaitUntilCommand(
+                                this.toleranceTrigger.and(activateWheels)
+                        ),
+                        m_gripper.manualCommand(
+                                state.m_innerWheelsVoltage,
+                                state.m_outWheelsVoltage
+                        )).withInterruptBehavior(kCancelSelf);
     }
 
     public Command intakeCommand(BooleanSupplier atPose) {
@@ -91,6 +110,10 @@ public class Superstructure implements Logged {
 
     public Command resetGripper() {
         return m_gripper.manualCommand(State.DEFAULT.m_innerWheelsVoltage, State.DEFAULT.m_outWheelsVoltage).withTimeout(0.05);
+    }
+
+    public Command resetElevator() {
+        return m_elevator.resetHeightCommand();
     }
 
     public Command toggleIdleMode() {

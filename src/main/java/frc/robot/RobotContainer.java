@@ -104,8 +104,10 @@ public class RobotContainer implements Logged {
         m_driver.R2().onTrue(m_superstructure.intakeCommand(()-> true));
         m_driver.square().onTrue(m_superstructure.scoreCoralCommand(3, m_driver.R1()));
         m_driver.circle().onTrue(m_superstructure.scoreCoralCommand(2, m_driver.R1()));
-        m_driver.triangle().onTrue(m_superstructure.scoreCoralCommand(4, m_driver.triangle()));
+        m_driver.triangle().onTrue(m_superstructure.scoreCoralCommand(4, m_driver.R1()));
+        m_driver.create().onTrue(m_superstructure.resetElevator());
     }
+
 
     public double deadband(double value) {
         return Math.abs(value) < DEADBAND_VALUE ? 0 : value;

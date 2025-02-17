@@ -42,7 +42,7 @@ public class Elevator extends SubsystemBase implements Logged {
         m_motorGroup.setVelocityConversionFactor(ROTATIONS_TO_METERS);
 
         m_setpoint = 0;
-        this.closedTrigger = new Trigger(() -> getCurrent() > STALL_THRESHOLD && m_setpoint == MIN_HEIGHT && Math.abs(getHeight()) <= 0.1);
+        this.closedTrigger = new Trigger(() -> getCurrent() > STALL_THRESHOLD && m_setpoint == MIN_HEIGHT && Math.abs(getHeight()) <= 0.1).debounce(0.35);
         this.closedTrigger.onTrue(new InstantCommand(() -> m_motorGroup.setMotorPosition(0)).andThen(new PrintCommand("reset elevator")));
 
         m_extensionMechanism = new LinearExtension(
@@ -88,6 +88,10 @@ public class Elevator extends SubsystemBase implements Logged {
                 () -> m_motorGroup.setIdleState(IdleState.COAST),
                 () -> m_motorGroup.setIdleState(IdleState.BRAKE)
         ).ignoringDisable(true);
+    }
+
+    public Command resetHeightCommand(){
+        return new InstantCommand(() -> m_motorGroup.setMotorPosition(0)).ignoringDisable(true);
     }
 
     @Log.NT

@@ -26,9 +26,9 @@ public class Constants {
     public static final double L3_OUT_WHEELS_VOLTAGE = 0;
 
     // L4 Constants
-    public static final double L4_ELEVATOR_HEIGHT = 0.65;
-    public static final double L4_ARM_ANGLE = PI / 2;
-    public static final double L4_INNER_WHEELS_VOLTAGE = 0;
+    public static final double L4_ELEVATOR_HEIGHT = 0.7;
+    public static final double L4_ARM_ANGLE = PI / 2 ;
+    public static final double L4_INNER_WHEELS_VOLTAGE = 9;
     public static final double L4_OUT_WHEELS_VOLTAGE = 0;
 
     // ALGAE2 Constants
