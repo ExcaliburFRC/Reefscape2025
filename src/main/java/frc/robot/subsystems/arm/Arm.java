@@ -42,24 +42,25 @@ public class Arm extends SubsystemBase implements Logged {
 
     private final ShuffleboardTab m_superstructureTab = Shuffleboard.getTab("Superstructure");
     private final GenericEntry m_armAngleEntry = m_superstructureTab.add("Arm Angle", -1).getEntry();
+    private final GenericEntry m_armSetpointEntry = m_superstructureTab.add("Arm Setpoint", -1).getEntry();
     private final GenericEntry m_armAtSetpointEntry = m_superstructureTab.add("Arm At Setpoint", false).getEntry();
-    private final GenericEntry m_armSetpoint = m_superstructureTab.add("Arm Setpoint", -1).getEntry();
 
     public Arm() {
         m_firstMotor = new TalonFXMotor(FIRST_MOTOR_ID);
         m_firstMotor.setInverted(REVERSE);
         m_secondMotor = new TalonFXMotor(SECOND_MOTOR_ID);
-        m_secondMotor.setIdleState(BRAKE);
         m_secondMotor.setInverted(FORWARD);
 
         m_motorGroup = new MotorGroup(m_firstMotor, m_secondMotor);
         m_motorGroup.setVelocityConversionFactor(RPS_TO_RAD_PER_SEC);
         m_motorGroup.setPositionConversionFactor(POSITION_CONVERSION_FACTOR);
+        m_motorGroup.setIdleState(BRAKE);
 
         m_encoder = new CANcoder(CAN_CODER_ID);
         m_radSupplier = () -> m_encoder.getPosition().getValueAsDouble() * ROTATIONS_TO_RAD;
 
         m_motorGroup.setMotorPosition(m_radSupplier.getAsDouble());
+        m_motorGroup.setCurrentLimit(0, 25);
 
         m_arm = new frc.excalib.mechanisms.Arm.Arm(
                 m_motorGroup,
@@ -68,15 +69,16 @@ public class Arm extends SubsystemBase implements Logged {
                 ANGLE_GAINS,
                 new Mass(() -> Math.cos(m_radSupplier.getAsDouble()), () -> Math.sin(m_radSupplier.getAsDouble()), MASS)
         );
+
         elevatorHeightSupplier = () -> 0;
         this.m_toleranceTrigger = new Trigger(() -> this.isAtTolerance);
-        this.m_softLimit = new ContinuousSoftLimit(() ->
-                elevatorHeightSupplier.getAsDouble() > ELEVATOR_HEIGHT_LIMIT_TRIGGER ?
+        this.m_softLimit = new ContinuousSoftLimit(
+                () -> elevatorHeightSupplier.getAsDouble() > ELEVATOR_HEIGHT_LIMIT_TRIGGER ?
                         EXTENDED_MIN_RAD_LIMIT :
-                        CLOSED_MIN_RAD_LIMIT, () -> MAX_RAD_LIMIT);
+                        CLOSED_MIN_RAD_LIMIT,
+                () -> MAX_RAD_LIMIT
+        );
 
-        m_firstMotor.setCurrentLimit(0, 25);
-        m_secondMotor.setCurrentLimit(0, 25);
         this.setDefaultCommand(defaultCommand());
     }
 
@@ -89,22 +91,24 @@ public class Arm extends SubsystemBase implements Logged {
     }
 
     public Command changeSetpointCommand(double setpoint) {
-        return new RunCommand(() -> {
-            this.setpointAngle = setpoint;
-            System.out.println("wated setpoint " + setpoint + " current setpoint " + this.setpointAngle);
-        }).until(() -> this.setpointAngle == setpoint);
+        return new RunCommand(
+                () -> {
+                    this.setpointAngle = setpoint;
+                    System.out.println("waited setpoint " + setpoint + " current setpoint " + this.setpointAngle);
+                }
+        ).until(() -> this.setpointAngle == setpoint);
     }
 
     private Command defaultCommand() {
         return m_arm.anglePositionControlCommand(
-//                () -> m_softLimit.getSetPoint(m_arm.logPosition(), this.setpointAngle),
-                () -> this.setpointAngle,
+                () -> m_softLimit.getSetPoint(m_arm.logPosition(), this.setpointAngle),
+//                () -> this.setpointAngle,
                 (isAtTolerance) -> {
                     this.isAtTolerance = isAtTolerance;
                 },
                 TOLERANCE,
                 this
-        );
+        ).withName("Default Command");
     }
 
     public void setElevatorHeightSupplier(DoubleSupplier elevatorHeightSupplier) {
@@ -136,7 +140,7 @@ public class Arm extends SubsystemBase implements Logged {
     @Override
     public void periodic() {
         m_armAngleEntry.setDouble(getAngle());
-        m_armSetpoint.setDouble(getSetpoint());
+        m_armSetpointEntry.setDouble(getSetpoint());
         m_armAtSetpointEntry.setBoolean(atSetpoint());
     }
 
