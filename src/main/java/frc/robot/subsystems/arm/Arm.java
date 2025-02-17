@@ -4,6 +4,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -80,6 +81,8 @@ public class Arm extends SubsystemBase implements Logged {
         );
 
         this.setDefaultCommand(defaultCommand());
+
+        SmartDashboard.putData(this);
     }
 
     /**

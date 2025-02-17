@@ -26,10 +26,10 @@ public class Superstructure implements Logged {
         this.m_arm = new Arm();
         this.m_gripper = new Gripper();
 
-        this.m_arm.setElevatorHeightSupplier(this.m_elevator.m_heightSupplier);
-        this.m_elevator.setArmRadSupplier(this.m_arm.m_radSupplier);
+//        this.m_arm.setElevatorHeightSupplier(this.m_elevator.m_heightSupplier);
+//        this.m_elevator.setArmRadSupplier(this.m_arm.m_radSupplier);
 
-        this.toleranceTrigger = m_arm.m_toleranceTrigger.and(m_elevator.m_toleranceTrigger);
+        this.toleranceTrigger = m_arm.m_toleranceTrigger; //.and(m_elevator.m_toleranceTrigger);
     }
 
     public Command setStateCommand(State state, BooleanSupplier activateWheels) {
@@ -39,9 +39,9 @@ public class Superstructure implements Logged {
                                 state.m_armAngle
                         ),
                         new WaitUntilCommand(m_arm::atSetpoint),
-                        m_elevator.changeSetpointCommand(
-                                state.m_elevatorHeight
-                        ),
+//                        m_elevator.changeSetpointCommand(
+//                                state.m_elevatorHeight
+//                        ),
                         new WaitUntilCommand(
                                 this.toleranceTrigger.and(activateWheels)
                         ),
@@ -51,10 +51,10 @@ public class Superstructure implements Logged {
                         )
                 ).withInterruptBehavior(kCancelSelf) :
                 new SequentialCommandGroup(
-                        m_elevator.changeSetpointCommand(
-                                state.m_elevatorHeight
-                        ),
-                        new WaitUntilCommand(m_elevator::atSetpoint),
+//                        m_elevator.changeSetpointCommand(
+//                                state.m_elevatorHeight
+//                        ),
+//                        new WaitUntilCommand(m_elevator::atSetpoint),
                         m_arm.changeSetpointCommand(
                                 state.m_armAngle
                         ),
@@ -116,11 +116,11 @@ public class Superstructure implements Logged {
         return m_gripper.manualCommand(State.DEFAULT.m_innerWheelsVoltage, State.DEFAULT.m_outWheelsVoltage).withTimeout(0.05);
     }
 
-    public Command resetElevator() {
-        return m_elevator.resetHeightCommand();
-    }
+//    public Command resetElevator() {
+//        return m_elevator.resetHeightCommand();
+//    }
 
     public Command toggleIdleMode() {
-        return m_arm.coastCommand().alongWith(m_elevator.coastCommand());
+        return m_arm.coastCommand(); //.alongWith(m_elevator.coastCommand());
     }
 }

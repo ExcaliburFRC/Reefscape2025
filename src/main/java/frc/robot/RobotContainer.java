@@ -104,7 +104,8 @@ public class RobotContainer implements Logged {
         m_driver.square().onTrue(m_superstructure.scoreCoralCommand(3, m_driver.R1()));
         m_driver.circle().onTrue(m_superstructure.scoreCoralCommand(2, m_driver.R1()));
         m_driver.triangle().onTrue(m_superstructure.scoreCoralCommand(4, m_driver.R1()));
-        m_driver.create().onTrue(m_superstructure.resetElevator());
+        m_driver.cross().onTrue(m_superstructure.scoreCoralCommand(1,m_driver.R1()));
+//        m_driver.create().onTrue(m_superstructure.resetElevator());
     }
 
 

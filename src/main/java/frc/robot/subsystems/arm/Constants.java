@@ -21,7 +21,7 @@ public class Constants {
 
     //Physical Properties
     public static final double MASS = 1;
-    public static final double TOLERANCE = 0.05; // TODO
+    public static final double TOLERANCE = 0.07; // TODO
     public static final double ROTATIONS_TO_RAD = -2 * Math.PI;
     public static final double POSITION_CONVERSION_FACTOR = 1 / 7.5498750273499192965754627065202;
     public static final double RPS_TO_RAD_PER_SEC = 1 / 7.5498750273499192965754627065202;
