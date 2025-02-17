@@ -25,7 +25,9 @@ public class Gripper extends SubsystemBase implements Logged {
 
     public Gripper() {
         m_outerMotor = new FlexMotor(OUTER_MOTOR_ID, kBrushless);
+        m_outerMotor.setCurrentLimit(0, 25);
         m_innerMotor = new TalonFXMotor(INNER_MOTOR_ID);
+        m_innerMotor.setCurrentLimit(0, 25);
         m_outerWheel = new Mechanism(m_outerMotor);
         m_innerWheel = new Mechanism(m_innerMotor);
     }

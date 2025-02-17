@@ -25,9 +25,10 @@ public class Superstructure implements Logged {
         this.m_elevator = new Elevator();
         this.m_arm = new Arm();
         this.m_gripper = new Gripper();
-        this.m_arm.setElevatorHeightSupplier(this.m_elevator.m_heightSupplier);
 
+        this.m_arm.setElevatorHeightSupplier(this.m_elevator.m_heightSupplier);
         this.m_elevator.setArmRadSupplier(this.m_arm.m_radSupplier);
+
         this.toleranceTrigger = m_arm.m_toleranceTrigger.and(m_elevator.m_toleranceTrigger);
     }
 
@@ -39,7 +40,6 @@ public class Superstructure implements Logged {
                         ),
                         new WaitUntilCommand(m_arm::atSetpoint),
                         m_elevator.changeSetpointCommand(
-
                                 state.m_elevatorHeight
                         ),
                         new WaitUntilCommand(
@@ -64,7 +64,8 @@ public class Superstructure implements Logged {
                         m_gripper.manualCommand(
                                 state.m_innerWheelsVoltage,
                                 state.m_outWheelsVoltage
-                        )).withInterruptBehavior(kCancelSelf);
+                        )
+                ).withInterruptBehavior(kCancelSelf);
     }
 
     public Command intakeCommand(BooleanSupplier atPose) {
@@ -72,7 +73,7 @@ public class Superstructure implements Logged {
                 resetGripper(),
                 setStateCommand(State.INTAKE, atPose).until(m_gripper.m_coralTrigger),
                 setStateCommand(State.DEFAULT, () -> true)
-        );
+        ).withName("Intake Command");
     }
 
     public Command scoreCoralCommand(int level, BooleanSupplier release) {
@@ -83,24 +84,27 @@ public class Superstructure implements Logged {
             case 3 -> state = State.L3;
             case 4 -> state = State.L4;
             default -> {
-                return new PrintCommand(level + " is not a valid coral level");
+                return new PrintCommand("L" + level + " is not a valid coral level");
             }
         }
-        return setStateCommand(state, release).until(
-                m_gripper.m_coralTrigger.negate().debounce(1)).andThen(
+        return setStateCommand(
+                state, release
+        ).until(
+                m_gripper.m_coralTrigger.negate().debounce(1)
+        ).andThen(
                 setStateCommand(State.DEFAULT, () -> true)
-        );
+        ).withName("Score Coral Command");
     }
 
     public Command removeAlgaeCommand(int level, BooleanSupplier atPose) {
         if (level != 2 && level != 3) {
-            return new PrintCommand(level + " is not a valid algae level :(");
+            return new PrintCommand("L" + level + " is not a valid algae level :(");
         }
         State state = (level == 2) ? State.ALGAE2 : State.ALGAE3;
         return new SequentialCommandGroup(
                 m_gripper.manualCommand(state.m_innerWheelsVoltage, state.m_outWheelsVoltage),
                 setStateCommand(state, () -> true)
-        ).until(atPose);
+        ).until(atPose).withName("Remove Algae Command");
     }
 
     @Log.NT
@@ -119,9 +123,4 @@ public class Superstructure implements Logged {
     public Command toggleIdleMode() {
         return m_arm.coastCommand().alongWith(m_elevator.coastCommand());
     }
-
-    public boolean hasCoral() {
-        return m_gripper.hasCoral();
-    }
-
 }

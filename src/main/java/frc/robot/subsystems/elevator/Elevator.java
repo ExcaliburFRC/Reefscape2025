@@ -1,5 +1,8 @@
 package frc.robot.subsystems.elevator;
 
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -25,11 +28,16 @@ public class Elevator extends SubsystemBase implements Logged {
     private double m_setpoint;
     public final Trigger m_toleranceTrigger;
     public DoubleSupplier m_heightSupplier;
-    private DoubleSupplier armRadSupplier;
+    private DoubleSupplier m_armRadSupplier;
     private SoftLimit m_softLimit;
     private double m_prevVel = 0;
     private double m_accel = 0;
-    private final Trigger closedTrigger;
+    private final Trigger m_closedTrigger;
+
+    private final ShuffleboardTab m_superstructureTab = Shuffleboard.getTab("Superstructure");
+    private final GenericEntry m_elevatorHeightEntry = m_superstructureTab.add("Elevator Height", -1).getEntry();
+    private final GenericEntry m_elevatorSetpointEntry = m_superstructureTab.add("Elevator Setpoint", -1).getEntry();
+    private final GenericEntry m_elevatorAtSetpointEntry = m_superstructureTab.add("Elevator At Setpoint", false).getEntry();
 
     public Elevator() {
         m_firstMotor = new TalonFXMotor(FIRST_MOTOR_ID);
@@ -40,10 +48,11 @@ public class Elevator extends SubsystemBase implements Logged {
         m_motorGroup = new MotorGroup(m_firstMotor, m_secondMotor);
         m_motorGroup.setPositionConversionFactor(ROTATIONS_TO_METERS);
         m_motorGroup.setVelocityConversionFactor(ROTATIONS_TO_METERS);
+        m_motorGroup.setCurrentLimit(0, 50);
 
         m_setpoint = 0;
-        this.closedTrigger = new Trigger(() -> getCurrent() > STALL_THRESHOLD && m_setpoint == MIN_HEIGHT && Math.abs(getHeight()) <= 0.1).debounce(0.35);
-        this.closedTrigger.onTrue(new InstantCommand(() -> m_motorGroup.setMotorPosition(0)).andThen(new PrintCommand("reset elevator")));
+        this.m_closedTrigger = new Trigger(() -> getCurrent() > STALL_THRESHOLD && m_setpoint == MIN_HEIGHT && Math.abs(getHeight()) <= 0.1).debounce(0.35);
+        this.m_closedTrigger.onTrue(new InstantCommand(() -> m_motorGroup.setMotorPosition(0)).andThen(new PrintCommand("reset elevator")));
 
         m_extensionMechanism = new LinearExtension(
                 m_motorGroup,
@@ -53,18 +62,24 @@ public class Elevator extends SubsystemBase implements Logged {
                 CONSTRAINTS,
                 TOLERANCE
         );
+
         m_heightSupplier = m_extensionMechanism::logPosition;
-        m_toleranceTrigger = new Trigger(
-                () -> Math.abs(this.m_setpoint - m_extensionMechanism.logPosition()) < TOLERANCE
+
+        m_toleranceTrigger = new Trigger(() -> Math.abs(this.m_setpoint - m_heightSupplier.getAsDouble()) < TOLERANCE);
+
+        this.m_armRadSupplier = () -> 0;
+
+        this.m_softLimit = new SoftLimit(
+                () -> {
+                    if (m_armRadSupplier.getAsDouble() > ARM_COLLISION_RAD) return MIN_HEIGHT;
+                    return m_heightSupplier.getAsDouble() > UPPER_MIN_HEIGHT ? UPPER_MIN_HEIGHT : MIN_HEIGHT;
+                },
+                () -> {
+                    if (m_armRadSupplier.getAsDouble() > ARM_COLLISION_RAD) return MAX_HEIGHT;
+                    return m_heightSupplier.getAsDouble() < LOWER_MAX_HEIGHT ? LOWER_MAX_HEIGHT : MAX_HEIGHT;
+                }
         );
-        this.armRadSupplier = () -> 0;
-        this.m_softLimit = new SoftLimit(() -> {
-            if (armRadSupplier.getAsDouble() > ARM_COLLISION_RAD) return MIN_HEIGHT;
-            return m_heightSupplier.getAsDouble() > UPPER_MIN_HEIGHT ? UPPER_MIN_HEIGHT : MIN_HEIGHT;
-        }, () -> {
-            if (armRadSupplier.getAsDouble() > ARM_COLLISION_RAD) return MAX_HEIGHT;
-            return m_heightSupplier.getAsDouble() < LOWER_MAX_HEIGHT ? LOWER_MAX_HEIGHT : MAX_HEIGHT;
-        });
+
         this.setDefaultCommand(defaultCommand());
     }
 
@@ -74,23 +89,29 @@ public class Elevator extends SubsystemBase implements Logged {
 
     private Command defaultCommand() {
         return m_extensionMechanism.extendCommand(
-                () -> this.m_setpoint,//m_softLimit.limit(this.m_setpoint),
+//                () -> this.m_setpoint,
+                () -> m_softLimit.limit(this.m_setpoint),
                 this
-        );
+        ).withName("Default Command");
     }
 
     public Command changeSetpointCommand(double length) {
-        return new InstantCommand(() -> this.m_setpoint = length);
+        return new RunCommand(
+                () -> {
+                    this.m_setpoint = length;
+                    System.out.println("waited setpoint " + length + " current setpoint " + m_setpoint);
+                }
+        ).until(() -> m_setpoint == length);
     }
 
     public Command coastCommand() {
         return new StartEndCommand(
                 () -> m_motorGroup.setIdleState(IdleState.COAST),
                 () -> m_motorGroup.setIdleState(IdleState.BRAKE)
-        ).ignoringDisable(true);
+        ).ignoringDisable(true).withName("Coast Command");
     }
 
-    public Command resetHeightCommand(){
+    public Command resetHeightCommand() {
         return new InstantCommand(() -> m_motorGroup.setMotorPosition(0)).ignoringDisable(true);
     }
 
@@ -120,7 +141,7 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public void setArmRadSupplier(DoubleSupplier armRadSupplier) {
-        this.armRadSupplier = armRadSupplier;
+        this.m_armRadSupplier = armRadSupplier;
     }
 
     public Command sysIdCommand(boolean dynamic, SysIdRoutine.Direction direction, SysidConfig sysidConfig) {
@@ -132,5 +153,9 @@ public class Elevator extends SubsystemBase implements Logged {
     public void periodic() {
         m_accel = (m_extensionMechanism.logVelocity() - m_prevVel) / 0.02;
         m_prevVel = m_extensionMechanism.logVelocity();
+
+        m_elevatorHeightEntry.setDouble(getHeight());
+        m_elevatorSetpointEntry.setDouble(getSetpoint());
+        m_elevatorAtSetpointEntry.setBoolean(atSetpoint());
     }
 }
