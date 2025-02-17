@@ -36,6 +36,8 @@ public class Robot extends TimedRobot {
         Monologue.setupMonologue(m_robotContainer, "Robot", fileOnly, lazyLogging);
 
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+
+        addPeriodic(m_robotContainer.updateOdometry, 0.01);
     }
 
     /**
