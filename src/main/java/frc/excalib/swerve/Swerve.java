@@ -42,6 +42,7 @@ public class Swerve extends SubsystemBase implements Logged {
     private final ModulesHolder m_MODULES;
     private final IMU m_imu;
     private final Odometry m_odometry;
+    private ChassisSpeeds m_desiredChassisSpeeds = new ChassisSpeeds();
 
     private final SwerveDriveKinematics m_swerveDriveKinematics;
 
@@ -99,6 +100,8 @@ public class Swerve extends SubsystemBase implements Logged {
             }
             return velocity;
         };
+
+        m_desiredChassisSpeeds = new ChassisSpeeds(adjustedVelocitySupplier.get().getX(), adjustedVelocitySupplier.get().getY(), omegaRadPerSec.getAsDouble());
 
         Command driveCommand = m_MODULES.setVelocitiesCommand(
                 adjustedVelocitySupplier,
@@ -193,6 +196,12 @@ public class Swerve extends SubsystemBase implements Logged {
         return new InstantCommand(m_imu::resetIMU).ignoringDisable(true);
     }
 
+    public Command coastCommand() {
+        Command coastCommand = m_MODULES.coastCommand().ignoringDisable(true);
+        coastCommand.addRequirements(this);
+        return coastCommand;
+    }
+
     /**
      * Updates the robot's odometry.
      */
@@ -253,8 +262,14 @@ public class Swerve extends SubsystemBase implements Logged {
      *
      * @return The robot's speed as a ChassisSpeeds.
      */
+    @Log.NT(key = "Measured Chassis Speeds")
     public ChassisSpeeds getRobotRelativeSpeeds() {
         return m_swerveDriveKinematics.toChassisSpeeds(m_MODULES.logStates());
+    }
+
+    @Log.NT
+    public ChassisSpeeds getDesiredChassisSpeeds() {
+        return m_desiredChassisSpeeds;
     }
 
     /**
@@ -358,6 +373,32 @@ public class Swerve extends SubsystemBase implements Logged {
      * @return The command to perform the sysid routine.
      */
     public Command driveSysId(int module, Direction dir, SysidConfig sysidConfig, boolean dynamic) {
+        SwerveModule selectedModule;
+
+        switch (module) {
+            case 0 -> selectedModule = m_MODULES.m_frontLeft;
+            case 1 -> selectedModule = m_MODULES.m_frontRight;
+            case 2 -> selectedModule = m_MODULES.m_backLeft;
+            case 3 -> selectedModule = m_MODULES.m_backRight;
+            default -> {
+                throw new IllegalArgumentException("Invalid module index: " + module);
+            }
+        }
+
+        return dynamic ?
+                selectedModule.driveSysIdDynamic(dir, this, sysidConfig)
+                : selectedModule.driveSysIdQuas(dir, this, sysidConfig);
+    }
+
+    /**
+     * Runs a system identification routine on a specific module's angle.
+     *
+     * @param module  The module index (0-3).
+     * @param dir     The direction of the sysid routine.
+     * @param dynamic Whether to perform a dynamic or quasistatic test.
+     * @return The command to perform the sysid routine.
+     */
+    public Command angleSysId(int module, Direction dir, SysidConfig sysidConfig, boolean dynamic) {
         SwerveModule selectedModule;
 
         switch (module) {

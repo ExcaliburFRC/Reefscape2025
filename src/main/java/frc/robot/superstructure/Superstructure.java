@@ -1,9 +1,6 @@
 package frc.robot.superstructure;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.elevator.Elevator;
@@ -13,50 +10,33 @@ import monologue.Logged;
 
 import java.util.function.BooleanSupplier;
 
-import static edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior.*;
-
 public class Superstructure implements Logged {
     private final Elevator m_elevator;
     private final Arm m_arm;
     private final Gripper m_gripper;
     public final Trigger toleranceTrigger;
+    public boolean occupied = false;
+    private Trigger occupiedTrigger = new Trigger(()-> occupied);
 
     public Superstructure() {
         this.m_elevator = new Elevator();
         this.m_arm = new Arm();
         this.m_gripper = new Gripper();
 
-//        this.m_arm.setElevatorHeightSupplier(this.m_elevator.m_heightSupplier);
-//        this.m_elevator.setArmRadSupplier(this.m_arm.m_radSupplier);
-
-        this.toleranceTrigger = m_arm.m_toleranceTrigger; //.and(m_elevator.m_toleranceTrigger);
+        this.m_arm.setElevatorHeightSupplier(this.m_elevator.m_heightSupplier);
+        this.m_elevator.setArmRadSupplier(this.m_arm.m_radSupplier);
+        this.toleranceTrigger = m_arm.m_toleranceTrigger.and(m_elevator.m_toleranceTrigger);
+        occupiedTrigger.whileFalse(new PrintCommand("bla bla bla").andThen(setStateCommand(State.DEFAULT, ()->true)));
     }
 
     public Command setStateCommand(State state, BooleanSupplier activateWheels) {
-        return m_gripper.hasCoral() ?
-                new SequentialCommandGroup(
+        return new SequentialCommandGroup(
+                new PrintCommand(state.name()),
                         m_arm.changeSetpointCommand(
                                 state.m_armAngle
                         ),
-                        new WaitUntilCommand(m_arm::atSetpoint),
-//                        m_elevator.changeSetpointCommand(
-//                                state.m_elevatorHeight
-//                        ),
-                        new WaitUntilCommand(
-                                this.toleranceTrigger.and(activateWheels)
-                        ),
-                        m_gripper.manualCommand(
-                                state.m_innerWheelsVoltage,
-                                state.m_outWheelsVoltage
-                        )
-                ).withInterruptBehavior(kCancelSelf) :
-                new SequentialCommandGroup(
-//                        m_elevator.changeSetpointCommand(
-//                                state.m_elevatorHeight
-//                        ),
-//                        new WaitUntilCommand(m_elevator::atSetpoint),
-                        m_arm.changeSetpointCommand(
-                                state.m_armAngle
+                        m_elevator.changeSetpointCommand(
+                                state.m_elevatorHeight
                         ),
                         new WaitUntilCommand(
                                 this.toleranceTrigger.and(activateWheels)
@@ -65,15 +45,15 @@ public class Superstructure implements Logged {
                                 state.m_innerWheelsVoltage,
                                 state.m_outWheelsVoltage
                         )
-                ).withInterruptBehavior(kCancelSelf);
+                );
     }
 
     public Command intakeCommand(BooleanSupplier atPose) {
         return new SequentialCommandGroup(
+                occupyCommand(),
                 resetGripper(),
-                setStateCommand(State.INTAKE, atPose).until(m_gripper.m_coralTrigger),
-                setStateCommand(State.DEFAULT, () -> true)
-        ).withName("Intake Command");
+                setStateCommand(State.INTAKE, atPose).until(m_gripper.m_coralTrigger)
+        ).withName("Intake Command").finallyDo(unoccupy());
     }
 
     public Command scoreCoralCommand(int level, BooleanSupplier release) {
@@ -87,13 +67,9 @@ public class Superstructure implements Logged {
                 return new PrintCommand("L" + level + " is not a valid coral level");
             }
         }
-        return setStateCommand(
-                state, release
-        ).until(
-                m_gripper.m_coralTrigger.negate().debounce(1)
-        ).andThen(
-                setStateCommand(State.DEFAULT, () -> true)
-        ).withName("Score Coral Command");
+        return occupyCommand().andThen(setStateCommand(state, release)
+                .until(m_gripper.m_coralTrigger.negate().debounce(3)))
+                .withName("Score Coral Command").finallyDo(unoccupy());
     }
 
     public Command removeAlgaeCommand(int level, BooleanSupplier atPose) {
@@ -116,11 +92,22 @@ public class Superstructure implements Logged {
         return m_gripper.manualCommand(State.DEFAULT.m_innerWheelsVoltage, State.DEFAULT.m_outWheelsVoltage).withTimeout(0.05);
     }
 
-//    public Command resetElevator() {
-//        return m_elevator.resetHeightCommand();
-//    }
+    public Command resetElevator() {
+        return m_elevator.resetHeightCommand();
+    }
 
     public Command toggleIdleMode() {
-        return m_arm.coastCommand(); //.alongWith(m_elevator.coastCommand());
+        return m_arm.coastCommand().alongWith(m_elevator.coastCommand());
+    }
+    public Command occupyCommand(){
+        return new InstantCommand(()->this.occupied = true).ignoringDisable(true);
+    }
+    public Runnable unoccupy(){
+        return ()->this.occupied = false;
+    }
+
+    @Log.NT
+    public boolean isOccupied(){
+        return this.occupied;
     }
 }

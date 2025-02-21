@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.superstructure.State;
 import monologue.Monologue;
 
 public class Robot extends TimedRobot {
@@ -37,7 +38,9 @@ public class Robot extends TimedRobot {
 
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
-        addPeriodic(m_robotContainer.updateOdometry, 0.01);
+//        addPeriodic(m_robotContainer.updateOdometry, 0.01);
+
+
     }
 
     /**
@@ -90,6 +93,9 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
+
+//        this.m_robotContainer.superstructure.setStateCommand(State.DEFAULT, ()-> true).schedule();
+        System.out.println("sdfghjkl;");
     }
 
     /**

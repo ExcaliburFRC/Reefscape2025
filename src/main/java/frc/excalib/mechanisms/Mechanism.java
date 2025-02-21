@@ -82,6 +82,15 @@ public class Mechanism implements Logged {
         return m_motor.getMotorPosition();
     }
 
+    @Log.NT
+    public double logVoltage() {
+        return  m_motor.getVoltage();
+    }
+
+    @Log.NT
+    public double logCurrent() {
+        return m_motor.getCurrent();
+    }
 
     private SysIdRoutine getLinearSysIdRoutine(SubsystemBase subsystem, DoubleSupplier sensorInput, SysidConfig config) {
         return new SysIdRoutine(

@@ -70,8 +70,8 @@ public final class Constants {
         public static final double MAX_SIDE_ACC = 6; //TODO
         public static final double MAX_SKID_ACC = 60; //TODO
         public static final double MAX_FORWARD_ACC = 9; //TODO
-        public static final double MAX_VEL = 1; //TODO
-        public static final double MAX_OMEGA_RAD_PER_SEC = 1; //TODO
+        public static final double MAX_VEL = 3; //TODO
+        public static final double MAX_OMEGA_RAD_PER_SEC = 4; //11.2 //TODO
         public static final double MAX_OMEGA_RAD_PER_SEC_SQUARE = 1; //TODO
 
         public static final PathConstraints MAX_PATH_CONSTRAINTS = new PathConstraints(
@@ -105,7 +105,7 @@ public final class Constants {
                             new SwerveModule(
                                     new TalonFXMotor(FRONT_LEFT_DRIVE_ID, SWERVE_CANBUS),
                                     new SparkMaxMotor(FRONT_LEFT_ROTATION_ID, kBrushless),
-                                    new Gains(6, 0, 0, 0.089025, 2.5605, 0.20684, 0), //TODO
+                                    new Gains(6, 0, 0, 0.32621, 2.6212, 0.33422, 0),
                                     new Gains(0, 0, 0, 0.0092262, 2.22144, 0.61204, 0), //TODO
                                     PID_TOLERANCE,
                                     FRONT_LEFT_TRANSLATION,
@@ -118,7 +118,7 @@ public final class Constants {
                             new SwerveModule(
                                     new TalonFXMotor(FRONT_RIGHT_DRIVE_ID, SWERVE_CANBUS),
                                     new SparkMaxMotor(FRONT_RIGHT_ROTATION_ID, kBrushless),
-                                    new Gains(6, 0, 0, 0.089025, 2.5605, 0.20684, 0), //TODO
+                                    new Gains(6, 0, 0, 0.32621, 2.6212, 0.33422, 0),
                                     new Gains(0, 0, 0, 0.0092262, 2.22144, 0.61204, 0), //TODO
                                     PID_TOLERANCE,
                                     FRONT_RIGHT_TRANSLATION,
@@ -131,7 +131,7 @@ public final class Constants {
                             new SwerveModule(
                                     new TalonFXMotor(BACK_LEFT_DRIVE_ID, SWERVE_CANBUS),
                                     new SparkMaxMotor(BACK_LEFT_ROTATION_ID, kBrushless),
-                                    new Gains(6, 0, 0, 0.089025, 2.5605, 0.20684, 0), //TODO
+                                    new Gains(7, 0, 0, 0.32621, 2.6212, 0.33422, 0),
                                     new Gains(0, 0, 0, 0.0092262, 2.22144, 0.61204, 0), //TODO
                                     PID_TOLERANCE,
                                     BACK_LEFT_TRANSLATION,
@@ -144,7 +144,7 @@ public final class Constants {
                             new SwerveModule(
                                     new TalonFXMotor(BACK_RIGHT_DRIVE_ID, SWERVE_CANBUS),
                                     new SparkMaxMotor(BACK_RIGHT_ROTATION_ID, kBrushless),
-                                    new Gains(6, 0, 0, 0.089025, 2.5605, 0.20684, 0), //TODO
+                                    new Gains(6, 0, 0, 0.32621, 2.6212, 0.33422, 0),
                                     new Gains(0, 0, 0, 0.0092262, 2.22144, 0.61204, 0), //TODO
                                     PID_TOLERANCE,
                                     BACK_RIGHT_TRANSLATION,

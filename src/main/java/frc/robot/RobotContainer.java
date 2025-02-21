@@ -20,8 +20,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.excalib.control.gains.SysidConfig;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.superstructure.State;
 import frc.robot.superstructure.Superstructure;
 import monologue.Logged;
@@ -33,15 +37,13 @@ public class RobotContainer implements Logged {
     // The robot's subsystems and commands are defined here...
 
     private final Swerve m_swerve = Constants.SwerveConstants.configureSwerve(new Pose2d());
-    private final Superstructure m_superstructure = new Superstructure();
-
+//    public final Superstructure superstructure = new Superstructure();
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
-
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
 
-    public Runnable updateOdometry = m_swerve::updateOdometry;
+//    public Runnable updateOdometry = m_swerve::updateOdometry;
 
-    private SendableChooser<Command> m_autoChooser;
+//    private SendableChooser<Command> m_autoChooser;
 
     public RobotContainer() {
         m_decelerator.put(-1.0, 1.0);
@@ -61,53 +63,33 @@ public class RobotContainer implements Logged {
                         () -> new Vector2D(
                                 deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
                                 deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
-                        () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC,
+                        () -> deadband(m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC,
                         () -> true
                 ));
 
         m_driver.PS().onTrue(m_swerve.resetAngleCommand());
 
-        /*
-        m_driver.cross().onTrue(
-                m_swerve.driveToPoseWithOverrideCommand(
-                        new Pose2d(1, 0, new Rotation2d()),
-                        m_driver.R2(),
-                        () -> new Vector2D(
-                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
-                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
-                        () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC
-                )
-        );*/
+//        m_driver.cross().onTrue(
+//                m_swerve.driveToPoseWithOverrideCommand(
+//                        new Pose2d(1, 0, new Rotation2d()),
+//                        m_driver.R2(),
+//                        () -> new Vector2D(
+//                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
+//                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
+//                        () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC
+//                )
+//        );
 
-//        m_driver.circle().toggleOnTrue(m_swerve.driveSysId(1, SysIdRoutine.Direction.kForward,new SysidConfig(0.5, 7, 15), false));
-//        m_driver.triangle().toggleOnTrue(m_swerve.driveSysId(1, SysIdRoutine.Direction.kForward,new SysidConfig(0.5, 7, 15), false));
-//        m_driver.square().toggleOnTrue(m_swerve.driveSysId(1, SysIdRoutine.Direction.kForward,new SysidConfig(0.5, 7, 15), true));
-//        m_driver.cross().toggleOnTrue(m_swerve.driveSysId(1, SysIdRoutine.Direction.kForward,new SysidConfig(0.5, 7, 15), true));
+//        m_driver.circle().onTrue(superstructure.intakeCommand(() -> true));
+//        m_driver.square().onTrue(superstructure.scoreCoralCommand(3, m_driver.R1()));
+//        m_driver.cross().onTrue(superstructure.scoreCoralCommand(2, m_driver.R1()));
+//        m_driver.triangle().onTrue(superstructure.scoreCoralCommand(4, m_driver.R1()));
 
-//        m_driver.povDown().onTrue(m_arm.changeSetpointCommand(-Math.PI / 2));
-//        m_driver.povLeft().onTrue(m_arm.changeSetpointCommand(-Math.PI / 4));
-//        m_driver.povRight().onTrue(m_arm.changeSetpointCommand(0));
-//        m_driver.povUp().onTrue(m_arm.changeSetpointCommand(Math.PI / 2));
-//
-//        m_driver.cross().onTrue(m_elevator.changeSetpointCommand(0));
-//        m_driver.square().onTrue(m_elevator.changeSetpointCommand(0.3));
-//        m_driver.circle().onTrue(m_elevator.changeSetpointCommand(0.15));
-//        m_driver.triangle().onTrue(m_elevator.changeSetpointCommand(0.6));
+//        m_driver.touchpad().toggleOnTrue(superstructure.toggleIdleMode());
 
-//        m_driver.povRight().whileTrue(m_elevator.sysIdCommand(false, kForward, new SysidConfig(0.3, 1.5, 30)));
-//        m_driver.povDown().whileTrue(m_elevator.sysIdCommand(false, kReverse, new SysidConfig(0.3, 1.5, 30)));
-//        m_driver.povLeft().whileTrue(m_elevator.sysIdCommand(true, kForward, new SysidConfig(0.3, 1.5, 30)));
-//        m_driver.povUp().whileTrue(m_elevator.sysIdCommand(true, kReverse, new SysidConfig(0.3, 1.5, 30)));
+//        m_driver.options().onTrue(superstructure.setStateCommand(State.DEFAULT, ()-> true));
 
-        m_driver.touchpad().toggleOnTrue(m_superstructure.toggleIdleMode());
-
-        m_driver.options().onTrue(m_superstructure.setStateCommand(State.DEFAULT, ()-> true));
-        m_driver.R2().onTrue(m_superstructure.intakeCommand(()-> true));
-        m_driver.square().onTrue(m_superstructure.scoreCoralCommand(3, m_driver.R1()));
-        m_driver.circle().onTrue(m_superstructure.scoreCoralCommand(2, m_driver.R1()));
-        m_driver.triangle().onTrue(m_superstructure.scoreCoralCommand(4, m_driver.R1()));
-        m_driver.cross().onTrue(m_superstructure.scoreCoralCommand(1,m_driver.R1()));
-//        m_driver.create().onTrue(m_superstructure.resetElevator());
+//        m_driver.create().onTrue(superstructure.resetElevator());
     }
 
 
@@ -116,21 +98,21 @@ public class RobotContainer implements Logged {
     }
 
     private void initAutoChooser() {
-        NamedCommands.registerCommand("print command", new PrintCommand("pathplanner"));
-
-        new EventTrigger("testTrigger").whileTrue(Commands.run(() -> System.out.println("Trigger Test")));
-        new PointTowardsZoneTrigger("PointTowardsZoneTrigger").whileTrue(Commands.run(() -> System.out.println("Trigger Test2")));
-
-//         Build an auto chooser. This will use Commands.none() as the default option.
-        m_autoChooser = AutoBuilder.buildAutoChooser();
-        m_autoChooser.addOption("Test Auto", new PathPlannerAuto("testAuto"));
-        m_autoChooser.addOption("Test Auto 2", new PathPlannerAuto("testAuto2"));
-        m_autoChooser.addOption("Calibration Auto", new PathPlannerAuto("calibrationAuto"));
-        m_autoChooser.addOption("Test Choreo Auto", new PathPlannerAuto("testChoreoAuto"));
-        m_autoChooser.addOption("Test Trigger", new PathPlannerAuto("triggerTest"));
-        m_autoChooser.addOption("Heart", new PathPlannerAuto("HeartAuto"));
-
-        SmartDashboard.putData("Auto Chooser", m_autoChooser);
+//        NamedCommands.registerCommand("print command", new PrintCommand("pathplanner"));
+//
+//        new EventTrigger("testTrigger").whileTrue(Commands.run(() -> System.out.println("Trigger Test")));
+//        new PointTowardsZoneTrigger("PointTowardsZoneTrigger").whileTrue(Commands.run(() -> System.out.println("Trigger Test2")));
+//
+////         Build an auto chooser. This will use Commands.none() as the default option.
+//        m_autoChooser = AutoBuilder.buildAutoChooser();
+//        m_autoChooser.addOption("Test Auto", new PathPlannerAuto("testAuto"));
+//        m_autoChooser.addOption("Test Auto 2", new PathPlannerAuto("testAuto2"));
+//        m_autoChooser.addOption("Calibration Auto", new PathPlannerAuto("calibrationAuto"));
+//        m_autoChooser.addOption("Test Choreo Auto", new PathPlannerAuto("testChoreoAuto"));
+//        m_autoChooser.addOption("Test Trigger", new PathPlannerAuto("triggerTest"));
+//        m_autoChooser.addOption("Heart", new PathPlannerAuto("HeartAuto"));
+//
+//        SmartDashboard.putData("Auto Chooser", m_autoChooser);
     }
 
     private void initElastic() {
@@ -163,6 +145,6 @@ public class RobotContainer implements Logged {
 
 
     public Command getAutonomousCommand() {
-        return m_autoChooser.getSelected();
+        return Commands.none(); //m_autoChooser.getSelected();
     }
 }

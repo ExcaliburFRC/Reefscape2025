@@ -9,8 +9,8 @@ public class Constants {
     static final int SECOND_MOTOR_ID = 21;
 
     //Measurements
-    static final double ELEVATOR_ANGLE = Math.PI/2;
-    static final double TOLERANCE = 0.01;
+    static final double ELEVATOR_ANGLE = Math.PI / 2;
+    static final double TOLERANCE = 0.025;
     static final double ROTATIONS_TO_METERS = 0.011767896627459766;
 
     //Gains and Constrains
@@ -21,14 +21,14 @@ public class Constants {
     private static final double ka = 0; //TODO
     private static final double kv = 10.224;
     private static final double kg = 0.18203;
-    static final Gains ELEVATOR_GAINS = new Gains(kp, ki,kd, ks, kv, ka, kg);
+    static final Gains ELEVATOR_GAINS = new Gains(kp, ki, kd, ks, kv, ka, kg);
 
-    static final double MIN_HEIGHT = 0;
+    static final double MIN_HEIGHT = 0.01;
     static final double STALL_THRESHOLD = 1;
     static final double MAX_HEIGHT = 0.7;
-    static final double LOWER_MAX_HEIGHT = 0.2; //TODO
-    static final double UPPER_MIN_HEIGHT = 0.46; //TODO
-    static final double ARM_COLLISION_RAD = 0; //TODO: get arm defualt angle
+    static final double LOWER_MAX_HEIGHT = 0.17; //TODO
+    static final double UPPER_MIN_HEIGHT = 0.524; //TODO
+    static final double ARM_COLLISION_RAD = -Math.PI / 4;
 
     static final TrapezoidProfile.Constraints CONSTRAINTS =
             new TrapezoidProfile.Constraints(

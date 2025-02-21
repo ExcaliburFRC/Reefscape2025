@@ -59,8 +59,8 @@ public final class Turret extends Mechanism {
     public void setPosition(Rotation2d wantedPosition) {
         double smartSetPoint = m_rotationLimit.getSetPoint(getPosition().getRadians(), wantedPosition.getRadians());
         double pid = m_anglePIDcontroller.calculate(m_POSITION_SUPPLIER.getAsDouble(), smartSetPoint);
-        double ff =m_angleFFcontroller.getKs() * Math.signum(pid);
-        super.setVoltage(pid + ff);
+//        double ff =m_angleFFcontroller.getKs() * Math.signum(pid);
+        super.setVoltage(pid);
     }
 
     /**

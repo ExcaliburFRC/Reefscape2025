@@ -142,6 +142,13 @@ public class SwerveModule implements Logged {
                 velocityRatioLimit.getAsDouble()));
     }
 
+    public Command coastCommand() {
+        return new ParallelCommandGroup(
+                m_driveWheel.coastCommand(),
+                m_turret.coastCommand()
+        );
+    }
+
     public void setDesiredState(SwerveModuleState wantedState) {
         Vector2D velocity = new Vector2D(wantedState.speedMetersPerSecond, wantedState.angle);
         double speed = velocity.getDistance();
@@ -197,11 +204,19 @@ public class SwerveModule implements Logged {
     }
 
 
-    public Command angleSysIdDynamic(SysIdRoutine.Direction direction, Swerve swerve, SysidConfig sysidConfig) {
+    public Command driveSysIdDynamic(SysIdRoutine.Direction direction, Swerve swerve, SysidConfig sysidConfig) {
         return m_driveWheel.sysIdDynamic(direction, swerve, m_driveWheel::logPosition, sysidConfig, false);
     }
 
-    public Command angleSysIdQuas(SysIdRoutine.Direction direction, Swerve swerve, SysidConfig sysidConfig) {
+    public Command driveSysIdQuas(SysIdRoutine.Direction direction, Swerve swerve, SysidConfig sysidConfig) {
         return m_driveWheel.sysIdQuasistatic(direction, swerve, m_driveWheel::logPosition, sysidConfig, false);
+    }
+
+    public Command angleSysIdDynamic(SysIdRoutine.Direction direction, Swerve swerve, SysidConfig sysidConfig) {
+        return m_turret.sysIdDynamic(direction, swerve, m_turret::logPosition, sysidConfig, false);
+    }
+
+    public Command angleSysIdQuas(SysIdRoutine.Direction direction, Swerve swerve, SysidConfig sysidConfig) {
+        return m_turret.sysIdQuasistatic(direction, swerve, m_turret::logPosition, sysidConfig, false);
     }
 }

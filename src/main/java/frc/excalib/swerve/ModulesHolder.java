@@ -5,7 +5,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.excalib.control.math.Vector2D;
 import monologue.Logged;
 
@@ -142,6 +142,15 @@ public class ModulesHolder implements Logged {
                         omega,
                         () -> calcVelocityRatioLimit(translationalVel.get(), omega.getAsDouble())
                 )
+        );
+    }
+
+    public Command coastCommand() {
+        return new ParallelCommandGroup(
+                m_frontLeft.coastCommand(),
+                m_frontRight.coastCommand(),
+                m_backLeft.coastCommand(),
+                m_backRight.coastCommand()
         );
     }
 

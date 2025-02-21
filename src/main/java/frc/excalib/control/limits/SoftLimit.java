@@ -29,7 +29,7 @@ public class SoftLimit {
      * @return if it is in the limit or not
      */
     public boolean within(double val) {
-        return (m_maxLimit.getAsDouble() > val) && (val > m_minLimit.getAsDouble());
+        return (m_maxLimit.getAsDouble() >= val) && (val >= m_minLimit.getAsDouble());
     }
 
     /**

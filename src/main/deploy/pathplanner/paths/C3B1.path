@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.980320512816177,
-        "y": 3.3851282051292815
+        "x": 7.268205128205127,
+        "y": 3.0651923076923078
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.288731467033868,
-        "y": 3.5370129524923617
+        "x": 6.576616082422818,
+        "y": 3.217077055055388
       },
       "isLocked": false,
       "linkedName": "C3"
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.45,
-    "maxAcceleration": 9.0,
+    "maxVelocity": 45.0,
+    "maxAcceleration": 45.0,
     "maxAngularVelocity": 658.9,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -48,7 +48,7 @@
   "folder": "CompPaths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 117.47443162627705
   },
   "useDefaultConstraints": true
 }

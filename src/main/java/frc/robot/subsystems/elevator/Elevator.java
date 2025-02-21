@@ -50,7 +50,7 @@ public class Elevator extends SubsystemBase implements Logged {
         m_motorGroup.setPositionConversionFactor(ROTATIONS_TO_METERS);
         m_motorGroup.setVelocityConversionFactor(ROTATIONS_TO_METERS);
         m_motorGroup.setCurrentLimit(0, 50);
-
+        m_motorGroup.setIdleState(IdleState.BRAKE);
         m_setpoint = 0;
         this.m_closedTrigger = new Trigger(() -> getCurrent() > STALL_THRESHOLD && m_setpoint == MIN_HEIGHT && Math.abs(getHeight()) <= 0.1).debounce(0.35);
         this.m_closedTrigger.onTrue(new InstantCommand(() -> m_motorGroup.setMotorPosition(0)).andThen(new PrintCommand("reset elevator")));
@@ -72,12 +72,16 @@ public class Elevator extends SubsystemBase implements Logged {
 
         this.m_softLimit = new SoftLimit(
                 () -> {
-                    if (m_armRadSupplier.getAsDouble() > ARM_COLLISION_RAD) return MIN_HEIGHT;
+                    if (m_armRadSupplier.getAsDouble() > ARM_COLLISION_RAD) {
+                        return MIN_HEIGHT;
+                    }
                     return m_heightSupplier.getAsDouble() > UPPER_MIN_HEIGHT ? UPPER_MIN_HEIGHT : MIN_HEIGHT;
                 },
                 () -> {
-                    if (m_armRadSupplier.getAsDouble() > ARM_COLLISION_RAD) return MAX_HEIGHT;
-                    return m_heightSupplier.getAsDouble() < LOWER_MAX_HEIGHT ? LOWER_MAX_HEIGHT : MAX_HEIGHT;
+                    if (m_armRadSupplier.getAsDouble() > ARM_COLLISION_RAD) {
+                        return MAX_HEIGHT;
+                    }
+                    return m_heightSupplier.getAsDouble() <= LOWER_MAX_HEIGHT ? LOWER_MAX_HEIGHT : MAX_HEIGHT;
                 }
         );
 
@@ -92,8 +96,10 @@ public class Elevator extends SubsystemBase implements Logged {
 
     private Command defaultCommand() {
         return m_extensionMechanism.extendCommand(
-//                () -> this.m_setpoint,
-                () -> m_softLimit.limit(this.m_setpoint),
+                () -> {
+                    double setpoint = m_softLimit.limit(this.m_setpoint);
+                    return setpoint;
+                },
                 this
         ).withName("Default Command");
     }
@@ -102,7 +108,6 @@ public class Elevator extends SubsystemBase implements Logged {
         return new RunCommand(
                 () -> {
                     this.m_setpoint = length;
-                    System.out.println("waited setpoint " + length + " current setpoint " + m_setpoint);
                 }
         ).until(() -> m_setpoint == length);
     }
@@ -115,7 +120,10 @@ public class Elevator extends SubsystemBase implements Logged {
     }
 
     public Command resetHeightCommand() {
-        return new InstantCommand(() -> m_motorGroup.setMotorPosition(0)).ignoringDisable(true);
+        return new InstantCommand(() -> {
+            m_motorGroup.setMotorPosition(0);
+            System.out.println("reset elevator height");
+        }).ignoringDisable(true);
     }
 
     @Log.NT
