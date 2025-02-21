@@ -39,7 +39,7 @@ public class Arm extends SubsystemBase implements Logged {
     public final Trigger m_toleranceTrigger;
     private double m_setpointAngle = State.DEFAULT.m_armAngle;
     private DoubleSupplier m_elevatorHeightSupplier;
-    private SoftLimit m_softLimit;
+    private ContinuousSoftLimit m_softLimit;
 
     private final ShuffleboardTab m_superstructureTab = Shuffleboard.getTab("Superstructure");
     private final GenericEntry m_armAngleEntry = m_superstructureTab.add("Arm Angle", -1).getEntry();
@@ -73,7 +73,7 @@ public class Arm extends SubsystemBase implements Logged {
 
         m_elevatorHeightSupplier = () -> 0;
         this.m_toleranceTrigger = new Trigger(() -> this.isAtTolerance);
-        this.m_softLimit = new SoftLimit(
+        this.m_softLimit = new ContinuousSoftLimit(
                 () -> m_elevatorHeightSupplier.getAsDouble() > ELEVATOR_HEIGHT_LIMIT_TRIGGER ?
                         EXTENDED_MIN_RAD_LIMIT :
                         CLOSED_MIN_RAD_LIMIT,

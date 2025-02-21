@@ -36,8 +36,9 @@ public class RobotContainer implements Logged {
     private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
     // The robot's subsystems and commands are defined here...
 
-    private final Swerve m_swerve = Constants.SwerveConstants.configureSwerve(new Pose2d());
-//    public final Superstructure superstructure = new Superstructure();
+//    private final Swerve m_swerve = Constants.SwerveConstants.configureSwerve(new Pose2d());
+    public final Superstructure superstructure = new Superstructure();
+
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
 
@@ -58,16 +59,16 @@ public class RobotContainer implements Logged {
 
 
     private void configureBindings() {
-        m_swerve.setDefaultCommand(
-                m_swerve.driveCommand(
-                        () -> new Vector2D(
-                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
-                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
-                        () -> deadband(m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC,
-                        () -> true
-                ));
-
-        m_driver.PS().onTrue(m_swerve.resetAngleCommand());
+//        m_swerve.setDefaultCommand(
+//                m_swerve.driveCommand(
+//                        () -> new Vector2D(
+//                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
+//                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
+//                        () -> deadband(m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC,
+//                        () -> true
+//                ));
+//
+//        m_driver.PS().onTrue(m_swerve.resetAngleCommand());
 
 //        m_driver.cross().onTrue(
 //                m_swerve.driveToPoseWithOverrideCommand(
@@ -80,16 +81,15 @@ public class RobotContainer implements Logged {
 //                )
 //        );
 
-//        m_driver.circle().onTrue(superstructure.intakeCommand(() -> true));
-//        m_driver.square().onTrue(superstructure.scoreCoralCommand(3, m_driver.R1()));
-//        m_driver.cross().onTrue(superstructure.scoreCoralCommand(2, m_driver.R1()));
-//        m_driver.triangle().onTrue(superstructure.scoreCoralCommand(4, m_driver.R1()));
+        m_driver.circle().onTrue(superstructure.intakeCommand(() -> true));
+        m_driver.square().onTrue(superstructure.scoreCoralCommand(3, m_driver.R1()));
+        m_driver.triangle().onTrue(superstructure.scoreCoralCommand(4, m_driver.R1()));
 
-//        m_driver.touchpad().toggleOnTrue(superstructure.toggleIdleMode());
+        m_driver.touchpad().toggleOnTrue(superstructure.toggleIdleMode());
+//
+        m_driver.options().onTrue(superstructure.setStateCommand(State.DEFAULT, ()-> true));
 
-//        m_driver.options().onTrue(superstructure.setStateCommand(State.DEFAULT, ()-> true));
-
-//        m_driver.create().onTrue(superstructure.resetElevator());
+        m_driver.create().onTrue(superstructure.resetElevator());
     }
 
 

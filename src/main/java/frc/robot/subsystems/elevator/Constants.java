@@ -25,14 +25,14 @@ public class Constants {
 
     static final double MIN_HEIGHT = 0.01;
     static final double STALL_THRESHOLD = 1;
-    static final double MAX_HEIGHT = 0.7;
+    static final double MAX_HEIGHT = 0.71;
     static final double LOWER_MAX_HEIGHT = 0.17; //TODO
     static final double UPPER_MIN_HEIGHT = 0.524; //TODO
     static final double ARM_COLLISION_RAD = -Math.PI / 4;
 
     static final TrapezoidProfile.Constraints CONSTRAINTS =
             new TrapezoidProfile.Constraints(
-                    1.1,
+                    0.5,
                     5
             );
 

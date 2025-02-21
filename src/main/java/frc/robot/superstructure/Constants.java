@@ -5,7 +5,7 @@ import static java.lang.Math.PI;
 public class Constants {
     public static final double INTAKE_ELEVATOR_HEIGHT = 0.17;
     public static final double INTAKE_ARM_ANGLE = -1.73;
-    public static final double INTAKE_INNER_WHEELS_VOLTAGE = -4;
+    public static final double INTAKE_INNER_WHEELS_VOLTAGE = -3;
     public static final double INTAKE_OUT_WHEELS_VOLTAGE = 0; //-2
     // L1 Constants TODO
     public static final double L1_ELEVATOR_HEIGHT = 0.01;
@@ -15,20 +15,20 @@ public class Constants {
 
     // L2 Constants
     public static final double L2_ELEVATOR_HEIGHT = 0.01;
-    public static final double L2_ARM_ANGLE = 0.955;
+    public static final double L2_ARM_ANGLE = 1;
     public static final double L2_INNER_WHEELS_VOLTAGE = 8;
     public static final double L2_OUT_WHEELS_VOLTAGE = 0;
 
     // L3 Constants
-    public static final double L3_ELEVATOR_HEIGHT = 0.22;
-    public static final double L3_ARM_ANGLE = 1.45;
+    public static final double L3_ELEVATOR_HEIGHT = 0.11;
+    public static final double L3_ARM_ANGLE = 2;
     public static final double L3_INNER_WHEELS_VOLTAGE = 8;
     public static final double L3_OUT_WHEELS_VOLTAGE = 0;
 
     // L4 Constants TODO
-    public static final double L4_ELEVATOR_HEIGHT = 0.7;
-    public static final double L4_ARM_ANGLE = PI / 2 + 0.3 ;
-    public static final double L4_INNER_WHEELS_VOLTAGE = 9;
+    public static final double L4_ELEVATOR_HEIGHT = 0.709;
+    public static final double L4_ARM_ANGLE = 1.7 ;
+    public static final double L4_INNER_WHEELS_VOLTAGE = 6;
     public static final double L4_OUT_WHEELS_VOLTAGE = 0;
 
     // ALGAE2 Constants TODO
