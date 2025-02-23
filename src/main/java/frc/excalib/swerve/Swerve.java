@@ -138,7 +138,7 @@ public class Swerve extends SubsystemBase implements Logged {
         m_angleSetpoint = angleSetpoint;
         return driveCommand(
                 velocityMPS,
-                () -> angleController.calculate(getPose2D().getRotation().getRadians(), angleSetpoint.get().getRadians()),
+                () -> angleController.calculate(getRotation2D().getRadians(), angleSetpoint.get().getRadians()),
                 () -> true).until(angleController::atSetpoint);
     }
 

@@ -70,7 +70,7 @@ public final class Constants {
         public static final double MAX_SIDE_ACC = 6; //TODO
         public static final double MAX_SKID_ACC = 60; //TODO
         public static final double MAX_FORWARD_ACC = 9; //TODO
-        public static final double MAX_VEL = 4; //TODO
+        public static final double MAX_VEL = 4.5; //TODO
         public static final double MAX_OMEGA_RAD_PER_SEC = 4; //11.2 //TODO
         public static final double MAX_OMEGA_RAD_PER_SEC_SQUARE = 1; //TODO
 
@@ -92,7 +92,7 @@ public final class Constants {
         private static final double POSITION_CONVERSION_FACTOR = Units.inchesToMeters(4) * Math.PI / 6.12;
         private static final double ROTATION_VELOCITY_CONVERSION_FACTOR = (2 * Math.PI) / (21.4285714);
 
-        public static final PIDConstants TRANSLATION_PID_CONSTANTS = new PIDConstants(5.0, 0.0, 0.0); //TODO
+        public static final PIDConstants TRANSLATION_PID_CONSTANTS = new PIDConstants(1.1, 0.0, 0.1);
         public static final PIDConstants ANGLE_PID_CONSTANTS = new PIDConstants(0.0, 0.0, 0.0); //TODO
 
         private static final IMU GYRO = new Pigeon(GYRO_ID, SWERVE_CANBUS, new Rotation3d()); //TODO: sort offset

@@ -10,6 +10,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -21,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.excalib.additional_utilities.LEDs;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
 import frc.robot.superstructure.State;
@@ -39,7 +41,7 @@ public class RobotContainer implements Logged {
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
 
-    private final CommandJoystick m_autoJoystick = new CommandJoystick(1);
+    private final LEDs leds = LEDs.getInstance();
 
     public Runnable updateOdometry = m_swerve::updateOdometry;
 
@@ -56,7 +58,6 @@ public class RobotContainer implements Logged {
         configureBindings();
     }
 
-
     private void configureBindings() {
         m_swerve.setDefaultCommand(
                 m_swerve.driveCommand(
@@ -68,35 +69,12 @@ public class RobotContainer implements Logged {
                 )
         );
 
-//        m_driver.povUp().toggleOnTrue(m_swerve.turnToAngleCommand(
-//                () -> new Vector2D(
-//                        deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
-//                        deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
-//                Rotation2d::new));
-//
-//        m_driver.povLeft().toggleOnTrue(m_swerve.turnToAngleCommand(
-//                () -> new Vector2D(
-//                        deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
-//                        deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
-//                () -> Rotation2d.fromDegrees(-90)));
-//
-//        m_driver.povRight().toggleOnTrue(m_swerve.turnToAngleCommand(
-//                () -> new Vector2D(
-//                        deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
-//                        deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
-//                ()-> Rotation2d.fromDegrees(90)));
-//
-//        m_driver.povDown().toggleOnTrue(m_swerve.turnToAngleCommand(
-//                () -> new Vector2D(
-//                        deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
-//                        deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
-//                () -> Rotation2d.fromDegrees(180)));
-
         m_driver.povUp().onTrue(m_superstructure.removeAlgaeCommand(3, () -> true).until(m_driver.R1()).withName("Remove 3"));
         m_driver.povDown().onTrue(m_superstructure.removeAlgaeCommand(2, () -> true).until(m_driver.R1()).withName("Remove 2"));
 
         m_driver.L1().toggleOnTrue(m_superstructure.intakeCommand(() -> true));
 
+        m_driver.cross().toggleOnTrue(m_superstructure.scoreCoralCommand(1, m_driver.R1()));
         m_driver.circle().toggleOnTrue(m_superstructure.scoreCoralCommand(2, m_driver.R1()));
         m_driver.square().toggleOnTrue(m_superstructure.scoreCoralCommand(3, m_driver.R1()));
 
@@ -115,12 +93,26 @@ public class RobotContainer implements Logged {
 
     private void initAutoChooser() {
         EventTrigger releaseCoral = new EventTrigger("atPoseTrigger");
+        NamedCommands.registerCommand("removeAlgea3", m_superstructure.removeAlgaeCommand(3, () -> true));
         NamedCommands.registerCommand("scoreL3", m_superstructure.scoreCoralCommand(3, releaseCoral));
 
 //         Build an auto chooser. This will use Commands.none() as the default option.
         m_autoChooser = AutoBuilder.buildAutoChooser();
-        m_autoChooser.addOption("Calibration Auto", new PathPlannerAuto("calibrationAuto"));
-        m_autoChooser.addOption("1 coral auto", new PathPlannerAuto("1 coral auto"));
+        m_autoChooser.addOption("L1 auto",
+                new SequentialCommandGroup(
+                        m_swerve.driveCommand(
+                                () -> new Vector2D(1, 0),
+                                () -> 0,
+                                () -> true
+                        ).withTimeout(3),
+                        m_swerve.driveCommand(
+                                () -> new Vector2D(0, 0),
+                                () -> 0,
+                                () -> true
+                        ).withTimeout(0.5),
+                        m_superstructure.scoreCoralCommand(1, m_superstructure::isSuperstructureAtSetpoint)
+                )
+        );
 
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
     }
@@ -142,15 +134,15 @@ public class RobotContainer implements Logged {
 
         swerveTab.add("Angle Chooser", angleChooser);
 
-//        swerveTab.add("Turn To Angle",
-//                m_swerve.turnToAngleCommand(
-//                        () -> new Vector2D(
-//                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
-//                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)
-//                                )
-//                        ),
-//                        angleChooser::getSelected
-//                ));
+        swerveTab.add("Turn To Angle",
+                m_swerve.turnToAngleCommand(
+                        () -> new Vector2D(
+                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
+                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)
+                                )
+                        ),
+                        angleChooser::getSelected
+                ));
     }
 
 

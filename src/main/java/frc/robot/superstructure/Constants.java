@@ -9,8 +9,8 @@ public class Constants {
     public static final double INTAKE_OUT_WHEELS_VOLTAGE = -2;
     // L1 Constants TODO
     public static final double L1_ELEVATOR_HEIGHT = 0.01;
-    public static final double L1_ARM_ANGLE = -1.5;
-    public static final double L1_INNER_WHEELS_VOLTAGE = 1.7;
+    public static final double L1_ARM_ANGLE = -PI / 2;
+    public static final double L1_INNER_WHEELS_VOLTAGE = 3;
     public static final double L1_OUT_WHEELS_VOLTAGE = 0;
 
     // L2 Constants
@@ -26,8 +26,8 @@ public class Constants {
     public static final double L3_OUT_WHEELS_VOLTAGE = 0;
 
     // L4 Constants TODO
-    public static final double L4_ELEVATOR_HEIGHT = 0.709;
-    public static final double L4_ARM_ANGLE = 1.7 ;
+    public static final double L4_ELEVATOR_HEIGHT = 0.98;
+    public static final double L4_ARM_ANGLE = 1.7;
     public static final double L4_INNER_WHEELS_VOLTAGE = 6;
     public static final double L4_OUT_WHEELS_VOLTAGE = 0;
 
