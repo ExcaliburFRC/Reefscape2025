@@ -104,13 +104,12 @@ public class Elevator extends SubsystemBase implements Logged {
                     return setpoint;
                 },
                 this
-        ).withName("Default Command");
+        ).withName("Default Elevator Command");
     }
 
     public Command changeSetpointCommand(double length) {
         return new RunCommand(
-                () -> this.m_setpoint = length,
-                this
+                () -> this.m_setpoint = length
         ).until(() -> m_setpoint == length);
     }
 
@@ -125,7 +124,7 @@ public class Elevator extends SubsystemBase implements Logged {
         return new InstantCommand(() -> {
             m_motorGroup.setMotorPosition(0);
             System.out.println("reset elevator height");
-        }, this).ignoringDisable(true);
+        }).ignoringDisable(true);
     }
 
     @Log.NT

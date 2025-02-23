@@ -61,10 +61,10 @@ public class RobotContainer implements Logged {
         m_swerve.setDefaultCommand(
                 m_swerve.driveCommand(
                         () -> new Vector2D(
-                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
-                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
+                                deadband(m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
+                                deadband(m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
                         () -> deadband(m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * m_decelerator.get(m_driver.getRawAxis(3)),
-                        () -> true
+                        () -> !m_driver.R2().getAsBoolean()
                 )
         );
 
@@ -95,10 +95,12 @@ public class RobotContainer implements Logged {
         m_driver.povUp().onTrue(m_superstructure.removeAlgaeCommand(3, () -> true).until(m_driver.R1()).withName("Remove 3"));
         m_driver.povDown().onTrue(m_superstructure.removeAlgaeCommand(2, () -> true).until(m_driver.R1()).withName("Remove 2"));
 
-        m_driver.L1().onTrue(m_superstructure.intakeCommand(() -> true));
+        m_driver.L1().toggleOnTrue(m_superstructure.intakeCommand(() -> true));
 
-        m_driver.circle().onTrue(m_superstructure.scoreCoralCommand(2, m_driver.R1()));
-        m_driver.square().onTrue(m_superstructure.scoreCoralCommand(3, m_driver.R1()));
+        m_driver.circle().toggleOnTrue(m_superstructure.scoreCoralCommand(2, m_driver.R1()));
+        m_driver.square().toggleOnTrue(m_superstructure.scoreCoralCommand(3, m_driver.R1()));
+
+        m_driver.options().onTrue(m_superstructure.ejetCoralCommand());
 
         m_driver.touchpad().whileTrue(m_superstructure.toggleIdleMode());
         m_driver.create().onTrue(m_superstructure.resetElevator());

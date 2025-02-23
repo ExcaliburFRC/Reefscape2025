@@ -118,8 +118,7 @@
             "type": "Camera Stream",
             "properties": {
               "topic": "/CameraPublisher/USB Camera 0",
-              "period": 0.06,
-              "rotation_turns": 0
+              "period": 0.06
             }
           },
           {
@@ -138,6 +137,23 @@
               "divisions": 10,
               "inverted": false,
               "orientation": "vertical"
+            }
+          },
+          {
+            "title": "hasCoral",
+            "x": 256.0,
+            "y": 384.0,
+            "width": 512.0,
+            "height": 384.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/m_superstructure/m_gripper/hasCoral",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           }
         ]

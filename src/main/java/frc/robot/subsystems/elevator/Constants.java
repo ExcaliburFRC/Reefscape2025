@@ -32,7 +32,7 @@ public class Constants {
 
     static final TrapezoidProfile.Constraints CONSTRAINTS =
             new TrapezoidProfile.Constraints(
-                    0.5,
+                    1.1,
                     5
             );
 

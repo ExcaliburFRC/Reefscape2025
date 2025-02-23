@@ -20,7 +20,7 @@ public class Constants {
     public static final double L2_OUT_WHEELS_VOLTAGE = 0;
 
     // L3 Constants
-    public static final double L3_ELEVATOR_HEIGHT = 0.11;
+    public static final double L3_ELEVATOR_HEIGHT = 0.13;
     public static final double L3_ARM_ANGLE = 1.59;
     public static final double L3_INNER_WHEELS_VOLTAGE = 9;
     public static final double L3_OUT_WHEELS_VOLTAGE = 0;
@@ -34,14 +34,19 @@ public class Constants {
     // ALGAE2 Constants TODO
     public static final double ALGAE2_ELEVATOR_HEIGHT = 0.01;
     public static final double ALGAE2_ARM_ANGLE = 0.9;
-    public static final double ALGAE2_INNER_WHEELS_VOLTAGE = 0;
+    public static final double ALGAE2_INNER_WHEELS_VOLTAGE = -0.8;
     public static final double ALGAE2_OUT_WHEELS_VOLTAGE = 3;
 
     // ALGAE3 Constants TODO
     public static final double ALGAE3_ELEVATOR_HEIGHT = 0.4;
     public static final double ALGAE3_ARM_ANGLE = 0.9;
-    public static final double ALGAE3_INNER_WHEELS_VOLTAGE = 0;
+    public static final double ALGAE3_INNER_WHEELS_VOLTAGE = -0.8;
     public static final double ALGAE3_OUT_WHEELS_VOLTAGE = 3;
+
+    public static final double EJECT_ELEVATOR_HEIGHT = 0;
+    public static final double EJECT_ARM_ANGLE = 0;
+    public static final double EJECT_INNER_WHEELS_VOLTAGE = 3;
+    public static final double EJECT_OUT_WHEELS_VOLTAGE = 3;
 
     // Default Constants
     public static final double DEFAULT_ELEVATOR_HEIGHT = 0.01;

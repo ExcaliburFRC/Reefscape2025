@@ -49,7 +49,7 @@ public class Superstructure implements Logged {
                     if (returnToDefault) {
                         resetGripper().schedule();
                         setStateCommand(State.DEFAULT, () -> false, false)
-                                .until(defaultTrigger).withName("default")
+                                .until(defaultTrigger)
                                 .schedule();
                     }
                 });
@@ -64,6 +64,11 @@ public class Superstructure implements Logged {
                 resetGripper(),
                 setStateCommand(State.INTAKE, atPose).until(m_gripper.m_coralTrigger)
         ).withName("Intake Command");
+    }
+
+    public  Command ejetCoralCommand(){
+        return m_gripper.manualCommand(State.EJECT.m_innerWheelsVoltage, State.EJECT.m_outWheelsVoltage)
+                .withTimeout(0.5).finallyDo(()-> setStateCommand(State.DEFAULT, ()-> true).schedule());
     }
 
     public Command scoreCoralCommand(int level, BooleanSupplier release) {

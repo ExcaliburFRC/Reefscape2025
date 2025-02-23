@@ -23,7 +23,7 @@ public class Gripper extends SubsystemBase implements Logged {
     private final TalonFXMotor m_innerMotor;
     private final Mechanism m_outerWheel, m_innerWheel;
     private final ColorSensorV3 m_colorSensor = new ColorSensorV3(kOnboard);
-    public final Trigger m_coralTrigger = new Trigger(() -> m_colorSensor.getProximity() > PROXIMITY_LIMIT);
+    public final Trigger m_coralTrigger = new Trigger(() -> m_colorSensor.getProximity() > PROXIMITY_LIMIT).debounce(0.05);
 
     public Gripper() {
         m_outerMotor = new FlexMotor(OUTER_MOTOR_ID, kBrushless);

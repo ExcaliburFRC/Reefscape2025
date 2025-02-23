@@ -100,8 +100,7 @@ public class Arm extends SubsystemBase implements Logged {
 
     public Command changeSetpointCommand(double setpoint) {
         return new RunCommand(
-                () -> this.m_setpointAngle = setpoint,
-                this
+                () -> this.m_setpointAngle = setpoint
         ).until(() -> this.m_setpointAngle == setpoint);
     }
 
@@ -113,7 +112,7 @@ public class Arm extends SubsystemBase implements Logged {
                 },
                 TOLERANCE,
                 this
-        ).withName("Default Command");
+        ).withName("Default Arm Command");
     }
 
     public void setElevatorHeightSupplier(DoubleSupplier elevatorHeightSupplier) {

@@ -70,7 +70,7 @@ public final class Constants {
         public static final double MAX_SIDE_ACC = 6; //TODO
         public static final double MAX_SKID_ACC = 60; //TODO
         public static final double MAX_FORWARD_ACC = 9; //TODO
-        public static final double MAX_VEL = 3; //TODO
+        public static final double MAX_VEL = 4; //TODO
         public static final double MAX_OMEGA_RAD_PER_SEC = 4; //11.2 //TODO
         public static final double MAX_OMEGA_RAD_PER_SEC_SQUARE = 1; //TODO
 
