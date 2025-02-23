@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoCamera;
+import edu.wpi.first.cscore.VideoSource;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -36,11 +40,10 @@ public class Robot extends TimedRobot {
         boolean lazyLogging = false;
         Monologue.setupMonologue(m_robotContainer, "Robot", fileOnly, lazyLogging);
 
-        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+        CameraServer.startAutomaticCapture();
+//        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
 //        addPeriodic(m_robotContainer.updateOdometry, 0.01);
-
-
     }
 
     /**

@@ -100,9 +100,8 @@ public class Arm extends SubsystemBase implements Logged {
 
     public Command changeSetpointCommand(double setpoint) {
         return new RunCommand(
-                () -> {
-                    this.m_setpointAngle = setpoint;
-                }
+                () -> this.m_setpointAngle = setpoint,
+                this
         ).until(() -> this.m_setpointAngle == setpoint);
     }
 
