@@ -13,6 +13,7 @@ import frc.excalib.control.motor.controllers.MotorGroup;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
 import frc.excalib.control.motor.motor_specs.IdleState;
 import frc.excalib.mechanisms.linear_extension.LinearExtension;
+import frc.robot.superstructure.State;
 import monologue.Logged;
 
 import java.util.function.DoubleSupplier;
@@ -28,6 +29,7 @@ public class Elevator extends SubsystemBase implements Logged {
     private final LinearExtension m_extensionMechanism;
     private double m_setpoint;
     public final Trigger m_toleranceTrigger;
+    public final Trigger defultTrigger;
     public DoubleSupplier m_heightSupplier;
     private DoubleSupplier m_armRadSupplier;
     private SoftLimit m_softLimit;
@@ -67,6 +69,7 @@ public class Elevator extends SubsystemBase implements Logged {
         m_heightSupplier = m_extensionMechanism::logPosition;
 
         m_toleranceTrigger = new Trigger(() -> Math.abs(this.m_setpoint - m_heightSupplier.getAsDouble()) < TOLERANCE);
+        defultTrigger = new Trigger(() -> Math.abs(State.DEFAULT.m_elevatorHeight - m_heightSupplier.getAsDouble()) < TOLERANCE);
 
         this.m_armRadSupplier = () -> 0;
 

@@ -31,5 +31,5 @@ public class Constants {
     public static double MAX_RAD_LIMIT = PI / 2;
     public static double EXTENDED_MIN_RAD_LIMIT = -Math.PI / 4;
     public static double CLOSED_MIN_RAD_LIMIT = -1.73;
-    public static double MAX_VOL_RAD_PER_SEC = 1;//2.5;
+    public static double MAX_VOL_RAD_PER_SEC = 2;
 }

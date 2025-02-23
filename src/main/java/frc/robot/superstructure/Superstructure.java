@@ -15,8 +15,7 @@ public class Superstructure implements Logged {
     private final Arm m_arm;
     private final Gripper m_gripper;
     public final Trigger toleranceTrigger;
-    public boolean occupied = false;
-    private Trigger occupiedTrigger = new Trigger(()-> occupied);
+    public final Trigger defaultTrigger;
 
     public Superstructure() {
         this.m_elevator = new Elevator();
@@ -26,10 +25,11 @@ public class Superstructure implements Logged {
         this.m_arm.setElevatorHeightSupplier(this.m_elevator.m_heightSupplier);
         this.m_elevator.setArmRadSupplier(this.m_arm.m_radSupplier);
         this.toleranceTrigger = m_arm.m_toleranceTrigger.and(m_elevator.m_toleranceTrigger);
-        occupiedTrigger.whileFalse(new PrintCommand("bla bla bla").andThen(setStateCommand(State.DEFAULT, ()->true)));
+        this.defaultTrigger = m_arm.m_defultTrigger.and(m_elevator.defultTrigger);
+//        occupiedTrigger.whileFalse(new PrintCommand("bla bla bla").andThen(setStateCommand(State.DEFAULT, ()->true)));
     }
 
-    public Command setStateCommand(State state, BooleanSupplier activateWheels) {
+    public Command setStateCommand(State state, BooleanSupplier activateWheels, boolean returnToDefault) {
         return new SequentialCommandGroup(
                 new PrintCommand(state.name()),
                         m_arm.changeSetpointCommand(
@@ -44,16 +44,26 @@ public class Superstructure implements Logged {
                         m_gripper.manualCommand(
                                 state.m_innerWheelsVoltage,
                                 state.m_outWheelsVoltage
-                        )
-                );
+                        )).withName("set state to: "+ state.name())
+                .finallyDo(()-> {
+                    if (returnToDefault) {
+                        resetGripper().schedule();
+                        setStateCommand(State.DEFAULT, () -> false, false)
+                                .until(defaultTrigger).withName("default")
+                                .schedule();
+                    }
+                });
+    }
+
+    public Command setStateCommand(State state, BooleanSupplier activateWheels) {
+        return setStateCommand(state, activateWheels, true);
     }
 
     public Command intakeCommand(BooleanSupplier atPose) {
         return new SequentialCommandGroup(
-                occupyCommand(),
                 resetGripper(),
                 setStateCommand(State.INTAKE, atPose).until(m_gripper.m_coralTrigger)
-        ).withName("Intake Command").finallyDo(unoccupy());
+        ).withName("Intake Command");
     }
 
     public Command scoreCoralCommand(int level, BooleanSupplier release) {
@@ -67,9 +77,9 @@ public class Superstructure implements Logged {
                 return new PrintCommand("L" + level + " is not a valid coral level");
             }
         }
-        return occupyCommand().andThen(setStateCommand(state, release)
-                .until(m_gripper.m_coralTrigger.negate().debounce(3)))
-                .withName("Score Coral Command").finallyDo(unoccupy());
+        return setStateCommand(state, release)
+                .until(m_gripper.m_coralTrigger.negate().debounce(1.15))
+                .withName("Score Coral Command: " + state);
     }
 
     public Command removeAlgaeCommand(int level, BooleanSupplier atPose) {
@@ -77,10 +87,10 @@ public class Superstructure implements Logged {
             return new PrintCommand("L" + level + " is not a valid algae level :(");
         }
         State state = (level == 2) ? State.ALGAE2 : State.ALGAE3;
-        return new SequentialCommandGroup(
+        return new ParallelCommandGroup(
                 m_gripper.manualCommand(state.m_innerWheelsVoltage, state.m_outWheelsVoltage),
-                setStateCommand(state, () -> true)
-        ).until(atPose).withName("Remove Algae Command");
+                setStateCommand(state, atPose)
+        ).withName("Remove Algae Command");
     }
 
     @Log.NT
@@ -99,15 +109,15 @@ public class Superstructure implements Logged {
     public Command toggleIdleMode() {
         return m_arm.coastCommand().alongWith(m_elevator.coastCommand());
     }
-    public Command occupyCommand(){
-        return new InstantCommand(()->this.occupied = true).ignoringDisable(true);
-    }
-    public Runnable unoccupy(){
-        return ()->this.occupied = false;
-    }
+//    public Command occupyCommand(){
+//        return new InstantCommand(()->this.occupied = true).ignoringDisable(true);
+//    }
+//    public Runnable unoccupy(){
+//        return ()->this.occupied = false;
+//    }
 
-    @Log.NT
-    public boolean isOccupied(){
-        return this.occupied;
-    }
+//    @Log.NT
+//    public boolean isOccupied(){
+//        return this.occupied;
+//    }
 }

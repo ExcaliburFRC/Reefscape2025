@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.excalib.control.motor.controllers.FlexMotor;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
 import frc.excalib.mechanisms.Mechanism;
+import frc.robot.superstructure.State;
 import monologue.Logged;
 
 import static com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless;
@@ -42,6 +43,10 @@ public class Gripper extends SubsystemBase implements Logged {
         ).withName("Manual Command");
         manualCommand.addRequirements(this);
         return manualCommand;
+    }
+
+    public Command defaultCommand(){
+        return manualCommand(State.DEFAULT.m_innerWheelsVoltage, State.DEFAULT.m_outWheelsVoltage);
     }
 
     @Log.NT

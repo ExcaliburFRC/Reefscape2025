@@ -21,6 +21,7 @@ import frc.excalib.additional_utilities.Elastic;
 import frc.excalib.control.gains.SysidConfig;
 import frc.excalib.control.imu.IMU;
 import frc.excalib.control.math.Vector2D;
+import frc.excalib.slam.mapper.AuroraClient;
 import frc.excalib.slam.mapper.Odometry;
 import monologue.Logged;
 import org.json.simple.parser.ParseException;
@@ -44,9 +45,12 @@ public class Swerve extends SubsystemBase implements Logged {
     private final Odometry m_odometry;
     private ChassisSpeeds m_desiredChassisSpeeds = new ChassisSpeeds();
 
+//    private AuroraClient m_auroraClient = new AuroraClient(5800);
+
     private final SwerveDriveKinematics m_swerveDriveKinematics;
 
     public final Field2d m_field = new Field2d();
+    private Supplier<Rotation2d> m_angleSetpoint = Rotation2d::new;
 
     /**
      * A constructor that initialize the Swerve Subsystem
@@ -124,18 +128,18 @@ public class Swerve extends SubsystemBase implements Logged {
     /**
      * A method that turns the robot to a desired angle.
      *
-     * @param angleSetPoint The desired angle in radians.
+     * @param angleSetpoint The desired angle in radians.
      * @return A command that turns the robot to the wanted angle.
      */
-    public Command turnToAngleCommand(Supplier<Vector2D> velocityMPS, Supplier<Rotation2d> angleSetPoint) {
+    public Command turnToAngleCommand(Supplier<Vector2D> velocityMPS, Supplier<Rotation2d> angleSetpoint) {
         PIDController angleController = new PIDController(ANGLE_PID_CONSTANTS.kP, ANGLE_PID_CONSTANTS.kI, ANGLE_PID_CONSTANTS.kD);
         angleController.enableContinuousInput(0, 2 * Math.PI);
         angleController.setTolerance(0.07);
+        m_angleSetpoint = angleSetpoint;
         return driveCommand(
                 velocityMPS,
-                () -> angleController.calculate(getPose2D().getRotation().getRadians(), angleSetPoint.get().getRadians()),
-                () -> true
-        ).until(angleController::atSetpoint);
+                () -> angleController.calculate(getPose2D().getRotation().getRadians(), angleSetpoint.get().getRadians()),
+                () -> true).until(angleController::atSetpoint);
     }
 
     /**
@@ -226,6 +230,11 @@ public class Swerve extends SubsystemBase implements Logged {
     @Log.NT(key = "Robot Rotation")
     public Rotation2d getRotation2D() {
         return m_imu.getZRotation();
+    }
+
+    @Log.NT()
+    public Rotation2d getSetpoint() {
+        return m_angleSetpoint.get();
     }
 
     /**

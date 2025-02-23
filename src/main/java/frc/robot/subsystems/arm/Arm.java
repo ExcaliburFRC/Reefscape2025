@@ -37,6 +37,7 @@ public class Arm extends SubsystemBase implements Logged {
     public final DoubleSupplier m_radSupplier;
     private boolean isAtTolerance = false;
     public final Trigger m_toleranceTrigger;
+    public final Trigger m_defultTrigger;
     private double m_setpointAngle = State.DEFAULT.m_armAngle;
     private DoubleSupplier m_elevatorHeightSupplier;
     private ContinuousSoftLimit m_softLimit;
@@ -63,6 +64,8 @@ public class Arm extends SubsystemBase implements Logged {
         m_motorGroup.setMotorPosition(m_radSupplier.getAsDouble());
         m_motorGroup.setCurrentLimit(0, 25);
 
+
+
         m_arm = new frc.excalib.mechanisms.Arm.Arm(
                 m_motorGroup,
                 m_radSupplier,
@@ -73,6 +76,8 @@ public class Arm extends SubsystemBase implements Logged {
 
         m_elevatorHeightSupplier = () -> 0;
         this.m_toleranceTrigger = new Trigger(() -> this.isAtTolerance);
+        m_defultTrigger = new Trigger(() -> Math.abs(State.DEFAULT.m_armAngle - m_radSupplier.getAsDouble()) < TOLERANCE);
+
         this.m_softLimit = new ContinuousSoftLimit(
                 () -> m_elevatorHeightSupplier.getAsDouble() > ELEVATOR_HEIGHT_LIMIT_TRIGGER ?
                         EXTENDED_MIN_RAD_LIMIT :
