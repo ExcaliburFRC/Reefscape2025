@@ -74,6 +74,7 @@ public class Superstructure implements Logged {
     public Command scoreCoralCommand(int level, BooleanSupplier release) {
         State state;
         switch (level) {
+            case 0 -> state = State.AUTO;
             case 1 -> state = State.L1;
             case 2 -> state = State.L2;
             case 3 -> state = State.L3;

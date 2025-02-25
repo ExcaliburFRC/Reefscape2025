@@ -97,7 +97,7 @@ public final class Constants {
 
         private static final IMU GYRO = new Pigeon(GYRO_ID, SWERVE_CANBUS, new Rotation3d()); //TODO: sort offset
 
-        public static final double DEADBAND_VALUE = 0.15;
+        public static final double DEADBAND_VALUE = 0.05;
 
         public static Swerve configureSwerve(Pose2d initialPose) {
             return new Swerve(

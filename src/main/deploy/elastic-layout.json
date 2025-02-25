@@ -110,18 +110,6 @@
             }
           },
           {
-            "title": "USB Camera 0",
-            "x": 768.0,
-            "y": 0.0,
-            "width": 768.0,
-            "height": 768.0,
-            "type": "Camera Stream",
-            "properties": {
-              "topic": "/CameraPublisher/USB Camera 0",
-              "period": 0.06
-            }
-          },
-          {
             "title": "Elevator Height",
             "x": 0.0,
             "y": 384.0,
@@ -137,6 +125,18 @@
               "divisions": 10,
               "inverted": false,
               "orientation": "vertical"
+            }
+          },
+          {
+            "title": "USB Camera 0",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 768.0,
+            "height": 768.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/USB Camera 0",
+              "period": 0.06
             }
           },
           {
