@@ -38,9 +38,9 @@ public class RobotContainer implements Logged {
     public final Superstructure m_superstructure = new Superstructure();
 
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
+    private final CommandPS5Controller m_test = new CommandPS5Controller(1);
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
 
-    private final LEDs leds = LEDs.getInstance();
 
     public Runnable updateOdometry = m_swerve::updateOdometry;
 
@@ -61,9 +61,9 @@ public class RobotContainer implements Logged {
         m_swerve.setDefaultCommand(
                 m_swerve.driveCommand(
                         () -> new Vector2D(
-                                deadband(m_driver.getLeftY()) * MAX_VEL * (!m_driver.R2().getAsBoolean()? m_decelerator.get(m_driver.getRawAxis(3)) : 0.05),
-                                deadband(m_driver.getLeftX()) * MAX_VEL * (!m_driver.R2().getAsBoolean()? m_decelerator.get(m_driver.getRawAxis(3)) : 0.05)),
-                        () -> deadband(m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * (!m_driver.R2().getAsBoolean()? m_decelerator.get(m_driver.getRawAxis(3)) : 0.065),
+                                deadband(m_driver.getLeftY()) * MAX_VEL * (!m_driver.R2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.05),
+                                deadband(m_driver.getLeftX()) * MAX_VEL * (!m_driver.R2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.05)),
+                        () -> deadband(m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * (!m_driver.R2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.065),
                         () -> !m_driver.R2().getAsBoolean()
                 )
         );
@@ -83,6 +83,18 @@ public class RobotContainer implements Logged {
         m_driver.create().onTrue(m_superstructure.resetElevator());
 
         m_driver.PS().onTrue(m_swerve.resetAngleCommand());
+
+//        m_test.PS().onTrue(m_swerve.driveCommand(
+//                () -> new Vector2D(0.5, 0),
+//                () -> 0,
+//                () -> false
+//        ).withTimeout(5).andThen(
+//                new WaitUntilCommand(m_test.povUp())
+//        ).andThen(
+//                m_superstructure.intakeCommand(() -> true)
+//        ).andThen(
+//                new WaitUntilCommand(m_test.povUp())
+//        ).andThen(m_superstructure.scoreCoralCommand(1, m_driver.R1())));
     }
 
 
@@ -160,38 +172,41 @@ public class RobotContainer implements Logged {
     }
 
 
+
     public Command getAutonomousCommand() {
-        return                 new SequentialCommandGroup(
+        return new SequentialCommandGroup(
                 m_swerve.resetAngleCommand(),
                 m_swerve.driveCommand(
                         () -> new Vector2D(1, 0),
                         () -> 0,
                         () -> true
-                ).withTimeout(3),
+                ).withTimeout(4),
                 m_swerve.driveCommand(
                         () -> new Vector2D(0, 0),
                         () -> 0,
                         () -> true
-                ).withTimeout(0.5),
-                m_superstructure.scoreCoralCommand(1, m_superstructure::isSuperstructureAtSetpoint)
+                ).withTimeout(0.5)
         );
 //                m_autoChooser.getSelected();
     }
 
     @NT
-    public double getLeftY(){
+    public double getLeftY() {
         return m_driver.getLeftY();
     }
+
     @NT
-    public double getLeftX(){
+    public double getLeftX() {
         return m_driver.getLeftX();
     }
+
     @NT
-    public double getRightX(){
+    public double getRightX() {
         return m_driver.getRightX();
     }
+
     @NT
-    public boolean isFieldOrianted(){
+    public boolean isFieldOrianted() {
         return !m_driver.R2().getAsBoolean();
     }
 }
