@@ -11,119 +11,104 @@ import monologue.Logged;
 import java.util.function.BooleanSupplier;
 
 public class Superstructure implements Logged {
-    private final Elevator m_elevator;
-    private final Arm m_arm;
-    private final Gripper m_gripper;
-    public final Trigger toleranceTrigger;
-    public final Trigger defaultTrigger;
+    private Elevator m_elevator;
+    private Arm m_arm;
+    private Gripper m_gripper;
+    public Trigger m_toleranceTrigger;
+    private State m_currentState;
 
     public Superstructure() {
-        this.m_elevator = new Elevator();
-        this.m_arm = new Arm();
-        this.m_gripper = new Gripper();
+        m_elevator = new Elevator();
+        m_arm = new Arm();
+        m_gripper = new Gripper();
 
-        this.m_arm.setElevatorHeightSupplier(this.m_elevator.m_heightSupplier);
-        this.m_elevator.setArmRadSupplier(this.m_arm.m_radSupplier);
-        this.toleranceTrigger = m_arm.m_toleranceTrigger.and(m_elevator.m_toleranceTrigger);
-        this.defaultTrigger = m_arm.m_defultTrigger.and(m_elevator.defultTrigger);
-//        occupiedTrigger.whileFalse(new PrintCommand("bla bla bla").andThen(setStateCommand(State.DEFAULT, ()->true)));
+        m_arm.setElevatorHeightSupplier(m_elevator.m_heightSupplier);
+        m_elevator.setArmRadSupplier(m_arm.m_radSupplier);
+
+        m_toleranceTrigger = m_arm.m_toleranceTrigger.and(m_elevator.m_toleranceTrigger);
+        m_currentState = State.DEFAULT;
+        setStateCommand(State.DEFAULT).schedule();
     }
 
-    public Command setStateCommand(State state, BooleanSupplier activateWheels, boolean returnToDefault) {
-        return new SequentialCommandGroup(
-                new PrintCommand(state.name()),
-                        m_arm.changeSetpointCommand(
-                                state.m_armAngle
-                        ),
-                        m_elevator.changeSetpointCommand(
-                                state.m_elevatorHeight
-                        ),
-                        new WaitUntilCommand(
-                                this.toleranceTrigger.and(activateWheels)
-                        ),
-                        m_gripper.manualCommand(
-                                state.m_innerWheelsVoltage,
-                                state.m_outWheelsVoltage
-                        )).withName("set state to: "+ state.name())
-                .finallyDo(()-> {
-                    if (returnToDefault) {
-                        resetGripper().schedule();
-                        setStateCommand(State.DEFAULT, () -> false, false)
-                                .until(defaultTrigger)
-                                .schedule();
-                    }
-                });
+    public Command setStateCommand(State state) {
+        return new ParallelCommandGroup(
+                new InstantCommand(() -> this.m_currentState = state),
+                m_gripper.setStateCommand(state.m_innerWheelsVoltage, state.m_outWheelsVoltage),
+                m_elevator.changeSetpointCommand(state.m_elevatorHeight),
+                m_arm.changeSetpointCommand(state.m_armAngle)
+        ).andThen(new WaitUntilCommand(m_toleranceTrigger));
     }
 
-    public Command setStateCommand(State state, BooleanSupplier activateWheels) {
-        return setStateCommand(state, activateWheels, true);
-    }
-
-    public Command intakeCommand(BooleanSupplier atPose) {
-        return new SequentialCommandGroup(
-                resetGripper(),
-                setStateCommand(State.INTAKE, atPose).until(m_gripper.m_coralTrigger)
-        ).withName("Intake Command");
-    }
-
-    public  Command ejetCoralCommand(){
-        return m_gripper.manualCommand(State.EJECT.m_innerWheelsVoltage, State.EJECT.m_outWheelsVoltage)
-                .withTimeout(0.5).finallyDo(()-> setStateCommand(State.DEFAULT, ()-> true).schedule());
+    public Command intakeCommand() {
+        return new ConditionalCommand(
+                new SequentialCommandGroup(
+                        setStateCommand(State.INTAKE).until(m_gripper.m_coralTrigger),
+                        new WaitUntilCommand(m_gripper.m_coralTrigger),
+                        setStateCommand(State.DEFAULT)
+                ),
+                new PrintCommand(this.m_currentState.name() +
+                        " is the current state of the robot.\n it cant intake"),
+                () -> this.m_currentState.equals(State.DEFAULT)
+        );
     }
 
     public Command scoreCoralCommand(int level, BooleanSupplier release) {
-        State state;
+        State pose, score;
         switch (level) {
-            case 0 -> state = State.AUTO;
-            case 1 -> state = State.L1;
-            case 2 -> state = State.L2;
-            case 3 -> state = State.L3;
-            case 4 -> state = State.L4;
+            case 1 -> {
+                pose = State.PRE_L1;
+                score = State.L1;
+            }
+            case 2 -> {
+                pose = State.PRE_L2;
+                score = State.L2;
+            }
+            case 3 -> {
+                pose = State.PRE_L3;
+                score = State.L3;
+            }
+            case 4 -> {
+                pose = State.PRE_L4;
+                score = State.L4;
+            }
             default -> {
-                return new PrintCommand("L" + level + " is not a valid coral level");
+                return new PrintCommand("this is not a valid coral level: " + level);
             }
         }
-        return setStateCommand(state, release)
-                .until(m_gripper.m_coralTrigger.negate().debounce(1.15))
-                .withName("Score Coral Command: " + state);
+        return new ConditionalCommand(
+                new ParallelDeadlineGroup(
+                        new WaitUntilCommand(m_gripper.m_coralTrigger.negate()),
+                        new SequentialCommandGroup(
+                                setStateCommand(pose),
+                                new WaitUntilCommand(release),
+                                setStateCommand(score)
+                        )
+                ).andThen(setStateCommand(State.DEFAULT)),
+                new PrintCommand(this.m_currentState.name() +
+                        " is the current state of the robot.\n it cant score"),
+                () -> this.m_currentState.equals(State.DEFAULT));
     }
 
-    public Command removeAlgaeCommand(int level, BooleanSupplier atPose) {
-        if (level != 2 && level != 3) {
-            return new PrintCommand("L" + level + " is not a valid algae level :(");
+    public Command removeAlgaeCommand(int level, BooleanSupplier finish) {
+        State state;
+        switch (level) {
+            case 2 -> state = State.ALGAE2;
+            case 3 -> state = State.ALGAE3;
+            default -> {
+                return new PrintCommand("this is not a valid coral level: " + level);
+            }
         }
-        State state = (level == 2) ? State.ALGAE2 : State.ALGAE3;
-        return new ParallelCommandGroup(
-                m_gripper.manualCommand(state.m_innerWheelsVoltage, state.m_outWheelsVoltage),
-                setStateCommand(state, atPose)
-        ).withName("Remove Algae Command");
+        return new ConditionalCommand(
+                new ParallelCommandGroup(
+                        new WaitUntilCommand(finish),
+                        setStateCommand(state)
+                ).andThen(setStateCommand(State.DEFAULT)),
+                new PrintCommand(this.m_currentState.name() +
+                        " is the current state of the robot.\n it cant remove algae"),
+                () -> this.m_currentState.equals(State.DEFAULT));
     }
-
     @Log.NT
-    public boolean isSuperstructureAtSetpoint() {
-        return this.toleranceTrigger.getAsBoolean();
+    public String currentState(){
+        return this.m_currentState.name();
     }
-
-    public Command resetGripper() {
-        return m_gripper.manualCommand(State.DEFAULT.m_innerWheelsVoltage, State.DEFAULT.m_outWheelsVoltage).withTimeout(0.05);
-    }
-
-    public Command resetElevator() {
-        return m_elevator.resetHeightCommand();
-    }
-
-    public Command toggleIdleMode() {
-        return m_arm.coastCommand().alongWith(m_elevator.coastCommand());
-    }
-//    public Command occupyCommand(){
-//        return new InstantCommand(()->this.occupied = true).ignoringDisable(true);
-//    }
-//    public Runnable unoccupy(){
-//        return ()->this.occupied = false;
-//    }
-
-//    @Log.NT
-//    public boolean isOccupied(){
-//        return this.occupied;
-//    }
 }

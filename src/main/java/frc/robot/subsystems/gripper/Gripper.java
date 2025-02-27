@@ -2,10 +2,7 @@ package frc.robot.subsystems.gripper;
 
 import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.excalib.control.motor.controllers.FlexMotor;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
@@ -24,6 +21,7 @@ public class Gripper extends SubsystemBase implements Logged {
     private final Mechanism m_outerWheel, m_innerWheel;
     private final ColorSensorV3 m_colorSensor = new ColorSensorV3(kOnboard);
     public final Trigger m_coralTrigger = new Trigger(() -> m_colorSensor.getProximity() > PROXIMITY_LIMIT).debounce(0.05);
+    private double innerVoltage, outerVoltage;
 
     public Gripper() {
         m_outerMotor = new FlexMotor(OUTER_MOTOR_ID, kBrushless);
@@ -32,7 +30,9 @@ public class Gripper extends SubsystemBase implements Logged {
         m_innerMotor.setCurrentLimit(0, 70);
         m_outerWheel = new Mechanism(m_outerMotor);
         m_innerWheel = new Mechanism(m_innerMotor);
-
+        innerVoltage = 0;
+        outerVoltage = 0;
+        this.setDefaultCommand(defaultCommand());
         SmartDashboard.putData(this);
     }
 
@@ -45,8 +45,26 @@ public class Gripper extends SubsystemBase implements Logged {
         return manualCommand;
     }
 
-    public Command defaultCommand(){
-        return manualCommand(State.DEFAULT.m_innerWheelsVoltage, State.DEFAULT.m_outWheelsVoltage);
+    private Command defaultCommand() {
+        Command defaultCommand = new ParallelCommandGroup(
+                new RunCommand(() -> {
+                    m_innerWheel.setVoltage(innerVoltage);
+                }),
+                new RunCommand(() -> {
+                    m_outerWheel.setVoltage(outerVoltage);
+                })
+        );
+        defaultCommand.addRequirements(this);
+        return defaultCommand;
+    }
+
+    public Command setStateCommand(double innerVoltage, double outerVoltage) {
+        return new InstantCommand(
+                () -> {
+                    this.innerVoltage = innerVoltage;
+                    this.outerVoltage = outerVoltage;
+                }
+        );
     }
 
     @Log.NT

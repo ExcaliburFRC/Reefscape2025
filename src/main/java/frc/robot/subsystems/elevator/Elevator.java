@@ -161,6 +161,19 @@ public class Elevator extends SubsystemBase implements Logged {
         return m_extensionMechanism.sysIdQuasistatic(direction, this, m_heightSupplier, sysidConfig, true);
     }
 
+    @Log.NT
+    public double getLimitedSetpoint() {
+        return m_softLimit.limit(getSetpoint());
+    }
+    @Log.NT
+    public double getMaxLimit() {
+        return m_softLimit.getMaxLimit();
+    }
+    @Log.NT
+    public double getMinLimit() {
+        return m_softLimit.getMinLimit();
+    }
+
     @Override
     public void periodic() {
         m_accel = (m_extensionMechanism.logVelocity() - m_prevVel) / 0.02;
