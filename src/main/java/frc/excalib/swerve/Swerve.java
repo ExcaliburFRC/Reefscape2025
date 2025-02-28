@@ -21,12 +21,15 @@ import frc.excalib.additional_utilities.Elastic;
 import frc.excalib.control.gains.SysidConfig;
 import frc.excalib.control.imu.IMU;
 import frc.excalib.control.math.Vector2D;
-import frc.excalib.slam.mapper.AuroraClient;
 import frc.excalib.slam.mapper.Odometry;
+import frc.excalib.slam.mapper.PhotonVision;
 import monologue.Logged;
 import org.json.simple.parser.ParseException;
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -44,6 +47,7 @@ public class Swerve extends SubsystemBase implements Logged {
     private final IMU m_imu;
     private final Odometry m_odometry;
     private ChassisSpeeds m_desiredChassisSpeeds = new ChassisSpeeds();
+    PhotonVision camera;
 
 //    private AuroraClient m_auroraClient = new AuroraClient(5800);
 
@@ -62,10 +66,11 @@ public class Swerve extends SubsystemBase implements Logged {
     public Swerve(ModulesHolder modules,
                   IMU imu,
                   Pose2d initialPosition) {
-
+        camera = new PhotonVision();
         this.m_MODULES = modules;
         this.m_imu = imu;
         m_imu.resetIMU();
+
 
         // Initialize odometry with the current yaw angle
         this.m_odometry = new Odometry(
@@ -211,6 +216,11 @@ public class Swerve extends SubsystemBase implements Logged {
      */
     public void updateOdometry() {
         m_odometry.updateOdometry(m_MODULES.getModulesPositions());
+
+        Optional<EstimatedRobotPose> pose = camera.getEstimatedGlobalPose(m_odometry.getEstimatedPosition());
+        if (pose.isPresent())
+            m_odometry.addVisionMeasurement(pose.get().estimatedPose.toPose2d(), pose.get().timestampSeconds);//
+
     }
 
     /**

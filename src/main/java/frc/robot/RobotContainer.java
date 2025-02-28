@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import frc.excalib.additional_utilities.Color;
 import frc.excalib.additional_utilities.LEDs;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
@@ -25,6 +26,7 @@ import frc.robot.superstructure.Superstructure;
 
 import monologue.Annotations;
 import monologue.Logged;
+import org.photonvision.PhotonCamera;
 
 import static frc.robot.Constants.SwerveConstants.*;
 import static monologue.Annotations.*;
@@ -35,14 +37,14 @@ public class RobotContainer implements Logged {
     // The robot's subsystems and commands are defined here...
 
     private final Swerve m_swerve = Constants.SwerveConstants.configureSwerve(new Pose2d());
-    public final Superstructure m_superstructure = new Superstructure();
+    private final Superstructure m_superstructure = new Superstructure();
+    private final LEDs leds = LEDs.getInstance();
 
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
     private final CommandPS5Controller m_test = new CommandPS5Controller(1);
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
 
-
-    public Runnable updateOdometry = m_swerve::updateOdometry;
+//    public Runnable updateOdometry = m_swerve::updateOdometry;
 
     private SendableChooser<Command> m_autoChooser;
 
@@ -71,16 +73,11 @@ public class RobotContainer implements Logged {
         m_driver.povUp().onTrue(m_superstructure.removeAlgaeCommand(3, () -> true).until(m_driver.R1()).withName("Remove 3"));
         m_driver.povRight().onTrue(m_superstructure.removeAlgaeCommand(2, () -> true).until(m_driver.R1()).withName("Remove 2"));
 
-        m_driver.L1().toggleOnTrue(m_superstructure.intakeCommand(() -> true));
+        m_driver.L1().toggleOnTrue(m_superstructure.intakeCommand());
 
         m_driver.cross().toggleOnTrue(m_superstructure.scoreCoralCommand(1, m_driver.R1()));
         m_driver.circle().toggleOnTrue(m_superstructure.scoreCoralCommand(2, m_driver.R1()));
         m_driver.square().toggleOnTrue(m_superstructure.scoreCoralCommand(3, m_driver.R1()));
-
-        m_driver.options().onTrue(m_superstructure.ejetCoralCommand());
-
-        m_driver.touchpad().whileTrue(m_superstructure.toggleIdleMode());
-        m_driver.create().onTrue(m_superstructure.resetElevator());
 
         m_driver.PS().onTrue(m_swerve.resetAngleCommand());
 
@@ -109,36 +106,6 @@ public class RobotContainer implements Logged {
 
 //         Build an auto chooser. This will use Commands.none() as the default option.
         m_autoChooser = AutoBuilder.buildAutoChooser();
-        m_autoChooser.addOption("L1 auto",
-                new SequentialCommandGroup(
-                        m_swerve.resetAngleCommand(),
-                        m_swerve.driveCommand(
-                                () -> new Vector2D(1, 0),
-                                () -> 0,
-                                () -> true
-                        ).withTimeout(3),
-                        m_swerve.driveCommand(
-                                () -> new Vector2D(0, 0),
-                                () -> 0,
-                                () -> true
-                        ).withTimeout(0.5),
-                        m_superstructure.scoreCoralCommand(1, m_superstructure::isSuperstructureAtSetpoint)
-                )
-        );
-        m_autoChooser.addOption("move auto",
-                new SequentialCommandGroup(
-                        m_swerve.resetAngleCommand(),
-                        m_swerve.driveCommand(
-                                () -> new Vector2D(1, 0),
-                                () -> 0,
-                                () -> true
-                        ).withTimeout(2),
-                        m_swerve.driveCommand(
-                                () -> new Vector2D(0, 0),
-                                () -> 0,
-                                () -> true
-                        ).withTimeout(0.5))
-        );
 
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
     }

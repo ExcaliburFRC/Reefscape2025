@@ -40,7 +40,6 @@ public class Robot extends TimedRobot {
         boolean lazyLogging = false;
         Monologue.setupMonologue(m_robotContainer, "Robot", fileOnly, lazyLogging);
 
-        CameraServer.startAutomaticCapture();
 //        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
 //        addPeriodic(m_robotContainer.updateOdometry, 0.01);

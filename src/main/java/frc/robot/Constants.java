@@ -95,9 +95,9 @@ public final class Constants {
         public static final PIDConstants TRANSLATION_PID_CONSTANTS = new PIDConstants(1.1, 0.0, 0.1);
         public static final PIDConstants ANGLE_PID_CONSTANTS = new PIDConstants(0.0, 0.0, 0.0); //TODO
 
-        private static final IMU GYRO = new Pigeon(GYRO_ID, SWERVE_CANBUS, new Rotation3d()); //TODO: sort offset
+        private static final IMU GYRO = new Pigeon(GYRO_ID, SWERVE_CANBUS, new Rotation3d());
 
-        public static final double DEADBAND_VALUE = 0.05;
+        public static final double DEADBAND_VALUE = 0.15;
 
         public static Swerve configureSwerve(Pose2d initialPose) {
             return new Swerve(

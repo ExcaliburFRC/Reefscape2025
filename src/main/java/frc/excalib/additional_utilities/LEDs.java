@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -26,13 +27,21 @@ public class LEDs extends SubsystemBase {
     private double offset = 0;
 
     public static final int LEDS_PORT = 9; // pwm
-    public static final int LENGTH = 23;
+    public static final int LENGTH = 50;
+
+    Color[] orange = new Color[LENGTH];
+    Color[] black = new Color[LENGTH];
+
 
     private LEDs() {
         LedStrip.setLength(LENGTH);
         LedStrip.start();
 
-        setDefaultCommand(setPattern(LEDPattern.TRAIN, BLUE.color, TEAM_GOLD.color));
+        Arrays.fill(orange, ORANGE.color);
+        Arrays.fill(black, OFF.color);
+
+//        setDefaultCommand(setPattern(LEDPattern.TRAIN_CIRCLE, BLUE.color, TEAM_GOLD.color));
+        setDefaultCommand(setPattern(LEDPattern.RSL, BLUE.color, TEAM_GOLD.color));
     }
 
     public static LEDs getInstance() {
@@ -150,6 +159,11 @@ public class LEDs extends SubsystemBase {
                     firstHue.set(firstHue.get() % 180);
                 });
 
+            case RSL:
+                command = new RunCommand(() ->{
+                    setLedStrip(RobotController.getRSLState()? orange : black);
+                } , this).withName("SOLID: " + mainColor.toString());
+
             default:
                 break;
         }
@@ -203,7 +217,8 @@ public class LEDs extends SubsystemBase {
         TRAIN,
         RANDOM,
         EXPAND,
-        BLINKING;
+        BLINKING,
+        RSL;
     }
 
     public Color getAllianceColor() {

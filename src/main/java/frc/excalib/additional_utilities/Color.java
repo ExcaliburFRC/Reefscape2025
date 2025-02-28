@@ -6,7 +6,7 @@ public class Color extends edu.wpi.first.wpilibj.util.Color {
     }
 
     public Color(int red, int green, int blue) {
-        super(green, red, blue);
+        super(red, green, blue);
     }
 
     public Color(){

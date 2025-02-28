@@ -35,8 +35,8 @@ public class Superstructure implements Logged {
                 new InstantCommand(() -> this.m_currentState = state),
                 m_gripper.setStateCommand(state.m_innerWheelsVoltage, state.m_outWheelsVoltage),
                 m_elevator.changeSetpointCommand(state.m_elevatorHeight),
-                m_arm.changeSetpointCommand(state.m_armAngle)
-        ).andThen(new WaitUntilCommand(m_toleranceTrigger));
+                m_arm.changeSetpointCommand(state.m_armAngle))
+                .andThen(new WaitUntilCommand(m_toleranceTrigger));
     }
 
     public Command intakeCommand() {
