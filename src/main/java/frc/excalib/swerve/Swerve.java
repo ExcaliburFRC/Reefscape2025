@@ -7,6 +7,8 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.networktables.GenericEntry;
@@ -22,11 +24,10 @@ import frc.excalib.control.gains.SysidConfig;
 import frc.excalib.control.imu.IMU;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.slam.mapper.Odometry;
-import frc.excalib.slam.mapper.PhotonVision;
+import frc.excalib.slam.mapper.PhotonAprilTagsCamera;
 import monologue.Logged;
 import org.json.simple.parser.ParseException;
 import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -34,6 +35,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import static edu.wpi.first.apriltag.AprilTagFields.k2025ReefscapeWelded;
 import static edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets.kTextView;
 import static frc.excalib.additional_utilities.Elastic.Notification.NotificationLevel.WARNING;
 import static frc.robot.Constants.SwerveConstants.*;
@@ -47,8 +49,7 @@ public class Swerve extends SubsystemBase implements Logged {
     private final IMU m_imu;
     private final Odometry m_odometry;
     private ChassisSpeeds m_desiredChassisSpeeds = new ChassisSpeeds();
-    PhotonVision camera;
-
+    private final PhotonAprilTagsCamera m_backCamera, m_frontCamera;
 //    private AuroraClient m_auroraClient = new AuroraClient(5800);
 
     private final SwerveDriveKinematics m_swerveDriveKinematics;
@@ -66,7 +67,6 @@ public class Swerve extends SubsystemBase implements Logged {
     public Swerve(ModulesHolder modules,
                   IMU imu,
                   Pose2d initialPosition) {
-        camera = new PhotonVision();
         this.m_MODULES = modules;
         this.m_imu = imu;
         m_imu.resetIMU();
@@ -79,6 +79,8 @@ public class Swerve extends SubsystemBase implements Logged {
                 this::getRotation2D,
                 initialPosition
         );
+        m_frontCamera = new PhotonAprilTagsCamera("Front", k2025ReefscapeWelded, new Transform3d(0.08671062685, 0.28129984689, 0.359, new Rotation3d(0, 0, Math.toRadians(-30.96227128))));
+        m_backCamera = new PhotonAprilTagsCamera("Back", k2025ReefscapeWelded, new Transform3d());
 
         m_swerveDriveKinematics = m_MODULES.getSwerveDriveKinematics();
 
@@ -217,10 +219,15 @@ public class Swerve extends SubsystemBase implements Logged {
     public void updateOdometry() {
         m_odometry.updateOdometry(m_MODULES.getModulesPositions());
 
-        Optional<EstimatedRobotPose> pose = camera.getEstimatedGlobalPose(m_odometry.getEstimatedPosition());
-        if (pose.isPresent())
-            m_odometry.addVisionMeasurement(pose.get().estimatedPose.toPose2d(), pose.get().timestampSeconds);//
+        Optional<EstimatedRobotPose> backPose = m_backCamera.getEstimatedGlobalPose(m_odometry.getEstimatedPosition());
+        if (backPose.isPresent()) {
+            m_odometry.addVisionMeasurement(backPose.get().estimatedPose.toPose2d(), backPose.get().timestampSeconds);
+        }
 
+        Optional<EstimatedRobotPose> frontPose = m_frontCamera.getEstimatedGlobalPose(m_odometry.getEstimatedPosition());
+        if (frontPose.isPresent()) {
+            m_odometry.addVisionMeasurement(frontPose.get().estimatedPose.toPose2d(), frontPose.get().timestampSeconds);
+        }
     }
 
     /**

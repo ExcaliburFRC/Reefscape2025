@@ -4,7 +4,6 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
 import java.util.function.Supplier;
@@ -36,6 +35,5 @@ public class Odometry extends SwerveDrivePoseEstimator {
 
     public void resetOdometry(SwerveModulePosition[] modulesPositions, Pose2d newInitialPose) {
         super.resetPosition(m_YAW_SUPPLIER.get(), modulesPositions, newInitialPose);
-        //itay keller, text me if u see it
     }
 }
