@@ -84,7 +84,7 @@
     "rotation": 54.0
   },
   "reversed": false,
-  "folder": "CompPaths",
+  "folder": "AutonomousPaths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 117.47443162627705

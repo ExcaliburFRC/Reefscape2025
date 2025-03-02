@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,7 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.excalib.additional_utilities.LEDs;
 import frc.excalib.control.math.Vector2D;
@@ -60,15 +60,18 @@ public class RobotContainer implements Logged {
         m_swerve.setDefaultCommand(
                 m_swerve.driveCommand(
                         () -> new Vector2D(
-                                deadband(m_driver.getLeftY()) * MAX_VEL * (!m_driver.R2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.05),
-                                deadband(m_driver.getLeftX()) * MAX_VEL * (!m_driver.R2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.05)),
-                        () -> deadband(m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * (!m_driver.R2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.065),
+                                deadband(-m_driver.getLeftY()) * MAX_VEL * (!m_driver.R2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.05),
+                                deadband(-m_driver.getLeftX()) * MAX_VEL * (!m_driver.R2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.05)),
+                        () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * (!m_driver.R2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.065),
                         () -> !m_driver.R2().getAsBoolean()
                 )
         );
 
-        m_driver.povUp().onTrue(m_superstructure.removeAlgaeCommand(3, () -> true).until(m_driver.R1()).withName("Remove 3"));
-        m_driver.povRight().onTrue(m_superstructure.removeAlgaeCommand(2, () -> true).until(m_driver.R1()).withName("Remove 2"));
+        m_driver.povUp().onTrue(m_swerve.pidToPoseCommand(() -> new Pose2d(2, 0, new Rotation2d())));
+        m_driver.povDown().onTrue(m_swerve.pidToPoseCommand(() -> new Pose2d(0, 0, new Rotation2d())));
+
+//        m_driver.povUp().onTrue(m_superstructure.removeAlgaeCommand(3, () -> true).until(m_driver.R1()).withName("Remove 3"));
+//        m_driver.povRight().onTrue(m_superstructure.removeAlgaeCommand(2, () -> true).until(m_driver.R1()).withName("Remove 2"));
 
         m_driver.L1().toggleOnTrue(m_superstructure.intakeCommand());
 
@@ -103,6 +106,7 @@ public class RobotContainer implements Logged {
 
 //         Build an auto chooser. This will use Commands.none() as the default option.
         m_autoChooser = AutoBuilder.buildAutoChooser();
+        m_autoChooser.addOption("Calibration Path", new PathPlannerAuto("calibrationAuto"));
 
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
     }
@@ -138,20 +142,7 @@ public class RobotContainer implements Logged {
 
 
     public Command getAutonomousCommand() {
-        return new SequentialCommandGroup(
-                m_swerve.resetAngleCommand(),
-                m_swerve.driveCommand(
-                        () -> new Vector2D(1, 0),
-                        () -> 0,
-                        () -> true
-                ).withTimeout(4),
-                m_swerve.driveCommand(
-                        () -> new Vector2D(0, 0),
-                        () -> 0,
-                        () -> true
-                ).withTimeout(0.5)
-        );
-//                m_autoChooser.getSelected();
+        return m_autoChooser.getSelected();
     }
 
     @NT
