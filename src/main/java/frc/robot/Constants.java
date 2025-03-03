@@ -92,7 +92,7 @@ public final class Constants {
         private static final double POSITION_CONVERSION_FACTOR = Units.inchesToMeters(4) * Math.PI / 6.12;
         private static final double ROTATION_VELOCITY_CONVERSION_FACTOR = (2 * Math.PI) / (21.4285714);
 
-        public static final PIDConstants TRANSLATION_PID_CONSTANTS = new PIDConstants(5.0, 0.0, 0.0); //TODO
+        public static final PIDConstants TRANSLATION_PID_CONSTANTS = new PIDConstants(20.0, 0.0, 0.0); //TODO
         public static final PIDConstants ANGLE_PID_CONSTANTS = new PIDConstants(2.5, 0.0, 1.0);
         public static final Gains X_Y_GAINS = new Gains(3.0, 0.0, 0.0);
 

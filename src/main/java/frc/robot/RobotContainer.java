@@ -67,17 +67,18 @@ public class RobotContainer implements Logged {
                 )
         );
 
-        m_driver.povUp().onTrue(m_swerve.pidToPoseCommand(() -> new Pose2d(2, 0, new Rotation2d())));
-        m_driver.povDown().onTrue(m_swerve.pidToPoseCommand(() -> new Pose2d(0, 0, new Rotation2d())));
+//        m_driver.povUp().onTrue(m_swerve.pidToPoseCommand(() -> new Pose2d(2, 0, new Rotation2d())));
+//        m_driver.povDown().onTrue(m_swerve.pidToPoseCommand(() -> new Pose2d(0, 0, new Rotation2d())));
+        m_driver.povUp().onTrue(m_swerve.driveToPoseCommand(new Pose2d(14.86, 3.82, new Rotation2d(Math.PI))).andThen(m_swerve.pidToPoseCommand(() -> new Pose2d(14.31, 3.82, new Rotation2d(Math.PI)))));
 
 //        m_driver.povUp().onTrue(m_superstructure.removeAlgaeCommand(3, () -> true).until(m_driver.R1()).withName("Remove 3"));
 //        m_driver.povRight().onTrue(m_superstructure.removeAlgaeCommand(2, () -> true).until(m_driver.R1()).withName("Remove 2"));
 
-        m_driver.L1().toggleOnTrue(m_superstructure.intakeCommand());
+        m_driver.L1().onTrue(m_superstructure.intakeCommand());
 
-        m_driver.cross().toggleOnTrue(m_superstructure.scoreCoralCommand(1, m_driver.R1()));
-        m_driver.circle().toggleOnTrue(m_superstructure.scoreCoralCommand(2, m_driver.R1()));
-        m_driver.square().toggleOnTrue(m_superstructure.scoreCoralCommand(3, m_driver.R1()));
+        m_driver.cross().onTrue(m_superstructure.scoreCoralCommand(1, m_driver.R1()));
+        m_driver.circle().onTrue(m_superstructure.scoreCoralCommand(2, m_driver.R1()));
+        m_driver.square().onTrue(m_superstructure.scoreCoralCommand(3, m_driver.R1()));
 
         m_driver.PS().onTrue(m_swerve.resetAngleCommand());
 
@@ -107,6 +108,7 @@ public class RobotContainer implements Logged {
 //         Build an auto chooser. This will use Commands.none() as the default option.
         m_autoChooser = AutoBuilder.buildAutoChooser();
         m_autoChooser.addOption("Calibration Path", new PathPlannerAuto("calibrationAuto"));
+        m_autoChooser.addOption("Test Path", new PathPlannerAuto("testAuto"));
 
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
     }
