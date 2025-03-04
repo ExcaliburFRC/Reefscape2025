@@ -123,6 +123,50 @@ public class LEDs extends SubsystemBase {
                 ).withName("BLINKING, main: " + mainColor.toString() + ", accent: " + accentColor.toString());
                 break;
 
+            case EXPAND:
+                final AtomicInteger expandStep = new AtomicInteger(0);
+                command = new InstantCommand(() -> {
+                    Color[] LedColors = new Color[LENGTH];
+                    Arrays.fill(LedColors, mainColor);
+
+                    if (LENGTH % 2 == 0) {
+                        int leftCenter = (LENGTH / 2) - 1;
+                        int rightCenter = LENGTH / 2;
+                        int step = expandStep.get();
+                        int leftIndex = leftCenter - step;
+                        int rightIndex = rightCenter + step;
+                        if (leftIndex >= 0) {
+                            LedColors[leftIndex] = accentColor;
+                        }
+                        if (rightIndex < LENGTH) {
+                            LedColors[rightIndex] = accentColor;
+                        }
+                    } else {
+                        int center = LENGTH / 2;
+                        int step = expandStep.get();
+                        int leftIndex = center - step;
+                        int rightIndex = center + step;
+                        if (leftIndex >= 0) {
+                            LedColors[leftIndex] = accentColor;
+                        }
+                        if (rightIndex < LENGTH) {
+                            LedColors[rightIndex] = accentColor;
+                        }
+                    }
+
+                    int newStep = expandStep.get() + 1;
+                    if (newStep > (LENGTH / 2)) {
+                        newStep = 0;
+                    }
+                    expandStep.set(newStep);
+
+                    setLedStrip(LedColors);
+                }, this)
+                        .andThen(new WaitCommand(0.1))
+                        .repeatedly()
+                        .withName("EXPAND, main: " + mainColor.toString() + ", accent: " + accentColor.toString());
+                break;
+
             case TRAIN:
                 command = new InstantCommand(() -> {
                     Arrays.fill(colors, mainColor);
@@ -160,9 +204,9 @@ public class LEDs extends SubsystemBase {
                 });
 
             case RSL:
-                command = new RunCommand(() ->{
-                    setLedStrip(RobotController.getRSLState()? orange : black);
-                } , this).withName("SOLID: " + mainColor.toString());
+                command = new RunCommand(() -> {
+                    setLedStrip(RobotController.getRSLState() ? orange : black);
+                }, this).withName("SOLID: " + mainColor.toString());
 
             default:
                 break;
