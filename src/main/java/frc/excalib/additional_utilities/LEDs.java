@@ -40,7 +40,7 @@ public class LEDs extends SubsystemBase {
         Arrays.fill(orange, ORANGE.color);
         Arrays.fill(black, OFF.color);
 
-        setDefaultCommand(setPattern(LEDPattern.TRAIN_CIRCLE, BLUE.color, TEAM_GOLD.color));
+        setDefaultCommand(setPattern(LEDPattern.EXPAND, BLUE.color, TEAM_GOLD.color));
 //        setDefaultCommand(setPattern(LEDPattern.RSL, BLUE.color, TEAM_GOLD.color));
     }
 
@@ -123,6 +123,57 @@ public class LEDs extends SubsystemBase {
                 ).withName("BLINKING, main: " + mainColor.toString() + ", accent: " + accentColor.toString());
                 break;
 
+            case EXPAND:
+                final AtomicInteger expandStep = new AtomicInteger(0);
+                command = new InstantCommand(() -> {
+                    Color[] LedColors = new Color[LENGTH];
+                    Arrays.fill(LedColors, mainColor);
+                    int LEDS_LENGTH = 5;
+
+                    int step = expandStep.get();
+
+                    if (LENGTH % 2 == 0) {
+                        int leftCenter = (LENGTH / 2) - 1;
+                        int rightCenter = LENGTH / 2;
+                        int leftIndex = leftCenter - step;
+                        int rightIndex = rightCenter + step;
+
+                        for (int i = 0; i < LEDS_LENGTH; i++) { // Light up 3 LEDs per side
+                            if (leftIndex - i >= 0) {
+                                LedColors[leftIndex - i] = accentColor;
+                            }
+                            if (rightIndex + i < LENGTH) {
+                                LedColors[rightIndex + i] = accentColor;
+                            }
+                        }
+                    } else {
+                        int center = LENGTH / 2;
+                        int leftIndex = center - step;
+                        int rightIndex = center + step;
+
+                        for (int i = 0; i < LEDS_LENGTH; i++) { // Light up 3 LEDs per side
+                            if (leftIndex - i >= 0) {
+                                LedColors[leftIndex - i] = accentColor;
+                            }
+                            if (rightIndex + i < LENGTH) {
+                                LedColors[rightIndex + i] = accentColor;
+                            }
+                        }
+                    }
+
+                    int newStep = expandStep.get() + 1;
+                    if (newStep > (LENGTH / 2)) {
+                        newStep = 0;
+                    }
+                    expandStep.set(newStep);
+
+                    setLedStrip(LedColors);
+                }, this)
+                        .andThen(new WaitCommand(0.01))
+                        .repeatedly()
+                        .withName("EXPAND, main: " + mainColor.toString() + ", accent: " + accentColor.toString());
+                break;
+
             case TRAIN:
                 command = new InstantCommand(() -> {
                     Arrays.fill(colors, mainColor);
@@ -160,9 +211,9 @@ public class LEDs extends SubsystemBase {
                 });
 
             case RSL:
-                command = new RunCommand(() ->{
-                    setLedStrip(RobotController.getRSLState()? orange : black);
-                } , this).withName("SOLID: " + mainColor.toString());
+                command = new RunCommand(() -> {
+                    setLedStrip(RobotController.getRSLState() ? orange : black);
+                }, this).withName("SOLID: " + mainColor.toString());
 
             default:
                 break;
