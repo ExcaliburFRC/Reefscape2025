@@ -107,7 +107,7 @@ public class SwerveModule implements Logged {
                     double speed = velocity.getDistance();
 
                     if (speed < 0.1) {
-                        return 0.0;
+                        speed = 0;
                     }
 
                     boolean optimize = isOptimizable(velocity);

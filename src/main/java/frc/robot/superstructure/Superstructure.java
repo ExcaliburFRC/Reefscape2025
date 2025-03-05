@@ -83,7 +83,7 @@ public class Superstructure implements Logged {
                                 new WaitUntilCommand(release),
                                 setStateCommand(score)
                         )
-                ).andThen(setStateCommand(State.DEFAULT)),
+                ).andThen(new WaitCommand(2),setStateCommand(State.DEFAULT)),
                 new PrintCommand(this.m_currentState.name() +
                         " is the current state of the robot.\n it cant score"),
                 () -> this.m_currentState.equals(State.DEFAULT));
@@ -107,6 +107,14 @@ public class Superstructure implements Logged {
                         " is the current state of the robot.\n it cant remove algae"),
                 () -> this.m_currentState.equals(State.DEFAULT));
     }
+
+    public Command coastCommand() {
+        return new SequentialCommandGroup(
+                m_arm.coastCommand(),
+                m_elevator.coastCommand()
+        );
+    }
+
     @Log.NT
     public String currentState(){
         return this.m_currentState.name();

@@ -5,9 +5,11 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -48,14 +50,21 @@ public class Swerve extends SubsystemBase implements Logged {
     private final Odometry m_odometry;
     private ChassisSpeeds m_desiredChassisSpeeds = new ChassisSpeeds();
     private final PhotonAprilTagsCamera m_backCamera, m_frontCamera;
+    private Trigger finishTrigger;
+
 //    private AuroraClient m_auroraClient = new AuroraClient(5800);
 
     private final SwerveDriveKinematics m_swerveDriveKinematics;
 
-    private final PIDController m_angleController = new PIDController(ANGLE_PID_CONSTANTS.kP, ANGLE_PID_CONSTANTS.kI, ANGLE_PID_CONSTANTS.kD);
-    private final PIDController m_xController = new PIDController(X_Y_GAINS.kp, X_Y_GAINS.ki, X_Y_GAINS.kd);
-    private final PIDController m_yController = new PIDController(X_Y_GAINS.kp, X_Y_GAINS.ki, X_Y_GAINS.kd);
-
+    private final PIDController m_angleController = new PIDController(ANGLE_PID_GAINS.kp, ANGLE_PID_GAINS.ki, ANGLE_PID_GAINS.kd);
+    private final ProfiledPIDController m_xController = new ProfiledPIDController(
+            TRANSLATION_PID_GAINS.kp, TRANSLATION_PID_GAINS.ki, TRANSLATION_PID_GAINS.kd,
+            new TrapezoidProfile.Constraints(MAX_VEL, 6)
+    );
+    private final ProfiledPIDController m_yController = new ProfiledPIDController(
+            TRANSLATION_PID_GAINS.kp, TRANSLATION_PID_GAINS.ki, TRANSLATION_PID_GAINS.kd,
+            new TrapezoidProfile.Constraints(MAX_VEL, 6)
+    );
     public final Field2d m_field = new Field2d();
     private Supplier<Rotation2d> m_angleSetpoint = Rotation2d::new;
     private Supplier<Translation2d> m_translationSetpoint = Translation2d::new;
@@ -75,11 +84,14 @@ public class Swerve extends SubsystemBase implements Logged {
         m_imu.resetIMU();
 
         m_angleController.enableContinuousInput(-Math.PI, Math.PI);
-        m_angleController.setTolerance(0.07);
-
-        m_xController.setTolerance(0.03);
-        m_yController.setTolerance(0.03);
-
+//        m_angleController.setTolerance(0.07);
+//
+//        m_xController.setTolerance(0.03);
+//        m_yController.setTolerance(0.03);
+        m_angleController.setTolerance(0);
+        m_xController.setTolerance(0);
+        m_yController.setTolerance(0);
+        finishTrigger = new Trigger(m_xController::atSetpoint).and(m_yController::atSetpoint).and(m_angleController::atSetpoint);
         // Initialize odometry with the current yaw angle
         this.m_odometry = new Odometry(
                 modules.getSwerveDriveKinematics(),
@@ -120,11 +132,18 @@ public class Swerve extends SubsystemBase implements Logged {
             return velocity;
         };
 
-        m_desiredChassisSpeeds = new ChassisSpeeds(adjustedVelocitySupplier.get().getX(), adjustedVelocitySupplier.get().getY(), omegaRadPerSec.getAsDouble());
-
-        Command driveCommand = m_MODULES.setVelocitiesCommand(
+        Command driveCommand = new ParallelCommandGroup(m_MODULES.setVelocitiesCommand(
                 adjustedVelocitySupplier,
                 omegaRadPerSec
+        ),
+                new RunCommand(
+                        () -> {
+                            m_desiredChassisSpeeds = new ChassisSpeeds(
+                                    adjustedVelocitySupplier.get().getX(),
+                                    adjustedVelocitySupplier.get().getY(),
+                                    omegaRadPerSec.getAsDouble());
+                        }
+                )
         );
         driveCommand.setName("Drive Command");
         driveCommand.addRequirements(this);
@@ -147,24 +166,32 @@ public class Swerve extends SubsystemBase implements Logged {
      * @return A command that turns the robot to the wanted angle.
      */
     public Command turnToAngleCommand(Supplier<Vector2D> velocityMPS, Supplier<Rotation2d> angleSetpoint) {
-        m_angleSetpoint = angleSetpoint;
-        return driveCommand(
-                velocityMPS,
-                () -> m_angleController.calculate(getRotation2D().getRadians(), angleSetpoint.get().getRadians()),
-                () -> true).withName("Turn To Angle");
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> m_angleSetpoint = angleSetpoint),
+                driveCommand(
+                        velocityMPS,
+                        () -> m_angleController.calculate(getRotation2D().getRadians(), angleSetpoint.get().getRadians()),
+                        () -> true
+                )
+        ).withName("Turn To Angle");
     }
 
     public Command pidToPoseCommand(Supplier<Pose2d> poseSetpoint) {
-        m_translationSetpoint = () -> poseSetpoint.get().getTranslation();
-        m_angleSetpoint = () -> poseSetpoint.get().getRotation();
-        Trigger finishTrigger = new Trigger(m_xController::atSetpoint).and(m_yController::atSetpoint).and(m_angleController::atSetpoint);
-        return driveCommand(
-                () -> new Vector2D(
-                        m_xController.calculate(getPose2D().getX(), poseSetpoint.get().getX()),
-                        m_yController.calculate(getPose2D().getY(), poseSetpoint.get().getY())
+        return new SequentialCommandGroup(
+                new InstantCommand(
+                        () -> {
+                            m_translationSetpoint = () -> poseSetpoint.get().getTranslation();
+                            m_angleSetpoint = () -> poseSetpoint.get().getRotation();
+                        }
                 ),
-                () -> m_angleController.calculate(getRotation2D().getRadians(), poseSetpoint.get().getRotation().getRadians()),
-                () -> true
+                driveCommand(
+                        () -> new Vector2D(
+                                m_xController.calculate(getPose2D().getX(), poseSetpoint.get().getX()),
+                                m_yController.calculate(getPose2D().getY(), poseSetpoint.get().getY())
+                        ),
+                        () -> m_angleController.calculate(getRotation2D().getRadians(), poseSetpoint.get().getRotation().getRadians()),
+                        () -> true
+                )
         ).until(finishTrigger).withName("PID To Pose");
     }
 
@@ -343,8 +370,8 @@ public class Swerve extends SubsystemBase implements Logged {
                 this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 (speeds, feedforwards) -> driveRobotRelativeChassisSpeeds(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                        TRANSLATION_PID_CONSTANTS, // Translation PID constants
-                        ANGLE_PID_CONSTANTS // Rotation PID constants
+                        TRANSLATION_PID_PP_CONSTANTS, // Translation PID constants
+                        ANGLE_PID_PP_CONSTANTS // Rotation PID constants
                 ),
                 config, // The robot configuration
                 () -> {

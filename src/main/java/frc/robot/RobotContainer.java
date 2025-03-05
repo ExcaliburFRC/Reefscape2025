@@ -19,10 +19,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import frc.excalib.additional_utilities.AllianceUtils;
 import frc.excalib.additional_utilities.LEDs;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
+import frc.robot.superstructure.State;
 import frc.robot.superstructure.Superstructure;
 import monologue.Logged;
 
@@ -67,9 +70,9 @@ public class RobotContainer implements Logged {
                 )
         );
 
-//        m_driver.povUp().onTrue(m_swerve.pidToPoseCommand(() -> new Pose2d(2, 0, new Rotation2d())));
+        m_driver.povDown().onTrue(m_swerve.pidToPoseCommand(() -> Constants.FieldConstants.B7.pose));
 //        m_driver.povDown().onTrue(m_swerve.pidToPoseCommand(() -> new Pose2d(0, 0, new Rotation2d())));
-        m_driver.povUp().onTrue(m_swerve.driveToPoseCommand(new Pose2d(14.86, 3.82, new Rotation2d(Math.PI))).andThen(m_swerve.pidToPoseCommand(() -> new Pose2d(14.31, 3.82, new Rotation2d(Math.PI)))));
+        m_driver.povUp().onTrue(m_swerve.pidToPoseCommand(() -> new Pose2d(14.31, 3.82, new Rotation2d(Math.PI))));
 
 //        m_driver.povUp().onTrue(m_superstructure.removeAlgaeCommand(3, () -> true).until(m_driver.R1()).withName("Remove 3"));
 //        m_driver.povRight().onTrue(m_superstructure.removeAlgaeCommand(2, () -> true).until(m_driver.R1()).withName("Remove 2"));
@@ -81,6 +84,7 @@ public class RobotContainer implements Logged {
         m_driver.square().onTrue(m_superstructure.scoreCoralCommand(3, m_driver.R1()));
 
         m_driver.PS().onTrue(m_swerve.resetAngleCommand());
+        m_driver.touchpad().whileTrue(m_superstructure.coastCommand());
 
 //        m_test.PS().onTrue(m_swerve.driveCommand(
 //                () -> new Vector2D(0.5, 0),
@@ -107,8 +111,9 @@ public class RobotContainer implements Logged {
 
 //         Build an auto chooser. This will use Commands.none() as the default option.
         m_autoChooser = AutoBuilder.buildAutoChooser();
-        m_autoChooser.addOption("Calibration Path", new PathPlannerAuto("calibrationAuto"));
+        m_autoChooser.addOption("Calibration Auto", new PathPlannerAuto("calibrationAuto"));
         m_autoChooser.addOption("Test Path", new PathPlannerAuto("testAuto"));
+        m_autoChooser.addOption("Test Auto", new PathPlannerAuto("testAuto2"));
 
         SmartDashboard.putData("Auto Chooser", m_autoChooser);
     }
@@ -140,8 +145,6 @@ public class RobotContainer implements Logged {
                         angleChooser::getSelected
                 ));
     }
-
-
 
     public Command getAutonomousCommand() {
         return m_autoChooser.getSelected();

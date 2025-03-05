@@ -8,9 +8,12 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
+import frc.excalib.additional_utilities.AllianceUtils;
 import frc.excalib.control.gains.Gains;
 import frc.excalib.control.imu.IMU;
 import frc.excalib.control.imu.Pigeon;
@@ -68,7 +71,7 @@ public final class Constants {
         public static final double MAX_MODULE_VEL = 4.45; //TODO
         public static final double MAX_FRONT_ACC = 2; //TODO
         public static final double MAX_SIDE_ACC = 6; //TODO
-        public static final double MAX_SKID_ACC = 60; //TODO
+        public static final double MAX_SKID_ACC = 9; //TODO
         public static final double MAX_FORWARD_ACC = 9; //TODO
         public static final double MAX_VEL = 4.5; //TODO
         public static final double MAX_OMEGA_RAD_PER_SEC = 4; //11.2 //TODO
@@ -76,7 +79,7 @@ public final class Constants {
 
         public static final PathConstraints MAX_PATH_CONSTRAINTS = new PathConstraints(
                 MAX_VEL,
-                MAX_FORWARD_ACC,
+                MAX_SKID_ACC,
                 MAX_OMEGA_RAD_PER_SEC,
                 MAX_OMEGA_RAD_PER_SEC_SQUARE,
                 12.0,
@@ -85,16 +88,17 @@ public final class Constants {
 
         private static final CANcoder FRONT_LEFT_ABS_ENCODER = new CANcoder(10, SWERVE_CANBUS);
         public static final CANcoder FRONT_RIGHT_ABS_ENCODER = new CANcoder(12, SWERVE_CANBUS);
-        private static final CANcoder BACK_RIGHT_ABS_ENCODER = new CANcoder(14,SWERVE_CANBUS);
+        private static final CANcoder BACK_RIGHT_ABS_ENCODER = new CANcoder(14, SWERVE_CANBUS);
         private static final CANcoder BACK_LEFT_ABS_ENCODER = new CANcoder(16, SWERVE_CANBUS);
 
         private static final double VELOCITY_CONVERSION_FACTOR = Units.inchesToMeters(4) * Math.PI / 6.12;
         private static final double POSITION_CONVERSION_FACTOR = Units.inchesToMeters(4) * Math.PI / 6.12;
         private static final double ROTATION_VELOCITY_CONVERSION_FACTOR = (2 * Math.PI) / (21.4285714);
 
-        public static final PIDConstants TRANSLATION_PID_CONSTANTS = new PIDConstants(20.0, 0.0, 0.0); //TODO
-        public static final PIDConstants ANGLE_PID_CONSTANTS = new PIDConstants(2.5, 0.0, 1.0);
-        public static final Gains X_Y_GAINS = new Gains(3.0, 0.0, 0.0);
+        public static final PIDConstants TRANSLATION_PID_PP_CONSTANTS = new PIDConstants(10.0, 0.0, 0.0); //TODO
+        public static final PIDConstants ANGLE_PID_PP_CONSTANTS = new PIDConstants(5.0, 0.0, 0.0);
+        public static final Gains ANGLE_PID_GAINS = new Gains(2.0, 0.0, 0.0); //2.5, 0.0, 1.0);
+        public static final Gains TRANSLATION_PID_GAINS = new Gains(15.0, 0.0, 0.0);
 
         private static final IMU GYRO = new Pigeon(GYRO_ID, SWERVE_CANBUS, new Rotation3d());
 
@@ -158,6 +162,113 @@ public final class Constants {
                     GYRO,
                     initialPose
             );
+        }
+    }
+
+    public static enum FieldConstants {
+        B1(
+                new Pose2d(5.77,3.82,Rotation2d.fromDegrees(180)),
+                new Pose2d(5.77,3.82,Rotation2d.fromDegrees(180))
+        ),
+        B2(
+                new Pose2d(5.77, 4.18, Rotation2d.fromDegrees(180)),
+                new Pose2d(5.77, 4.18, Rotation2d.fromDegrees(180))
+        ),
+        B3(
+                new Pose2d(4.96, 2.84, Rotation2d.fromDegrees(120)),
+                new Pose2d(4.96, 2.84, Rotation2d.fromDegrees(120))
+        ),
+        B4(
+                new Pose2d(3.98,2.74, Rotation2d.fromDegrees(60)),
+                new Pose2d(3.98,2.74, Rotation2d.fromDegrees(60))
+                ),
+        B5(
+                new Pose2d(3.68, 3.02, Rotation2d.fromDegrees(60)),
+                new Pose2d(3.68, 3.02, Rotation2d.fromDegrees(60))
+        ),
+        B6(
+                new Pose2d(),
+                new Pose2d()
+                ),
+        B7(
+                new Pose2d(3.21, 4.22, Rotation2d.fromDegrees(0)),
+                new Pose2d(3.21, 4.22, Rotation2d.fromDegrees(0))
+        ),
+        B8(
+                new Pose2d(),
+                new Pose2d()
+        ),
+        B9(
+                new Pose2d(4.02, 5.22, Rotation2d.fromDegrees(-60)),
+                new Pose2d(4.02, 5.22, Rotation2d.fromDegrees(-60))
+        ),
+        B10(
+                new Pose2d(),
+                new Pose2d()
+        ),
+        B11(
+                new Pose2d(5.31, 5.03, Rotation2d.fromDegrees(-120)),
+                new Pose2d(5.31, 5.03, Rotation2d.fromDegrees(-120))
+        ),
+        B12(
+                new Pose2d(),
+                new Pose2d()
+        ),
+        ALGAE_1(
+                new Pose2d(),
+                new Pose2d()
+                ),
+        ALGAE_2(
+                new Pose2d(),
+                new Pose2d()
+                ),
+        ALGAE_3(
+                new Pose2d(),
+                new Pose2d()
+        ),
+        ALGAE_4(
+                new Pose2d(),
+                new Pose2d()
+        ),
+        ALGAE_5(
+                new Pose2d(),
+                new Pose2d()
+                ),
+        ALGAE_6(
+                new Pose2d(),
+                new Pose2d()
+                ),
+        LEFT_INTAKE_1(
+                new Pose2d(),
+                new Pose2d()
+                ),
+        LEFT_INTAKE_2(
+                new Pose2d(),
+                new Pose2d()
+        ),
+        LEFT_INTAKE_3(
+                new Pose2d(),
+                new Pose2d()
+        ),
+        RIGHT_INTAKE_1(
+                new Pose2d(),
+                new Pose2d()
+                ),
+        RIGHT_INTAKE_2(
+                new Pose2d(),
+                new Pose2d()
+        ),
+        RIGHT_INTAKE_3(
+                new Pose2d(),
+                new Pose2d()
+        );
+
+        public final Pose2d pose;
+        public final Pose2d prePose;
+
+        FieldConstants(Pose2d bluePose, Pose2d prePose) {
+            this.pose = bluePose;
+            this.prePose = prePose;
         }
     }
 }

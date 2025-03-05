@@ -20,7 +20,7 @@ public class Constants {
 
     // L3 Constants
     public static final double L3_ELEVATOR_HEIGHT = 0.145;
-    public static final double L3_ARM_ANGLE = 1.59;
+    public static final double L3_ARM_ANGLE = 1.59+0.1;
     public static final double L3_INNER_WHEELS_VOLTAGE = 6;
     public static final double L3_OUT_WHEELS_VOLTAGE = 0;
 
