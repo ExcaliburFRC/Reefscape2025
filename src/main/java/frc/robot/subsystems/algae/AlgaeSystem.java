@@ -1,27 +1,31 @@
 package frc.robot.subsystems.algae;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
 import frc.excalib.mechanisms.Mechanism;
-import monologue.Annotations;
+import monologue.Logged;
 
 import static frc.robot.subsystems.algae.Constants.*;
 import static monologue.Annotations.*;
 
-public class AlgaeSystem extends SubsystemBase {
-    private final Trigger m_hasAlgaeTrigger;
+public class AlgaeSystem extends SubsystemBase implements Logged {
     private final Mechanism m_algaeWheel;
+    private final TalonFXMotor m_motor;
+    private final Trigger m_hasAlgaeTrigger;
     private double m_voltageState;
 
     public AlgaeSystem() {
-        this.m_algaeWheel = new Mechanism(new TalonFXMotor(MOTOR_ID));
+        m_motor = new TalonFXMotor(MOTOR_ID);
+        m_motor.setCurrentLimit(25,40);
+
+        this.m_algaeWheel = new Mechanism(m_motor);
 
         this.m_hasAlgaeTrigger = new Trigger(
-                () -> this.m_algaeWheel.logCurrent() > HAS_ALGAE_CURRENT
+                () -> this.m_algaeWheel.logCurrent() > HAS_ALGAE_CURRENT &&
+                        Math.abs(m_algaeWheel.logVelocity()) < HAS_ALGAE_VELOCITY
         ).debounce(HAS_ALGAE_DEBOUNCE);
 
         this.m_voltageState = 0;

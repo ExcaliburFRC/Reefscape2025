@@ -91,6 +91,7 @@ public class Swerve extends SubsystemBase implements Logged {
         m_angleController.setTolerance(0);
         m_xController.setTolerance(0);
         m_yController.setTolerance(0);
+
         finishTrigger = new Trigger(m_xController::atSetpoint).and(m_yController::atSetpoint).and(m_angleController::atSetpoint);
         // Initialize odometry with the current yaw angle
         this.m_odometry = new Odometry(

@@ -17,23 +17,23 @@ public class Constants {
     private static final double kp = 0; //TODO
     private static final double ki = 0; //TODO
     private static final double kd = 0; //TODO
-    private static final double ks = 0.11663;
+    private static final double ks = 0.038911;
     private static final double ka = 0; //TODO
-    private static final double kv = 10.224;
-    private static final double kg = 0.18203;
+    private static final double kv = 10.05;
+    private static final double kg = 0.16602;
     static final Gains ELEVATOR_GAINS = new Gains(kp, ki, kd, ks, kv, ka, kg);
 
-    static final double MIN_HEIGHT = 0.01;
     static final double STALL_THRESHOLD = 1;
-    static final double MAX_HEIGHT = 0.71;
-    static final double LOWER_MAX_HEIGHT = 0.17; //TODO
-    static final double UPPER_MIN_HEIGHT = 0.524; //TODO
-    static final double ARM_COLLISION_RAD = -Math.PI / 4;
+    static final double MIN_HEIGHT_LIMIT = 0.01;
+    static final double MAX_HEIGHT_LIMIT = 0.69;
+    static final double ARM_COLLISION_TRIGGER = -1.0967962633382335;
+    static final double CORAL_COLLISION_TRIGGER = -0.760854470791278;
+    static final double LOWER_MAX_LIMIT = 0.2727273249889827;
+    static final double UPPER_MIN_LIMIT = 0.5495056104869298;
 
     static final TrapezoidProfile.Constraints CONSTRAINTS =
             new TrapezoidProfile.Constraints(
                     1.1,
                     5
             );
-
 }

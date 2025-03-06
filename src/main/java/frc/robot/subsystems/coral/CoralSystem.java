@@ -10,13 +10,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
 import frc.excalib.mechanisms.Mechanism;
 import monologue.Annotations;
+import monologue.Logged;
 
 import static edu.wpi.first.wpilibj.I2C.Port.kOnboard;
 import static frc.robot.subsystems.coral.Constants.*;
 import static monologue.Annotations.*;
 
-public class CoralSystem extends SubsystemBase {
-    private final Trigger m_hasCoralTrigger;
+public class CoralSystem extends SubsystemBase implements Logged {
+    public final Trigger m_hasCoralTrigger;
     private final Mechanism m_coralWheel;
     private final ColorSensorV3 m_colorSensor;
     private double m_voltageState;
@@ -53,5 +54,10 @@ public class CoralSystem extends SubsystemBase {
     @Log.NT
     public boolean hasCoral() {
         return m_hasCoralTrigger.getAsBoolean();
+    }
+
+    @Log.NT
+    public int getProximity() {
+        return m_colorSensor.getProximity();
     }
 }

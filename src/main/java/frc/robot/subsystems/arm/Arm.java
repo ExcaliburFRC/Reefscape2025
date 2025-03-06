@@ -1,6 +1,7 @@
 package frc.robot.subsystems.arm;
 
 import com.ctre.phoenix6.hardware.CANcoder;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -20,6 +21,7 @@ import frc.excalib.control.motor.controllers.TalonFXMotor;
 import frc.robot.superstructure.State;
 import monologue.Logged;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import static frc.excalib.control.motor.motor_specs.DirectionState.FORWARD;
@@ -38,10 +40,11 @@ public class Arm extends SubsystemBase implements Logged {
     private boolean isAtTolerance = false;
     public final Trigger m_toleranceTrigger;
     public final Trigger m_defultTrigger;
-    private double m_setpointAngle = State.DEFAULT.m_armAngle;
+    private double m_setpointAngle = -0.58;
     private DoubleSupplier m_elevatorHeightSupplier;
+    private BooleanSupplier m_hasCoralTrigger, m_hasAlgaeTrigger;
     private ContinuousSoftLimit m_softLimit;
-
+    private InterpolatingDoubleTreeMap m_voltageLimitInterpulator;
     private final ShuffleboardTab m_superstructureTab = Shuffleboard.getTab("Superstructure");
     private final GenericEntry m_armAngleEntry = m_superstructureTab.add("Arm Angle", -1).getEntry();
     private final GenericEntry m_armSetpointEntry = m_superstructureTab.add("Arm Setpoint", -1).getEntry();
@@ -62,26 +65,49 @@ public class Arm extends SubsystemBase implements Logged {
         m_radSupplier = () -> m_encoder.getPosition().getValueAsDouble() * ROTATIONS_TO_RAD;
 
         m_motorGroup.setMotorPosition(m_radSupplier.getAsDouble());
-        m_motorGroup.setCurrentLimit(0, 25);
+        m_motorGroup.setCurrentLimit(0, 35);
 
-
-
+        m_voltageLimitInterpulator = new InterpolatingDoubleTreeMap();
+        m_voltageLimitInterpulator.put(0.0, CLOSED_MAX_VOL);
+        m_voltageLimitInterpulator.put(0.2, 4.0);
+        m_voltageLimitInterpulator.put(0.7, OPENED_MAX_VOL);
         m_arm = new frc.excalib.mechanisms.Arm.Arm(
                 m_motorGroup,
                 m_radSupplier,
-                new SoftLimit(() -> -MAX_VOL_RAD_PER_SEC, () -> MAX_VOL_RAD_PER_SEC),
+                new SoftLimit(
+                        () -> -m_voltageLimitInterpulator.get(m_elevatorHeightSupplier.getAsDouble()),
+                        () -> m_voltageLimitInterpulator.get(m_elevatorHeightSupplier.getAsDouble())),
                 ANGLE_GAINS,
                 new Mass(() -> Math.cos(m_radSupplier.getAsDouble()), () -> Math.sin(m_radSupplier.getAsDouble()), MASS)
         );
 
         m_elevatorHeightSupplier = () -> 0;
+
         this.m_toleranceTrigger = new Trigger(() -> this.isAtTolerance);
         m_defultTrigger = new Trigger(() -> Math.abs(State.DEFAULT.m_armAngle - m_radSupplier.getAsDouble()) < TOLERANCE);
 
         this.m_softLimit = new ContinuousSoftLimit(
-                () -> m_elevatorHeightSupplier.getAsDouble() > ELEVATOR_HEIGHT_LIMIT_TRIGGER ?
-                        EXTENDED_MIN_RAD_LIMIT :
-                        CLOSED_MIN_RAD_LIMIT,
+                () -> {
+                    double elevatorHeight = m_elevatorHeightSupplier.getAsDouble();
+                    boolean hasCoral = m_hasCoralTrigger.getAsBoolean();
+                    boolean hasAlgae = m_hasAlgaeTrigger.getAsBoolean();
+                    if (hasCoral &&
+                            elevatorHeight > ELEVATOR_LOWER_PROFILE_CORAL_TRIGGER &&
+                            elevatorHeight < ELEVATOR_UPPER_PROFILE_CORAL_TRIGGER) {
+                        return MIN_PROFILE_CORAL_LIMIT;
+                    }
+                    if (elevatorHeight > ELEVATOR_LOWER_PROFILE_TRIGGER &&
+                            elevatorHeight < ELEVATOR_UPPER_PROFILE_TRIGGER) {
+                        return MIN_PROFILE_LIMIT;
+                    }
+                    if (hasAlgae && elevatorHeight < ELEVATOR_ALGAE_SHIELD_TRIGGER) {
+                        return MIN_ALGAE_SHIELD_LIMIT;
+                    }
+                    if (hasAlgae) {
+                        return MIN_ALGAE_SHAFT_LIMIT;
+                    }
+                    return MIN_RAD_LIMIT;
+                },
                 () -> MAX_RAD_LIMIT
         );
 
@@ -119,6 +145,14 @@ public class Arm extends SubsystemBase implements Logged {
         this.m_elevatorHeightSupplier = elevatorHeightSupplier;
     }
 
+    public void setHasCoralTrigger(BooleanSupplier hasCoralTrigger) {
+        m_hasCoralTrigger = hasCoralTrigger;
+    }
+
+    public void setHasAlgaeTrigger(BooleanSupplier hasAlgaeTrigger) {
+        m_hasAlgaeTrigger = hasAlgaeTrigger;
+    }
+
     public Command coastCommand() {
         return new StartEndCommand(
                 () -> m_motorGroup.setIdleState(COAST),
@@ -141,15 +175,16 @@ public class Arm extends SubsystemBase implements Logged {
         return m_setpointAngle;
     }
 
-
     @Log.NT
     public double getLimitedSetpoint() {
         return m_softLimit.limit(getSetpoint());
     }
+
     @Log.NT
     public double getMaxLimit() {
         return m_softLimit.getMaxLimit();
     }
+
     @Log.NT
     public double getMinLimit() {
         return m_softLimit.getMinLimit();

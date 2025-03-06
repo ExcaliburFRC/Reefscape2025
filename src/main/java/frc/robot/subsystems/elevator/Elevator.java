@@ -20,6 +20,7 @@ import java.util.function.DoubleSupplier;
 
 import static frc.excalib.control.motor.motor_specs.DirectionState.FORWARD;
 import static frc.excalib.control.motor.motor_specs.DirectionState.REVERSE;
+import static frc.excalib.control.motor.motor_specs.IdleState.BRAKE;
 import static frc.robot.subsystems.elevator.Constants.*;
 import static monologue.Annotations.Log;
 
@@ -29,13 +30,14 @@ public class Elevator extends SubsystemBase implements Logged {
     private final LinearExtension m_extensionMechanism;
     private double m_setpoint;
     public final Trigger m_toleranceTrigger;
-    public final Trigger defultTrigger;
+    public final Trigger m_defultTrigger;
     public DoubleSupplier m_heightSupplier;
     private DoubleSupplier m_armRadSupplier;
     private SoftLimit m_softLimit;
     private double m_prevVel = 0;
     private double m_accel = 0;
     private final Trigger m_closedTrigger;
+    private Trigger m_hasCoralTrigger = new Trigger(() -> true);
 
     private final ShuffleboardTab m_superstructureTab = Shuffleboard.getTab("Superstructure");
     private final GenericEntry m_elevatorHeightEntry = m_superstructureTab.add("Elevator Height", -1).getEntry();
@@ -52,10 +54,12 @@ public class Elevator extends SubsystemBase implements Logged {
         m_motorGroup.setPositionConversionFactor(ROTATIONS_TO_METERS);
         m_motorGroup.setVelocityConversionFactor(ROTATIONS_TO_METERS);
         m_motorGroup.setCurrentLimit(0, 50);
-        m_motorGroup.setIdleState(IdleState.BRAKE);
+        m_motorGroup.setIdleState(BRAKE);
+
         m_setpoint = 0;
-        this.m_closedTrigger = new Trigger(() -> getCurrent() > STALL_THRESHOLD && m_setpoint == MIN_HEIGHT && Math.abs(getHeight()) <= 0.1).debounce(0.35);
-        this.m_closedTrigger.onTrue(new InstantCommand(() -> m_motorGroup.setMotorPosition(0)).andThen(new PrintCommand("reset elevator")));
+
+        this.m_closedTrigger = new Trigger(() -> getCurrent() > STALL_THRESHOLD && m_setpoint == MIN_HEIGHT_LIMIT && Math.abs(getHeight()) <= 0.1).debounce(0.35);
+        this.m_closedTrigger.onTrue(resetHeightCommand());
 
         m_extensionMechanism = new LinearExtension(
                 m_motorGroup,
@@ -69,22 +73,30 @@ public class Elevator extends SubsystemBase implements Logged {
         m_heightSupplier = m_extensionMechanism::logPosition;
 
         m_toleranceTrigger = new Trigger(() -> Math.abs(this.m_setpoint - m_heightSupplier.getAsDouble()) < TOLERANCE);
-        defultTrigger = new Trigger(() -> Math.abs(State.DEFAULT.m_elevatorHeight - m_heightSupplier.getAsDouble()) < TOLERANCE);
+        m_defultTrigger = new Trigger(() -> Math.abs(State.DEFAULT.m_elevatorHeight - m_heightSupplier.getAsDouble()) < TOLERANCE);
 
         this.m_armRadSupplier = () -> 0;
 
         this.m_softLimit = new SoftLimit(
                 () -> {
-                    if (m_armRadSupplier.getAsDouble() > ARM_COLLISION_RAD) {
-                        return MIN_HEIGHT;
+                    double collisionAngle = m_hasCoralTrigger.getAsBoolean() ?
+                            CORAL_COLLISION_TRIGGER : ARM_COLLISION_TRIGGER;
+                    boolean inCollision = m_armRadSupplier.getAsDouble() < collisionAngle;
+                    if (!inCollision) {
+                        return MIN_HEIGHT_LIMIT;
                     }
-                    return m_heightSupplier.getAsDouble() > UPPER_MIN_HEIGHT ? UPPER_MIN_HEIGHT : MIN_HEIGHT;
+                    return m_heightSupplier.getAsDouble() > UPPER_MIN_LIMIT ?
+                            UPPER_MIN_LIMIT : MIN_HEIGHT_LIMIT;
                 },
                 () -> {
-                    if (m_armRadSupplier.getAsDouble() > ARM_COLLISION_RAD) {
-                        return MAX_HEIGHT;
+                    double collisionAngle = m_hasCoralTrigger.getAsBoolean() ?
+                            CORAL_COLLISION_TRIGGER : ARM_COLLISION_TRIGGER;
+                    boolean inCollision = m_armRadSupplier.getAsDouble() < collisionAngle;
+                    if (!inCollision) {
+                        return MAX_HEIGHT_LIMIT;
                     }
-                    return m_heightSupplier.getAsDouble() <= LOWER_MAX_HEIGHT ? LOWER_MAX_HEIGHT : MAX_HEIGHT;
+                    return m_heightSupplier.getAsDouble() < LOWER_MAX_LIMIT ?
+                            LOWER_MAX_LIMIT : MAX_HEIGHT_LIMIT;
                 }
         );
 
@@ -116,7 +128,7 @@ public class Elevator extends SubsystemBase implements Logged {
     public Command coastCommand() {
         return new StartEndCommand(
                 () -> m_motorGroup.setIdleState(IdleState.COAST),
-                () -> m_motorGroup.setIdleState(IdleState.BRAKE)
+                () -> m_motorGroup.setIdleState(BRAKE)
         ).ignoringDisable(true).withName("Coast Command");
     }
 
@@ -125,6 +137,14 @@ public class Elevator extends SubsystemBase implements Logged {
             m_motorGroup.setMotorPosition(0);
             System.out.println("reset elevator height");
         }).ignoringDisable(true);
+    }
+
+    public void setArmRadSupplier(DoubleSupplier armRadSupplier) {
+        this.m_armRadSupplier = armRadSupplier;
+    }
+
+    public void setHasCoralTrigger(Trigger hasCoralTrigger) {
+        this.m_hasCoralTrigger = hasCoralTrigger;
     }
 
     @Log.NT
@@ -152,23 +172,16 @@ public class Elevator extends SubsystemBase implements Logged {
         return m_motorGroup.getCurrent();
     }
 
-    public void setArmRadSupplier(DoubleSupplier armRadSupplier) {
-        this.m_armRadSupplier = armRadSupplier;
-    }
-
-    public Command sysIdCommand(boolean dynamic, SysIdRoutine.Direction direction, SysidConfig sysidConfig) {
-        if (dynamic) return m_extensionMechanism.sysIdDynamic(direction, this, m_heightSupplier, sysidConfig, true);
-        return m_extensionMechanism.sysIdQuasistatic(direction, this, m_heightSupplier, sysidConfig, true);
-    }
-
     @Log.NT
     public double getLimitedSetpoint() {
         return m_softLimit.limit(getSetpoint());
     }
+
     @Log.NT
     public double getMaxLimit() {
         return m_softLimit.getMaxLimit();
     }
+
     @Log.NT
     public double getMinLimit() {
         return m_softLimit.getMinLimit();
@@ -182,5 +195,14 @@ public class Elevator extends SubsystemBase implements Logged {
         m_elevatorHeightEntry.setDouble(getHeight());
         m_elevatorSetpointEntry.setDouble(getSetpoint());
         m_elevatorAtSetpointEntry.setBoolean(atSetpoint());
+    }
+    @Log.NT
+    public boolean collisionAngle(){
+        return m_hasCoralTrigger.getAsBoolean();// ? CORAL_COLLISION_TRIGGER : ARM_COLLISION_TRIGGER;
+    }
+
+    public Command sysIdCommand(boolean dynamic, SysIdRoutine.Direction direction, SysidConfig sysidConfig) {
+        if (dynamic) return m_extensionMechanism.sysIdDynamic(direction, this, m_heightSupplier, sysidConfig, true);
+        return m_extensionMechanism.sysIdQuasistatic(direction, this, m_heightSupplier, sysidConfig, true);
     }
 }
