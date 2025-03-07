@@ -24,7 +24,7 @@ public class Constants {
     static final Gains ELEVATOR_GAINS = new Gains(kp, ki, kd, ks, kv, ka, kg);
 
     static final double STALL_THRESHOLD = 1;
-    static final double MIN_HEIGHT_LIMIT = 0.01;
+    static final double MIN_HEIGHT_LIMIT = 0;
     static final double MAX_HEIGHT_LIMIT = 0.69;
     static final double ARM_COLLISION_TRIGGER = -1.0967962633382335;
     static final double CORAL_COLLISION_TRIGGER = -0.760854470791278;

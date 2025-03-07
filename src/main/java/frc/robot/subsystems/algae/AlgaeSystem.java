@@ -14,7 +14,7 @@ import static monologue.Annotations.*;
 public class AlgaeSystem extends SubsystemBase implements Logged {
     private final Mechanism m_algaeWheel;
     private final TalonFXMotor m_motor;
-    private final Trigger m_hasAlgaeTrigger;
+    public final Trigger m_hasAlgaeTrigger;
     private double m_voltageState;
 
     public AlgaeSystem() {
@@ -24,7 +24,7 @@ public class AlgaeSystem extends SubsystemBase implements Logged {
         this.m_algaeWheel = new Mechanism(m_motor);
 
         this.m_hasAlgaeTrigger = new Trigger(
-                () -> this.m_algaeWheel.logCurrent() > HAS_ALGAE_CURRENT &&
+                () -> this.m_algaeWheel.logCurrent() > Math.abs(HAS_ALGAE_CURRENT) &&
                         Math.abs(m_algaeWheel.logVelocity()) < HAS_ALGAE_VELOCITY
         ).debounce(HAS_ALGAE_DEBOUNCE);
 

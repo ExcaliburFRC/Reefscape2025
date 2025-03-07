@@ -271,4 +271,7 @@ public final class Constants {
             this.prePose = prePose;
         }
     }
+
+    public static final int PROCESSOR_ID = 1;
+    public static final int NET_ID = 4;
 }

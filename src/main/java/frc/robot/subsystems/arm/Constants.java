@@ -11,7 +11,7 @@ public class Constants {
     //Gains for PID and FF
     private static final double kp = 6.5; //TODO
     private static final double ki = 0; // TODO
-    private static final double kd = 0.2; // TODO
+    private static final double kd = 0.1; // TODO
     private static final double ka = 0; // TODO
     private static final double kv = 0; //1.6548; TODO
     private static final double kg = 0.3;
@@ -40,5 +40,5 @@ public class Constants {
     public static final double ELEVATOR_ALGAE_SHIELD_TRIGGER = 0.12;
 
     public static double OPENED_MAX_VOL = 1;
-    public static double CLOSED_MAX_VOL = 8;
+    public static double CLOSED_MAX_VOL = 6;
 }

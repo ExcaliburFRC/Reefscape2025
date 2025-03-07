@@ -29,6 +29,7 @@ import static frc.excalib.control.motor.motor_specs.DirectionState.REVERSE;
 import static frc.excalib.control.motor.motor_specs.IdleState.BRAKE;
 import static frc.excalib.control.motor.motor_specs.IdleState.COAST;
 import static frc.robot.subsystems.arm.Constants.*;
+import static frc.robot.superstructure.Constants.DEFAULT_ARM_ANGLE;
 import static monologue.Annotations.Log;
 
 public class Arm extends SubsystemBase implements Logged {
@@ -40,7 +41,7 @@ public class Arm extends SubsystemBase implements Logged {
     private boolean isAtTolerance = false;
     public final Trigger m_toleranceTrigger;
     public final Trigger m_defultTrigger;
-    private double m_setpointAngle = -0.58;
+    private double m_setpointAngle = DEFAULT_ARM_ANGLE;
     private DoubleSupplier m_elevatorHeightSupplier;
     private BooleanSupplier m_hasCoralTrigger, m_hasAlgaeTrigger;
     private ContinuousSoftLimit m_softLimit;
@@ -51,6 +52,7 @@ public class Arm extends SubsystemBase implements Logged {
     private final GenericEntry m_armAtSetpointEntry = m_superstructureTab.add("Arm At Setpoint", false).getEntry();
 
     public Arm() {
+        m_hasCoralTrigger = () -> true;
         m_firstMotor = new TalonFXMotor(FIRST_MOTOR_ID);
         m_firstMotor.setInverted(REVERSE);
         m_secondMotor = new TalonFXMotor(SECOND_MOTOR_ID);
