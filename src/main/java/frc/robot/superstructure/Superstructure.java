@@ -16,6 +16,7 @@ public class Superstructure implements Logged {
     private AlgaeSystem m_algaeSystem;
     public Trigger m_toleranceTrigger;
     private State m_currentState;
+    private Command runningCommand = null;
 
     public Superstructure() {
         m_elevator = new Elevator();
@@ -34,7 +35,40 @@ public class Superstructure implements Logged {
         setStateCommand(State.DEFAULT).schedule();
     }
 
-    public Command setStateCommand(State state) {
+    private State getCoralPreState(int level) {
+        State state;
+        switch (level) {
+            case 1 -> state = State.PRE_L1;
+            case 2 -> state = State.PRE_L2;
+            case 3 -> state = State.PRE_L3;
+            case 4 -> state = State.PRE_L4;
+            default -> state = State.DEFAULT;
+        }
+        return state;
+    }
+
+    private State getIntakeAlgaeState(int level) {
+        State state;
+        switch (level) {
+            case 2 -> state = State.INTAKE_ALGAE2;
+            case 3 -> state = State.INTAKE_ALGAE3;
+            default -> state = State.DEFAULT;
+        }
+        return state;
+    }
+
+    private State getPreScoreAlgaeState(int level) {
+        State state;
+        switch (level) {
+            case 1 -> state = State.PRE_PROCESSOR;
+            case 4 -> state = State.PRE_NET;
+            default -> state = State.DEFAULT;
+        }
+        return state;
+    }
+
+
+    private Command setStateCommand(State state) {
         return new ParallelCommandGroup(
                 new InstantCommand(() -> this.m_currentState = state),
                 m_algaeSystem.setStateCommand(state.m_algaeVoltage),
@@ -44,15 +78,14 @@ public class Superstructure implements Logged {
                 .andThen(new WaitUntilCommand(m_toleranceTrigger));
     }
 
-    public Command alignToCoralCommand(int level) {
-        State state = getCoralPreState(level);
-        if (state.equals(State.DEFAULT))
-            return new PrintCommand(level + " is not a valid coral level, cant align to it");
-        return new ConditionalCommand(
-                setStateCommand(state),
-                new PrintCommand("cant go to level " + level + " no coral exist"),
-                this.m_coralSystem.m_hasCoralTrigger
-        );
+    private Command scheduleExclusiveCommand(Command newCommand) {
+        return new InstantCommand(() -> {
+            if (runningCommand != null && runningCommand.isScheduled()) {
+                runningCommand.cancel(); // Cancel the previously running command
+            }
+            runningCommand = newCommand;
+            runningCommand.schedule();
+        });
     }
 
     private Command scoreCoralCommand(State score, State after) {
@@ -61,6 +94,18 @@ public class Superstructure implements Logged {
                 new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate()),
                 setStateCommand(after)
         );
+    }
+
+    public Command alignToCoralCommand(int level) {
+        State state = getCoralPreState(level);
+        if (state.equals(State.DEFAULT))
+            return new PrintCommand(level + " is not a valid coral level, cant align to it");
+        return scheduleExclusiveCommand(
+                new ConditionalCommand(
+                        setStateCommand(state),
+                        new PrintCommand("cant go to level " + level + " no coral exist"),
+                        this.m_coralSystem.m_hasCoralTrigger
+                ));
     }
 
     public Command scoreCoralCommand(int level) {
@@ -86,52 +131,42 @@ public class Superstructure implements Logged {
                 return new PrintCommand(level + " is not a valid coral level, cant score to it");
             }
         }
-        return new ConditionalCommand(
+        return scheduleExclusiveCommand(new ConditionalCommand(
                 new WaitUntilCommand(m_toleranceTrigger).andThen(scoreCoralCommand(score, after)),
                 new PrintCommand("has no coral or not at correct state"),
                 m_coralSystem.m_hasCoralTrigger.and(() -> getCoralPreState(level).equals(m_currentState))
-        );
-    }
-
-    private State getCoralPreState(int level) {
-        State state;
-        switch (level) {
-            case 1 -> state = State.PRE_L1;
-            case 2 -> state = State.PRE_L2;
-            case 3 -> state = State.PRE_L3;
-            case 4 -> state = State.PRE_L4;
-            default -> state = State.DEFAULT;
-        }
-        return state;
+        ));
     }
 
     public Command intakeCoralCommand() {
-        return new ConditionalCommand(
-                new SequentialCommandGroup(
-                        setStateCommand(State.INTAKE).until(m_coralSystem.m_hasCoralTrigger),
-                        new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger),
-                        collapseCommand()
-                ),
-                new PrintCommand("cant intake"),
-                m_coralSystem.m_hasCoralTrigger.negate().and(() -> !m_algaeSystem.hasAlgae()));
+        return scheduleExclusiveCommand(
+                new ConditionalCommand(
+                        new SequentialCommandGroup(
+                                setStateCommand(State.INTAKE).until(m_coralSystem.m_hasCoralTrigger),
+                                new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger),
+                                collapseCommand()
+                        ),
+                        new PrintCommand("cant intake"),
+                        m_coralSystem.m_hasCoralTrigger.negate().and(() -> !m_algaeSystem.hasAlgae())));
     }
 
     public Command intakeAlgaeCommand(int level) {
         State state = getIntakeAlgaeState(level);
         if (state.equals(State.DEFAULT))
             return new PrintCommand(level + " is not a valid algae level, cant align to it");
-        return setStateCommand(state);
+        return scheduleExclusiveCommand(setStateCommand(state));
     }
 
     public Command alignToAlgaeCommand(int level) {
         State state = getPreScoreAlgaeState(level);
         if (state.equals(State.DEFAULT))
             return new PrintCommand(level + " is not a valid coral level, cant align to it");
-        return new ConditionalCommand(
-                setStateCommand(state),
-                new PrintCommand("cant go to level " + level + " no coral exist"),
-                this.m_algaeSystem.m_hasAlgaeTrigger
-        );
+        return scheduleExclusiveCommand(
+                new ConditionalCommand(
+                        setStateCommand(state),
+                        new PrintCommand("cant go to level " + level + " no coral exist"),
+                        this.m_algaeSystem.m_hasAlgaeTrigger
+                ));
     }
 
     private Command scoreAlgaeCommand(State score, State after) {
@@ -157,56 +192,39 @@ public class Superstructure implements Logged {
                 return new PrintCommand(level + " is not a valid coral level, cant score to it");
             }
         }
-        return new ConditionalCommand(
-                new WaitUntilCommand(m_toleranceTrigger).andThen(scoreAlgaeCommand(score, after)),
-                new PrintCommand("has no coral or not at correct state"),
-                m_algaeSystem.m_hasAlgaeTrigger.and(() -> getPreScoreAlgaeState(level).equals(m_currentState))
-        );
-    }
-
-    private State getIntakeAlgaeState(int level) {
-        State state;
-        switch (level) {
-            case 2 -> state = State.INTAKE_ALGAE2;
-            case 3 -> state = State.INTAKE_ALGAE3;
-            default -> state = State.DEFAULT;
-        }
-        return state;
-    }
-
-    private State getPreScoreAlgaeState(int level) {
-        State state;
-        switch (level) {
-            case 1 -> state = State.PRE_PROCESSOR;
-            case 4 -> state = State.PRE_NET;
-            default -> state = State.DEFAULT;
-        }
-        return state;
+        return scheduleExclusiveCommand(
+                new ConditionalCommand(
+                        new WaitUntilCommand(m_toleranceTrigger).andThen(scoreAlgaeCommand(score, after)),
+                        new PrintCommand("has no coral or not at correct state"),
+                        m_algaeSystem.m_hasAlgaeTrigger.and(() -> getPreScoreAlgaeState(level).equals(m_currentState))
+                ));
     }
 
     public Command collapseCommand() {
-        return new ConditionalCommand(
+        return scheduleExclusiveCommand(new ConditionalCommand(
                 setStateCommand(State.ALGAE_DEFAULT),
                 setStateCommand(State.DEFAULT),
                 () -> m_algaeSystem.hasAlgae()
-        );
+        ));
     }
 
     public Command coastCommand() {
-        return new ParallelCommandGroup(
+        return scheduleExclusiveCommand(new ParallelCommandGroup(
                 m_arm.coastCommand(),
                 m_elevator.coastCommand()
-        );
+        ));
     }
 
     @Log.NT
     public String currentState() {
         return this.m_currentState.name();
     }
-    public Trigger hasAlgaeTrigger(){
+
+    public Trigger hasAlgaeTrigger() {
         return m_algaeSystem.m_hasAlgaeTrigger;
     }
-    public Trigger hasCoralTrigger(){
+
+    public Trigger hasCoralTrigger() {
         return m_coralSystem.m_hasCoralTrigger;
     }
 }
