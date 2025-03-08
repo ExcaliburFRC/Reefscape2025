@@ -59,13 +59,13 @@ public class Swerve extends SubsystemBase implements Logged {
     private final SwerveDriveKinematics m_swerveDriveKinematics;
 
     private final PIDController m_angleController = new PIDController(ANGLE_PID_GAINS.kp, ANGLE_PID_GAINS.ki, ANGLE_PID_GAINS.kd);
-    private final ProfiledPIDController m_xController = new ProfiledPIDController(
-            TRANSLATION_PID_GAINS.kp, TRANSLATION_PID_GAINS.ki, TRANSLATION_PID_GAINS.kd,
-            new TrapezoidProfile.Constraints(MAX_VEL, 6)
+    private final PIDController m_xController = new PIDController(
+            TRANSLATION_PID_GAINS.kp, TRANSLATION_PID_GAINS.ki, TRANSLATION_PID_GAINS.kd
+//            new TrapezoidProfile.Constraints(MAX_VEL, 6)
     );
-    private final ProfiledPIDController m_yController = new ProfiledPIDController(
-            TRANSLATION_PID_GAINS.kp, TRANSLATION_PID_GAINS.ki, TRANSLATION_PID_GAINS.kd,
-            new TrapezoidProfile.Constraints(MAX_VEL, 6)
+    private final PIDController m_yController = new PIDController(
+            TRANSLATION_PID_GAINS.kp, TRANSLATION_PID_GAINS.ki, TRANSLATION_PID_GAINS.kd
+//            new TrapezoidProfile.Constraints(MAX_VEL, 6)
     );
     public final Field2d m_field = new Field2d();
     private Supplier<Rotation2d> m_angleSetpoint = Rotation2d::new;

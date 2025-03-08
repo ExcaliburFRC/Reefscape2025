@@ -166,6 +166,9 @@ public final class Constants {
     }
 
     public static enum FieldConstants {
+        // x1 = 5.77 y1 = 3.82
+        // x12 = 5.77 y12 = 2 * (1.76746 * 2.54) - y1
+        //
         B1(
                 new Pose2d(5.77,3.82,Rotation2d.fromDegrees(180)),
                 new Pose2d(5.77,3.82,Rotation2d.fromDegrees(180))
@@ -184,7 +187,7 @@ public final class Constants {
                 ),
         B5(
                 new Pose2d(3.68, 3.02, Rotation2d.fromDegrees(60)),
-                new Pose2d(3.68, 3.02, Rotation2d.fromDegrees(60))
+                new Pose2d(3.56, 2.714, Rotation2d.fromDegrees(60))   //prePose
         ),
         B6(
                 new Pose2d(),
