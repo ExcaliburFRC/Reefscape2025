@@ -36,6 +36,7 @@ public class SwerveModule implements Logged {
     private final double m_MAX_VEL;
     private final Rotation2d m_moduleAnglePlus90;
     private final Vector2D m_setPoint = new Vector2D(0, 0);
+    private final SwerveModulePosition m_swerveModulePosition;
 
     /**
      * A constructor for the SwerveModule
@@ -64,6 +65,8 @@ public class SwerveModule implements Logged {
 
         // Precompute the rotated module angle (module angle + 90 degrees)
         m_moduleAnglePlus90 = m_MODULE_LOCATION.getAngle().plus(new Rotation2d(Math.PI / 2));
+
+        m_swerveModulePosition = new SwerveModulePosition(m_driveWheel.logPosition(), m_turret.getPosition());
     }
 
     double getVelocityRatioLimit(Vector2D translationVelocity, double omegaRadPerSec) {
@@ -192,7 +195,7 @@ public class SwerveModule implements Logged {
     }
 
     public SwerveModulePosition getModulePosition() {
-        return new SwerveModulePosition(m_driveWheel.logPosition(), m_turret.getPosition());
+        return m_swerveModulePosition;
     }
 
     public SwerveModuleState logState() {
@@ -219,5 +222,10 @@ public class SwerveModule implements Logged {
 
     public Command angleSysIdQuas(SysIdRoutine.Direction direction, Swerve swerve, SysidConfig sysidConfig) {
         return m_turret.sysIdQuasistatic(direction, swerve, m_turret::logPosition, sysidConfig, false);
+    }
+
+    public void periodic() {
+        m_swerveModulePosition.distanceMeters = m_driveWheel.logPosition();
+        m_swerveModulePosition.angle = m_turret.getPosition();
     }
 }

@@ -36,7 +36,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import static edu.wpi.first.apriltag.AprilTagFields.k2025Reefscape;
+import static edu.wpi.first.apriltag.AprilTagFields.k2025ReefscapeWelded;
 import static edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets.kTextView;
 import static frc.excalib.additional_utilities.Elastic.Notification.NotificationLevel.WARNING;
 import static frc.robot.Constants.SwerveConstants.*;
@@ -50,7 +50,7 @@ public class Swerve extends SubsystemBase implements Logged {
     private final IMU m_imu;
     private final Odometry m_odometry;
     private ChassisSpeeds m_desiredChassisSpeeds = new ChassisSpeeds();
-    private final PhotonAprilTagsCamera m_backCamera, m_frontCamera;
+    private final PhotonAprilTagsCamera m_frontCamera;//, m_backCamera,;
     private Trigger finishTrigger;
     private Rotation2d pi = new Rotation2d(Math.PI);
 
@@ -90,11 +90,11 @@ public class Swerve extends SubsystemBase implements Logged {
 //
 //        m_xController.setTolerance(0.03);
 //        m_yController.setTolerance(0.03);
-        m_angleController.setTolerance(0);
-        m_xController.setTolerance(0);
-        m_yController.setTolerance(0);
+        m_angleController.setTolerance(0.052);
+        m_xController.setTolerance(0.01);
+        m_yController.setTolerance(0.01);
 
-        finishTrigger = new Trigger(m_xController::atSetpoint).and(m_yController::atSetpoint).and(m_angleController::atSetpoint);
+        finishTrigger = new Trigger(m_xController::atSetpoint).and(m_yController::atSetpoint).and(m_angleController::atSetpoint).debounce(0.1);
         // Initialize odometry with the current yaw angle
         this.m_odometry = new Odometry(
                 modules.getSwerveDriveKinematics(),
@@ -102,8 +102,8 @@ public class Swerve extends SubsystemBase implements Logged {
                 m_imu::getZRotation,
                 initialPosition
         );
-        m_frontCamera = new PhotonAprilTagsCamera("Front", k2025Reefscape, new Transform3d(0.08671062685, 0.28129984689, 0.359, new Rotation3d(0, 0, Math.toRadians(-30.96227128))));
-        m_backCamera = new PhotonAprilTagsCamera("Back", k2025Reefscape, new Transform3d(-0.1455338456, 0.2979238, 0.94232478177, new Rotation3d(0, Math.toRadians(-48), Math.toRadians(180))));
+        m_frontCamera = new PhotonAprilTagsCamera("Front", k2025ReefscapeWelded, new Transform3d(0.08671062685, 0.28129984689, 0.359, new Rotation3d(0, 0, Math.toRadians(-30.96227128))));
+//        m_backCamera = new PhotonAprilTagsCamera("Back", k2025ReefscapeWelded, new Transform3d(-0.1455338456, 0.2979238, 0.94232478177, new Rotation3d(0, Math.toRadians(-48), Math.toRadians(180))));
 
         m_swerveDriveKinematics = m_MODULES.getSwerveDriveKinematics();
 
@@ -130,7 +130,7 @@ public class Swerve extends SubsystemBase implements Logged {
 //            Vector2D velocity = getSmartTranslationalVelocitySetPoint(getVelocity(), velocityMPS.get());
             if (fieldOriented.getAsBoolean()) {
                 Rotation2d yaw = getRotation2D().unaryMinus();
-                if(!AllianceUtils.isBlueAlliance()) yaw = yaw.plus(pi);
+                if (!AllianceUtils.isBlueAlliance()) yaw = yaw.plus(pi);
                 return velocity.rotate(yaw);
             }
             return velocity;
@@ -269,10 +269,10 @@ public class Swerve extends SubsystemBase implements Logged {
     public void updateOdometry() {
         m_odometry.updateOdometry(m_MODULES.getModulesPositions());
 
-        Optional<EstimatedRobotPose> backPose = m_backCamera.getEstimatedGlobalPose(m_odometry.getEstimatedPosition());
-        if (backPose.isPresent()) {
-            m_odometry.addVisionMeasurement(backPose.get().estimatedPose.toPose2d(), backPose.get().timestampSeconds);
-        }
+//        Optional<EstimatedRobotPose> backPose = m_backCamera.getEstimatedGlobalPose(m_odometry.getEstimatedPosition());
+//        if (backPose.isPresent()) {
+//            m_odometry.addVisionMeasurement(backPose.get().estimatedPose.toPose2d(), backPose.get().timestampSeconds);
+//        }
 
         Optional<EstimatedRobotPose> frontPose = m_frontCamera.getEstimatedGlobalPose(m_odometry.getEstimatedPosition());
         if (frontPose.isPresent()) {
@@ -499,6 +499,7 @@ public class Swerve extends SubsystemBase implements Logged {
 
     @Override
     public void periodic() {
+        m_MODULES.periodic();
         updateOdometry();
         m_field.setRobotPose(getPose2D());
     }

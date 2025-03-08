@@ -23,13 +23,15 @@ public class ModulesHolder implements Logged {
 
     private final SwerveDriveKinematics m_swerveDriveKinematics;
 
+    private final SwerveModulePosition[] m_modulePositions;
+
     /**
      * A constructor that initialize the ModulesHolder.
      *
-     * @param frontLeft A SwerveModule represents the front-left module.
+     * @param frontLeft  A SwerveModule represents the front-left module.
      * @param frontRight A SwerveModule represents the front-right module.
-     * @param backLeft A SwerveModule represents the back-left module.
-     * @param backRight A SwerveModule represents the back-right module.
+     * @param backLeft   A SwerveModule represents the back-left module.
+     * @param backRight  A SwerveModule represents the back-right module.
      */
     public ModulesHolder(
             SwerveModule frontLeft,
@@ -48,6 +50,13 @@ public class ModulesHolder implements Logged {
                 backLeft.m_MODULE_LOCATION,
                 backRight.m_MODULE_LOCATION
         );
+
+        m_modulePositions = new SwerveModulePosition[]{
+                m_frontLeft.getModulePosition(),
+                m_frontRight.getModulePosition(),
+                m_backLeft.getModulePosition(),
+                m_backRight.getModulePosition()
+        };
     }
 
     /**
@@ -81,7 +90,7 @@ public class ModulesHolder implements Logged {
         return new Vector2D(totalX * 0.25, totalY * 0.25);
     }
 
-    @Log.NT (key = "angular vel")
+    @Log.NT(key = "angular vel")
     public double getOmegaRadPerSec() {
         return new SwerveDriveKinematics(
                 m_frontLeft.m_MODULE_LOCATION,
@@ -91,7 +100,7 @@ public class ModulesHolder implements Logged {
         ).toChassisSpeeds(logStates()).omegaRadiansPerSecond;
     }
 
-    @Log.NT (key = "swerve velocity")
+    @Log.NT(key = "swerve velocity")
     public double getVelocityDistance() {
         return getVelocity().getDistance();
     }
@@ -202,11 +211,13 @@ public class ModulesHolder implements Logged {
      * @return An array of SwerveModulePosition representing the positions of the modules.
      */
     public SwerveModulePosition[] getModulesPositions() {
-        return new SwerveModulePosition[]{
-                m_frontLeft.getModulePosition(),
-                m_frontRight.getModulePosition(),
-                m_backLeft.getModulePosition(),
-                m_backRight.getModulePosition()
-        };
+        return m_modulePositions;
+    }
+
+    public void periodic() {
+        m_frontLeft.periodic();
+        m_frontRight.periodic();
+        m_backLeft.periodic();
+        m_backRight.periodic();
     }
 }
