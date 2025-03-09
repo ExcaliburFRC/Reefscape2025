@@ -184,6 +184,9 @@ public class Swerve extends SubsystemBase implements Logged {
         return new SequentialCommandGroup(
                 new InstantCommand(
                         () -> {
+                            m_xController.calculate(getPose2D().getX(), poseSetpoint.get().getX());
+                            m_yController.calculate(getPose2D().getY(), poseSetpoint.get().getY());
+                            m_angleController.calculate(getRotation2D().getRadians(), poseSetpoint.get().getRotation().getRadians());
                             m_translationSetpoint = () -> poseSetpoint.get().getTranslation();
                             m_angleSetpoint = () -> poseSetpoint.get().getRotation();
                         }
