@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.*;
+import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
 import frc.robot.superstructure.Superstructure;
 
@@ -36,10 +37,6 @@ public class Automations {
     }
 
 
-    private Pose2d getCoralScorePrePose(int level) {
-        return Constants.FieldConstants.B5.prePose;
-    }
-
     public Command intakeCoralCommand(boolean right) {
         return new ParallelDeadlineGroup(
                 m_superstructure.intakeCoralCommand(),
@@ -63,14 +60,13 @@ public class Automations {
         return new ConditionalCommand(
                 new PrintCommand("doesn't have coral, cant score one"),
                 new SequentialCommandGroup(
-                        m_swerve.pidToPoseCommand(() -> getCoralScorePrePose(level)),
-//                        m_superstructure.alignToCoralCommand(level),
-                        new PrintCommand("keller Pay attention!!!"),
-                        m_swerve.pidToPoseCommand(() -> getCoralScorePose(level, right)),
-                        new PrintCommand("yuda buda")
-//                        m_superstructure.scoreCoralCommand(level),
-//                        m_swerve.pidToPoseCommand(() -> getCoralScorePrePose(level)),
-//                        m_superstructure.collapseCommand()
+                        m_superstructure.startAutomationCommand(),
+                        m_swerve.pidToPoseCommand(() -> getCoralScorePose(level, false)),
+                        m_swerve.driveCommand(()->new Vector2D(0,0),()->0,()->true).withTimeout(0.1),
+                        m_superstructure.alignToCoralCommand(level),
+                        new WaitCommand(1),
+                        m_superstructure.scoreCoralCommand(level),
+                        m_superstructure.startAutomationCommand()
                 ), m_superstructure.hasCoralTrigger().negate());
     }
 }

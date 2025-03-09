@@ -44,32 +44,32 @@ public class Constants {
     public static final double POST_L2_ALGAE_WHEELS_VOLTAGE = 3;
 
     // PRE L3 Constants TODO
-    public static final double PRE_L3_ELEVATOR_HEIGHT = 0.0794;
-    public static final double PRE_L3_ARM_ANGLE = 1.2502;
+    public static final double PRE_L3_ELEVATOR_HEIGHT = 0.0794 + 0.04;
+    public static final double PRE_L3_ARM_ANGLE = 1.2502;// + Math.PI * 3.0 / 180.0;
     public static final double PRE_L3_CORAL_WHEELS_VOLTAGE = 0;
     public static final double PRE_L3_ALGAE_WHEELS_VOLTAGE = 3;
 
     // L3 Constants TODO
-    public static final double L3_ELEVATOR_HEIGHT = 0.0794;
-    public static final double L3_ARM_ANGLE = 1.2502;
+    public static final double L3_ELEVATOR_HEIGHT = 0.0794 + 0.04;
+    public static final double L3_ARM_ANGLE = 1.2502;// + Math.PI * 3.0 / 180.0;
     public static final double L3_CORAL_WHEELS_VOLTAGE = 5;
     public static final double L3_ALGAE_WHEELS_VOLTAGE = 3;
 
     // POST L3 Constants TODO
-    public static final double POST_L3_ELEVATOR_HEIGHT = 0.0794;
-    public static final double POST_L3_ARM_ANGLE = 1.2502;
+    public static final double POST_L3_ELEVATOR_HEIGHT = 0.0794 + 0.04;
+    public static final double POST_L3_ARM_ANGLE = 1.2502;// + Math.PI * 3.0 / 180.0;
     public static final double POST_L3_CORAL_WHEELS_VOLTAGE = 5;
     public static final double POST_L3_ALGAE_WHEELS_VOLTAGE = 3;
 
     // PRE L4 Constants TODO
     public static final double PRE_L4_ELEVATOR_HEIGHT = 0.68;
-    public static final double PRE_L4_ARM_ANGLE = 1.5;
+    public static final double PRE_L4_ARM_ANGLE = 1.5 - 0.017435839227423353;
     public static final double PRE_L4_CORAL_WHEELS_VOLTAGE = 0;
     public static final double PRE_L4_ALGAE_WHEELS_VOLTAGE = 3;
 
     // L4 Constants TODO
     public static final double L4_ELEVATOR_HEIGHT = 0.68;
-    public static final double L4_ARM_ANGLE = 1.5;
+    public static final double L4_ARM_ANGLE = 1.5 - 0.017435839227423353;
     public static final double L4_CORAL_WHEELS_VOLTAGE = 5;
     public static final double L4_ALGAE_WHEELS_VOLTAGE = 3;
 
@@ -111,7 +111,7 @@ public class Constants {
 
     //PRE PROCESSOR Constants TODO
     public static final double PRE_PROCESSOR_ELEVATOR_HEIGHT = 0.221;
-    public static final double PRE_PROCESSOR_ARM_ANGLE =  -1.3897;
+    public static final double PRE_PROCESSOR_ARM_ANGLE = -1.3897;
     public static final double PRE_PROCESSOR_CORAL_WHEELS_VOLTAGE = 0;
     public static final double PRE_PROCESSOR_ALGAE_WHEELS_VOLTAGE = 3;
 
@@ -150,4 +150,10 @@ public class Constants {
     public static final double ALGAE_DEFAULT_ARM_ANGLE = -1.2624661884298827;
     public static final double ALGAE_DEFAULT_CORAL_WHEELS_VOLTAGE = 0;
     public static final double ALGAE_DEFAULT_ALGAE_WHEELS_VOLTAGE = 3;
+
+    //Automation Default Constants TODO
+    public static final double AUTOMATION_DEFAULT_ELEVATOR_HEIGHT = 0;
+    public static final double AUTOMATION_DEFAULT_ARM_ANGLE = 2.0586022173425302;
+    public static final double AUTOMATION_DEFAULT_CORAL_WHEELS_VOLTAGE = 0;
+    public static final double AUTOMATION_DEFAULT_ALGAE_WHEELS_VOLTAGE = 3;
 }
