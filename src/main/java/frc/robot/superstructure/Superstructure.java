@@ -9,7 +9,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import monologue.Annotations.Log;
 import monologue.Logged;
 
-public class Superstructure implements Logged {
+public class Superstructure implements Logged{
     private Elevator m_elevator;
     private Arm m_arm;
     private CoralSystem m_coralSystem;
@@ -261,5 +261,8 @@ public class Superstructure implements Logged {
 
     public Trigger hasCoralTrigger() {
         return m_coralSystem.m_hasCoralTrigger;
+    }
+    public Command toggleCoralCommand(){
+        return m_coralSystem.toggleCoralCommand();
     }
 }

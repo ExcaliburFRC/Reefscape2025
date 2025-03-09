@@ -12,24 +12,23 @@ import frc.excalib.mechanisms.Mechanism;
 import monologue.Annotations;
 import monologue.Logged;
 
+import static edu.wpi.first.wpilibj.I2C.Port.kMXP;
 import static edu.wpi.first.wpilibj.I2C.Port.kOnboard;
 import static frc.robot.subsystems.coral.Constants.*;
 import static monologue.Annotations.*;
 
 public class CoralSystem extends SubsystemBase implements Logged {
     public final Trigger m_hasCoralTrigger;
+    boolean hasCoral = false;
     private final Mechanism m_coralWheel;
-    private final ColorSensorV3 m_colorSensor;
     private double m_voltageState;
 
     public CoralSystem() {
-        this.m_colorSensor = new ColorSensorV3(kOnboard);
 
         this.m_coralWheel = new Mechanism(new TalonFXMotor(MOTOR_ID));
 
         this.m_hasCoralTrigger = new Trigger(
-                () -> (this.m_coralWheel.logCurrent() > HAS_CORAL_CURRENT) ||
-                        (this.m_colorSensor.getProximity() > PROXIMITY_LIMIT)
+                () -> hasCoral
         ).debounce(HAS_CORAL_DEBOUNCE);
 
         this.m_voltageState = 0;
@@ -58,6 +57,11 @@ public class CoralSystem extends SubsystemBase implements Logged {
 
     @Log.NT
     public int getProximity() {
-        return m_colorSensor.getProximity();
+        return 0;//m_colorSensor.getProximity();
     }
+
+    public Command toggleCoralCommand() {
+        return new InstantCommand(() -> hasCoral = !hasCoral);
+    }
+
 }

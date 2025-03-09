@@ -1,5 +1,8 @@
 package frc.excalib.control.limits;
 
+import monologue.Annotations;
+import monologue.Annotations.Log;
+
 import java.util.function.DoubleSupplier;
 
 /**
@@ -28,6 +31,7 @@ public class SoftLimit {
      * @param val the value to check
      * @return if it is in the limit or not
      */
+    @Log.NT
     public boolean within(double val) {
         return (m_maxLimit.getAsDouble() >= val) && (val >= m_minLimit.getAsDouble());
     }
@@ -38,6 +42,7 @@ public class SoftLimit {
      * @param val the value to limit
      * @return the limited value
      */
+    @Log.NT
     public double limit(double val) {
         if (within(val)) {
             return val;
@@ -51,6 +56,7 @@ public class SoftLimit {
     /**
      * @return the current maximal limit of the represented range
      */
+    @Log.NT
     public double getMaxLimit() {
         return m_maxLimit.getAsDouble();
     }
@@ -58,6 +64,7 @@ public class SoftLimit {
     /**
      * @return the current minimal limit of the represented range
      */
+    @Log.NT
     public double getMinLimit() {
         return m_minLimit.getAsDouble();
     }

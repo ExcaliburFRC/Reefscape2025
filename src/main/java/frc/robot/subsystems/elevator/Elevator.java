@@ -172,17 +172,14 @@ public class Elevator extends SubsystemBase implements Logged {
         return m_motorGroup.getCurrent();
     }
 
-    @Log.NT
     public double getLimitedSetpoint() {
         return m_softLimit.limit(getSetpoint());
     }
 
-    @Log.NT
     public double getMaxLimit() {
         return m_softLimit.getMaxLimit();
     }
 
-    @Log.NT
     public double getMinLimit() {
         return m_softLimit.getMinLimit();
     }

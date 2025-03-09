@@ -37,7 +37,7 @@ public class RobotContainer implements Logged {
     // The robot's subsystems and commands are defined here...
 
     private final Swerve m_swerve = Constants.SwerveConstants.configureSwerve(new Pose2d());
-//    private Superstructure m_superstructure = new Superstructure();
+    private Superstructure m_superstructure = new Superstructure();
     private final LEDs leds = LEDs.getInstance();
 
 
@@ -68,7 +68,7 @@ public class RobotContainer implements Logged {
 
         m_driver.cross().onTrue(m_swerve.pidToPoseCommand(()-> new Pose2d()));
         m_driver.square().onTrue(m_swerve.pidToPoseCommand(()-> new Pose2d(1,0, new Rotation2d())));
-
+        m_driver.povRight().onTrue(m_superstructure.toggleCoralCommand());
 //        m_driver.square().onTrue(m_superstructure.scoreCoralCommand(1));
 //        m_driver.povLeft().onTrue(m_superstructure.collapseCommand());
 //
@@ -85,6 +85,8 @@ public class RobotContainer implements Logged {
         );
 
         m_driver.PS().onTrue(m_swerve.resetAngleCommand());
+
+        m_driver.touchpad().whileTrue(m_superstructure.coastCommand());
     }
 
 
