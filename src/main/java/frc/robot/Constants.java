@@ -187,7 +187,7 @@ public final class Constants {
                 ),
         B5(
                 new Pose2d(3.68, 3.02, Rotation2d.fromDegrees(60)),
-                new Pose2d(3.56, 2.714, Rotation2d.fromDegrees(60))   //prePose
+                new Pose2d(3.87, 2.8, Rotation2d.fromDegrees(240))
         ),
         B6(
                 new Pose2d(),
@@ -267,11 +267,11 @@ public final class Constants {
         );
 
         public final Pose2d pose;
-        public final Pose2d prePose;
+        public final Pose2d l1Pose;
 
-        FieldConstants(Pose2d bluePose, Pose2d prePose) {
+        FieldConstants(Pose2d bluePose, Pose2d l1Pose) {
             this.pose = bluePose;
-            this.prePose = prePose;
+            this.l1Pose = l1Pose;
         }
     }
 

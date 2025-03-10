@@ -27,19 +27,19 @@ public class Constants {
 
     // PRE L2 Constants TODO
     public static final double PRE_L2_ELEVATOR_HEIGHT = 0;
-    public static final double PRE_L2_ARM_ANGLE = 0.75;
+    public static final double PRE_L2_ARM_ANGLE = 1.02;
     public static final double PRE_L2_CORAL_WHEELS_VOLTAGE = 0;
     public static final double PRE_L2_ALGAE_WHEELS_VOLTAGE = 3;
 
     // L2 Constants TODO
     public static final double L2_ELEVATOR_HEIGHT = 0;
-    public static final double L2_ARM_ANGLE = 0.75;
+    public static final double L2_ARM_ANGLE = 1.02;
     public static final double L2_CORAL_WHEELS_VOLTAGE = 5;
     public static final double L2_ALGAE_WHEELS_VOLTAGE = 3;
 
     // POST L2 Constants TODO
     public static final double POST_L2_ELEVATOR_HEIGHT = 0;
-    public static final double POST_L2_ARM_ANGLE = 0.75;
+    public static final double POST_L2_ARM_ANGLE = 1.02;
     public static final double POST_L2_CORAL_WHEELS_VOLTAGE = 5;
     public static final double POST_L2_ALGAE_WHEELS_VOLTAGE = 3;
 
@@ -62,19 +62,19 @@ public class Constants {
     public static final double POST_L3_ALGAE_WHEELS_VOLTAGE = 3;
 
     // PRE L4 Constants TODO
-    public static final double PRE_L4_ELEVATOR_HEIGHT = 0.68;
+    public static final double PRE_L4_ELEVATOR_HEIGHT = 0.69;
     public static final double PRE_L4_ARM_ANGLE = 1.5 - 0.017435839227423353;
     public static final double PRE_L4_CORAL_WHEELS_VOLTAGE = 0;
     public static final double PRE_L4_ALGAE_WHEELS_VOLTAGE = 3;
 
     // L4 Constants TODO
-    public static final double L4_ELEVATOR_HEIGHT = 0.68;
+    public static final double L4_ELEVATOR_HEIGHT = 0.69;
     public static final double L4_ARM_ANGLE = 1.5 - 0.017435839227423353;
     public static final double L4_CORAL_WHEELS_VOLTAGE = 5;
     public static final double L4_ALGAE_WHEELS_VOLTAGE = 3;
 
     // POST L4 Constants TODO
-    public static final double POST_L4_ELEVATOR_HEIGHT = 0.68;
+    public static final double POST_L4_ELEVATOR_HEIGHT = 0.69;
     public static final double POST_L4_ARM_ANGLE = 1.7;
     public static final double POST_L4_CORAL_WHEELS_VOLTAGE = 5;
     public static final double POST_L4_ALGAE_WHEELS_VOLTAGE = 3;

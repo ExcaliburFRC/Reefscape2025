@@ -119,7 +119,7 @@ public class Superstructure implements Logged{
         return
                 new SequentialCommandGroup(
                         scheduleExclusiveStateCommand(score),
-                        new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate()),
+                        new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate()).withTimeout(0.1),
                         scheduleExclusiveStateCommand(after),
                         new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate().debounce(0.2))
                 );
@@ -131,7 +131,7 @@ public class Superstructure implements Logged{
             return new PrintCommand(level + " is not a valid coral level, cant align to it");
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
-                        new PrintCommand("graaaaaaaaa").andThen(scheduleExclusiveStateCommand(state)),
+                        scheduleExclusiveStateCommand(state),
                         new PrintCommand("cant go to level " + level + " no coral exist"),
                         this.m_coralSystem.m_hasCoralTrigger
                 ));
@@ -248,6 +248,10 @@ public class Superstructure implements Logged{
                         m_elevator.coastCommand()
                 )
         );
+    }
+
+    public Command startAutomationCommand() {
+        return scheduleExclusiveCommand(scheduleExclusiveStateCommand(State.AUTOMATION_DEFAULT));
     }
 
     @Log.NT

@@ -44,7 +44,7 @@ public class RobotContainer implements Logged {
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
     private final CommandPS5Controller m_test = new CommandPS5Controller(1);
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
-//    private final Automations automations;
+    private final Automations automations;
 //    public Runnable updateOdometry = m_swerve::updateOdometry;
 
     private SendableChooser<Command> m_autoChooser;
@@ -52,7 +52,7 @@ public class RobotContainer implements Logged {
     public RobotContainer() {
         m_decelerator.put(-1.0, 1.0);
         m_decelerator.put(1.0, 0.25);
-//        automations = new Automations(m_swerve, m_superstructure);
+        automations = new Automations(m_swerve, m_superstructure);
 
 
 //        initAutoChooser();
@@ -66,11 +66,13 @@ public class RobotContainer implements Logged {
 //        m_driver.circle().onTrue(m_superstructure.intakeCoralCommand().raceWith(leds.setPattern(LEDs.LEDPattern.BLINKING, Color.Colors.GREEN.color)));
 //        m_driver.cross().onTrue(automations.scoreCoralCommand(4, false));
 
-        m_driver.cross().onTrue(m_swerve.pidToPoseCommand(()-> new Pose2d()));
-        m_driver.square().onTrue(m_swerve.pidToPoseCommand(()-> new Pose2d(1,0, new Rotation2d())));
+        m_driver.cross().onTrue(automations.L3Command(false));
+        m_driver.circle().onTrue(m_superstructure.alignToCoralCommand(4));
+        m_driver.square().onTrue(m_superstructure.scoreCoralCommand(4));
+//        m_driver.square().onTrue(m_swerve.pidToPoseCommand(()-> new Pose2d(1,0, new Rotation2d())));
         m_driver.povRight().onTrue(m_superstructure.toggleCoralCommand());
 //        m_driver.square().onTrue(m_superstructure.scoreCoralCommand(1));
-//        m_driver.povLeft().onTrue(m_superstructure.collapseCommand());
+        m_driver.create().onTrue(m_superstructure.collapseCommand());
 //
 //        m_driver.touchpad().whileTrue(m_superstructure.coastCommand());
 //        m_driver.circle().onTrue(m_swerve.pidToPoseCommand(() -> new Pose2d(1.5, 1, new Rotation2d(Math.PI /3))));

@@ -36,7 +36,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import static edu.wpi.first.apriltag.AprilTagFields.k2025ReefscapeWelded;
+import static edu.wpi.first.apriltag.AprilTagFields.k2025Reefscape;
 import static edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets.kTextView;
 import static frc.excalib.additional_utilities.Elastic.Notification.NotificationLevel.WARNING;
 import static frc.robot.Constants.SwerveConstants.*;
@@ -86,15 +86,11 @@ public class Swerve extends SubsystemBase implements Logged {
         m_imu.resetIMU();
 
         m_angleController.enableContinuousInput(-Math.PI, Math.PI);
-//        m_angleController.setTolerance(0.07);
-//
-//        m_xController.setTolerance(0.03);
-//        m_yController.setTolerance(0.03);
-        m_angleController.setTolerance(0.052);
+        m_angleController.setTolerance(0.026);
         m_xController.setTolerance(0.01);
         m_yController.setTolerance(0.01);
 
-        finishTrigger = new Trigger(m_xController::atSetpoint).and(m_yController::atSetpoint).and(m_angleController::atSetpoint).debounce(0.1);
+        finishTrigger = new Trigger(m_xController::atSetpoint).and(m_yController::atSetpoint).and(m_angleController::atSetpoint).debounce(1);
         // Initialize odometry with the current yaw angle
         this.m_odometry = new Odometry(
                 modules.getSwerveDriveKinematics(),
@@ -102,7 +98,7 @@ public class Swerve extends SubsystemBase implements Logged {
                 m_imu::getZRotation,
                 initialPosition
         );
-        m_frontCamera = new PhotonAprilTagsCamera("Front", k2025ReefscapeWelded, new Transform3d(0.08671062685, 0.28129984689, 0.359, new Rotation3d(0, 0, Math.toRadians(-30.96227128))));
+        m_frontCamera = new PhotonAprilTagsCamera("Front", k2025Reefscape, new Transform3d(0.08671062685, 0.28129984689, 0.359, new Rotation3d(0, 0, Math.toRadians(-30.96227128))));
 //        m_backCamera = new PhotonAprilTagsCamera("Back", k2025ReefscapeWelded, new Transform3d(-0.1455338456, 0.2979238, 0.94232478177, new Rotation3d(0, Math.toRadians(-48), Math.toRadians(180))));
 
         m_swerveDriveKinematics = m_MODULES.getSwerveDriveKinematics();
@@ -192,10 +188,15 @@ public class Swerve extends SubsystemBase implements Logged {
                         }
                 ),
                 driveCommand(
-                        () -> new Vector2D(
-                                m_xController.calculate(getPose2D().getX(), poseSetpoint.get().getX()),
-                                m_yController.calculate(getPose2D().getY(), poseSetpoint.get().getY())
-                        ),
+                        () -> {
+                            Vector2D vel = new Vector2D(
+                                    m_xController.calculate(getPose2D().getX(), poseSetpoint.get().getX()),
+                                    m_yController.calculate(getPose2D().getY(), poseSetpoint.get().getY())
+                            );
+
+                            vel.setMagnitude(Math.min(vel.getDistance(), 1));
+                            return vel;
+                        },
                         () -> m_angleController.calculate(getRotation2D().getRadians(), poseSetpoint.get().getRotation().getRadians()),
                         () -> true
                 )
