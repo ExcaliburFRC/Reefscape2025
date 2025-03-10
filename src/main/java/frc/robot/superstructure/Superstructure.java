@@ -9,7 +9,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import monologue.Annotations.Log;
 import monologue.Logged;
 
-public class Superstructure implements Logged{
+public class Superstructure implements Logged {
     private Elevator m_elevator;
     private Arm m_arm;
     private CoralSystem m_coralSystem;
@@ -105,8 +105,10 @@ public class Superstructure implements Logged{
                     runningStateCommand = stateCommand;
                     runningStateCommand.schedule();
                 },
-                () -> {}, // No execute action needed
-                (interrupted) -> {}, // No special end behavior needed
+                () -> {
+                }, // No execute action needed
+                (interrupted) -> {
+                }, // No special end behavior needed
                 () -> !runningStateCommand.isScheduled() // Ends when the command is no longer scheduled
         );
     }
@@ -259,6 +261,35 @@ public class Superstructure implements Logged{
         return this.m_currentState.name();
     }
 
+    public String getRobotState() {
+        if (currentState().equals("DEFUALT_ALGAE")) {
+            return "Travel";
+        } else if (currentState().equals("AUTOMATION_DEFAULT")) {
+            return "Automating...";
+        } else if (currentState().equals("INTAKE")) {
+            return "Intake";
+        } else if (currentState().equals("INTAKE_ALGAE2")) {
+            return "Intake Algae 2";
+        } else if (currentState().equals("ALGAE_DEFAULT")) {
+            return "Automating Algae";
+        } else if (currentState().equals("INTAKE_ALGAE3")) {
+            return "Intake Algae 3";
+        } else if (currentState().equals("PRE_L4") || currentState().equals("L4") || currentState().equals("POST_L4")) {
+            return "Scoring L4";
+        } else if (currentState().equals("PRE_L3") || currentState().equals("L3") || currentState().equals("POST_L3")) {
+            return "Scoring L3";
+        } else if (currentState().equals("PRE_L2") || currentState().equals("L2") || currentState().equals("POST_L2")) {
+            return "Scoring L2";
+        } else if (currentState().equals("PRE_L1") || currentState().equals("L1") || currentState().equals("POST_L1")) {
+            return "Scoring L1";
+        } else if (currentState().equals("PROCESSOR") || currentState().equals("PRE_PROCESSOR") || currentState().equals("POST_PROCESSOR")) {
+            return "Scoring Processor";
+        } else if (currentState().equals("PRE_NET") || currentState().equals("NET") || currentState().equals("POST_NET")) {
+            return "Scoring Net";
+        }
+        return "DISABLED";
+    }
+
     public Trigger hasAlgaeTrigger() {
         return m_algaeSystem.m_hasAlgaeTrigger;
     }
@@ -266,7 +297,8 @@ public class Superstructure implements Logged{
     public Trigger hasCoralTrigger() {
         return m_coralSystem.m_hasCoralTrigger;
     }
-    public Command toggleCoralCommand(){
+
+    public Command toggleCoralCommand() {
         return m_coralSystem.toggleCoralCommand();
     }
 }

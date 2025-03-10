@@ -12,8 +12,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Unit;
-import frc.excalib.additional_utilities.AllianceUtils;
 import frc.excalib.control.gains.Gains;
 import frc.excalib.control.imu.IMU;
 import frc.excalib.control.imu.Pigeon;
@@ -102,7 +100,7 @@ public final class Constants {
 
         private static final IMU GYRO = new Pigeon(GYRO_ID, SWERVE_CANBUS, new Rotation3d());
 
-        public static final double DEADBAND_VALUE = 0.15;
+        public static final double DEADBAND_VALUE = 0.05;
 
         public static Swerve configureSwerve(Pose2d initialPose) {
             return new Swerve(
@@ -165,114 +163,79 @@ public final class Constants {
         }
     }
 
-    public static enum FieldConstants {
-        // x1 = 5.77 y1 = 3.82
-        // x12 = 5.77 y12 = 2 * (1.76746 * 2.54) - y1
+    public static class FieldConstants {
+        public static final Translation2d REEF_CENTER = new Translation2d(4.4893484, 4.025);
+        private static final Translation2d B5 = new Translation2d(3.66, 3.03), B6 = new Translation2d(3.22, 3.88);
+        private static final Translation2d BASE_L1 = new Translation2d();
+        private static final Translation2d BASE_ALGAE = new Translation2d(3.75, 2.83); //S3
+        private static final Translation2d BASE_POST_ALGAE = new Translation2d(3.5, 2.58);
+
+        public static final Pose2d[] LEFT_BRANCHES = {
+                new Pose2d(B5.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(180)),
+                new Pose2d(B5.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(120)),
+                new Pose2d(B5, Rotation2d.fromDegrees(60)),
+                new Pose2d(B5.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), new Rotation2d()),
+                new Pose2d(B5.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-60)),
+                new Pose2d(B5.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(-120)),
+        };
+        public static final Pose2d[] RIGHT_BRANCHES = {
+                new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(120)),
+                new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(60)),
+                new Pose2d(B6, new Rotation2d(0)),
+                new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(-60)),
+                new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-120)),
+                new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(180))
+        };
+
+        public static final Pose2d[] L1s = {
+                new Pose2d(BASE_L1, Rotation2d.fromDegrees(180)),
+                new Pose2d(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(120)),
+                new Pose2d(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(60)),
+                new Pose2d(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(0)),
+                new Pose2d(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-60)),
+                new Pose2d(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(-120)),
+        };
+
+        public static final Pose2d[] ALGAES = {
+                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(180)),
+                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(120)),
+                new Pose2d(BASE_ALGAE, Rotation2d.fromDegrees(60)),
+                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(0)),
+                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-60)),
+                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(-120)),
+        };
+        public static final Pose2d[] POST_ALGAES = {
+                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(180)),
+                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(120)),
+                new Pose2d(BASE_POST_ALGAE, Rotation2d.fromDegrees(60)),
+                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(0)),
+                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-60)),
+                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-120)),
+        };
+        //S3 new Pose2d(3.47, 2.55, Rotation2d.fromDegrees(60)
+
+        public static final Pose2d[] FEADERS_POSES = {
+                new Pose2d(),
+                new Pose2d(),
+                new Pose2d(),
+                new Pose2d(),
+                new Pose2d(),
+                new Pose2d()
+        };
+
+        public static final Pose2d[] NET_POSES = {
+                new Pose2d(),
+                new Pose2d(),
+                new Pose2d()
+        };
+
         //
-        B1(
-                new Pose2d(5.77,3.82,Rotation2d.fromDegrees(180)),
-                new Pose2d(5.77,3.82,Rotation2d.fromDegrees(180))
-        ),
-        B2(
-                new Pose2d(5.77, 4.18, Rotation2d.fromDegrees(180)),
-                new Pose2d(5.77, 4.18, Rotation2d.fromDegrees(180))
-        ),
-        B3(
-                new Pose2d(4.96, 2.84, Rotation2d.fromDegrees(120)),
-                new Pose2d(4.96, 2.84, Rotation2d.fromDegrees(120))
-        ),
-        B4(
-                new Pose2d(3.98,2.74, Rotation2d.fromDegrees(60)),
-                new Pose2d(3.98,2.74, Rotation2d.fromDegrees(60))
-                ),
-        B5(
-                new Pose2d(3.68, 3.02, Rotation2d.fromDegrees(60)),
-                new Pose2d(3.87, 2.8, Rotation2d.fromDegrees(240))
-        ),
-        B6(
-                new Pose2d(),
-                new Pose2d()
-                ),
-        B7(
-                new Pose2d(3.21, 4.22, Rotation2d.fromDegrees(0)),
-                new Pose2d(3.21, 4.22, Rotation2d.fromDegrees(0))
-        ),
-        B8(
-                new Pose2d(),
-                new Pose2d()
-        ),
-        B9(
-                new Pose2d(4.02, 5.22, Rotation2d.fromDegrees(-60)),
-                new Pose2d(4.02, 5.22, Rotation2d.fromDegrees(-60))
-        ),
-        B10(
-                new Pose2d(),
-                new Pose2d()
-        ),
-        B11(
-                new Pose2d(5.31, 5.03, Rotation2d.fromDegrees(-120)),
-                new Pose2d(5.31, 5.03, Rotation2d.fromDegrees(-120))
-        ),
-        B12(
-                new Pose2d(),
-                new Pose2d()
-        ),
-        ALGAE_1(
-                new Pose2d(),
-                new Pose2d()
-                ),
-        ALGAE_2(
-                new Pose2d(),
-                new Pose2d()
-                ),
-        ALGAE_3(
-                new Pose2d(),
-                new Pose2d()
-        ),
-        ALGAE_4(
-                new Pose2d(),
-                new Pose2d()
-        ),
-        ALGAE_5(
-                new Pose2d(),
-                new Pose2d()
-                ),
-        ALGAE_6(
-                new Pose2d(),
-                new Pose2d()
-                ),
-        LEFT_INTAKE_1(
-                new Pose2d(),
-                new Pose2d()
-                ),
-        LEFT_INTAKE_2(
-                new Pose2d(),
-                new Pose2d()
-        ),
-        LEFT_INTAKE_3(
-                new Pose2d(),
-                new Pose2d()
-        ),
-        RIGHT_INTAKE_1(
-                new Pose2d(),
-                new Pose2d()
-                ),
-        RIGHT_INTAKE_2(
-                new Pose2d(),
-                new Pose2d()
-        ),
-        RIGHT_INTAKE_3(
-                new Pose2d(),
-                new Pose2d()
-        );
-
-        public final Pose2d pose;
-        public final Pose2d l1Pose;
-
-        FieldConstants(Pose2d bluePose, Pose2d l1Pose) {
-            this.pose = bluePose;
-            this.l1Pose = l1Pose;
-        }
+//        B5(
+//                new Pose2d(3.66, 3.03,Rotation2d.fromDegrees(60)),
+//                new
+//
+//        Pose2d(3.87,2.8,Rotation2d.fromDegrees(240))
+//                )
     }
 
     public static final int PROCESSOR_ID = 1;

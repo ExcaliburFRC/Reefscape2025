@@ -38,7 +38,7 @@ public class RobotContainer implements Logged {
 
     private final Swerve m_swerve = Constants.SwerveConstants.configureSwerve(new Pose2d());
     private Superstructure m_superstructure = new Superstructure();
-    private final LEDs leds = LEDs.getInstance();
+//    private final LEDs leds = LEDs.getInstance();
 
 
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
@@ -63,26 +63,56 @@ public class RobotContainer implements Logged {
     }
 
     private void configureBindings() {
+        /*m_driver.triangle().onTrue(automations.L4Command(true));
+        m_driver.povUp().onTrue(automations.L4Command(false));
+
+        m_driver.square().onTrue(automations.L3Command(true));
+        m_driver.povRight().onTrue(automations.L3Command(false));
+
+        m_driver.circle().onTrue(automations.L2Command(true));
+        m_driver.povLeft().onTrue(automations.L2Command(false));
+
+        m_driver.cross().onTrue(automations.L1Command(true));
+        m_driver.povDown().onTrue(automations.L1Command(false));
+
+        m_driver.L1().onTrue(m_superstructure.intakeCoralCommand());
+        m_driver.R1().onTrue(m_superstructure.collapseCommand());
+
+        m_driver.L2().onTrue(automations.intakeAlgaeCommand());
+*/
+
 //        m_driver.circle().onTrue(m_superstructure.intakeCoralCommand().raceWith(leds.setPattern(LEDs.LEDPattern.BLINKING, Color.Colors.GREEN.color)));
 //        m_driver.cross().onTrue(automations.scoreCoralCommand(4, false));
 
-        m_driver.cross().onTrue(automations.L3Command(false));
-        m_driver.circle().onTrue(m_superstructure.alignToCoralCommand(4));
-        m_driver.square().onTrue(m_superstructure.scoreCoralCommand(4));
-//        m_driver.square().onTrue(m_swerve.pidToPoseCommand(()-> new Pose2d(1,0, new Rotation2d())));
-        m_driver.povRight().onTrue(m_superstructure.toggleCoralCommand());
-//        m_driver.square().onTrue(m_superstructure.scoreCoralCommand(1));
+//        m_driver.square().onTrue(automations.L3Command(true));
+//        m_driver.triangle().onTrue(automations.L4Command(true));
+        m_driver.cross().onTrue(automations.L1Command(true));
+        m_driver.povRight().onTrue(automations.L3Command(false));
+        m_driver.povUp().onTrue(automations.L4Command(false));
+        m_driver.povDown().onTrue(automations.L1Command(false));
+
+        m_driver.R2().onTrue(
+//                m_superstructure.hasAlgaeTrigger().getAsBoolean() ?
+//                        automations.scoreAlgaeCommand() :
+                        automations.intakeAlgaeCommand()
+        );
+
+        m_driver.L1().onTrue(m_superstructure.intakeCoralCommand()
+                //.andThen(m_superstructure.collapseCommand())
+        );
+//        m_driver.R1().onTrue(m_superstructure.collapseCommand());
         m_driver.create().onTrue(m_superstructure.collapseCommand());
-//
+        //options - force outake coral, r1 - outake coral
+
 //        m_driver.touchpad().whileTrue(m_superstructure.coastCommand());
 //        m_driver.circle().onTrue(m_swerve.pidToPoseCommand(() -> new Pose2d(1.5, 1, new Rotation2d(Math.PI /3))));
         m_swerve.setDefaultCommand(
                 m_swerve.driveCommand(
                         () -> new Vector2D(
-                                deadband(-m_driver.getLeftY()) * MAX_VEL * (!m_driver.R2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.05),
-                                deadband(-m_driver.getLeftX()) * MAX_VEL * (!m_driver.R2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.05)),
-                        () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * (!m_driver.R2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.065),
-                        () -> !m_driver.R2().getAsBoolean()
+                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
+                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
+                        () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * (!m_driver.L2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.065),
+                        () -> true
                 )
         );
 
@@ -125,6 +155,8 @@ public class RobotContainer implements Logged {
 
         swerveTab.add("Angle Chooser", angleChooser);
 
+        SmartDashboard.putData("toggleHasCoral", m_superstructure.toggleCoralCommand());
+
 //        swerveTab.add("Turn To Angle",
 //                m_swerve.turnToAngleCommand(
 //                        () -> new Vector2D(
@@ -153,10 +185,5 @@ public class RobotContainer implements Logged {
     @NT
     public double getRightX() {
         return m_driver.getRightX();
-    }
-
-    @NT
-    public boolean isFieldOrianted() {
-        return !m_driver.R2().getAsBoolean();
     }
 }
