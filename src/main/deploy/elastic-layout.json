@@ -110,50 +110,76 @@
             }
           },
           {
-            "title": "USB Camera 0",
+            "title": "toggleHasCoral",
             "x": 768.0,
-            "y": 0.0,
-            "width": 768.0,
-            "height": 768.0,
-            "type": "Camera Stream",
-            "properties": {
-              "topic": "/CameraPublisher/USB Camera 0",
-              "period": 0.06
-            }
-          },
-          {
-            "title": "Elevator Height",
-            "x": 0.0,
-            "y": 384.0,
+            "y": 640.0,
             "width": 256.0,
-            "height": 384.0,
-            "type": "Number Bar",
+            "height": 128.0,
+            "type": "Command",
             "properties": {
-              "topic": "/Shuffleboard/Superstructure/Elevator Height",
+              "topic": "/SmartDashboard/toggleHasCoral",
               "period": 0.06,
-              "data_type": "double",
-              "min_value": 0.0,
-              "max_value": 1.0,
-              "divisions": 10,
-              "inverted": false,
-              "orientation": "vertical"
+              "show_type": true
             }
           },
           {
             "title": "hasCoral",
-            "x": 256.0,
+            "x": 384.0,
             "y": 384.0,
-            "width": 512.0,
+            "width": 384.0,
             "height": 384.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/m_superstructure/m_gripper/hasCoral",
+              "topic": "/Robot/m_superstructure/m_coralSystem/hasCoral",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
               "false_color": 4294198070,
               "true_icon": "None",
               "false_icon": "None"
+            }
+          },
+          {
+            "title": "hasAlgae",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/m_superstructure/m_algaeSystem/hasAlgae",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "OrangePi_Port_1183_Input_MJPEG_Server",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 768.0,
+            "height": 640.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/OrangePi_Port_1183_Input_MJPEG_Server",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "currentState",
+            "x": 1024.0,
+            "y": 640.0,
+            "width": 512.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/Robot/m_superstructure/currentState",
+              "period": 0.06,
+              "data_type": "string"
             }
           }
         ]
