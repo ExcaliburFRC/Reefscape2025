@@ -179,12 +179,12 @@ public final class Constants {
                 new Pose2d(B5.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(-120)),
         };
         public static final Pose2d[] RIGHT_BRANCHES = {
+                new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(180)),
                 new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(120)),
                 new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(60)),
                 new Pose2d(B6, new Rotation2d(0)),
                 new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(-60)),
-                new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-120)),
-                new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(180))
+                new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-120))
         };
 
         public static final Pose2d[] L1s = {
