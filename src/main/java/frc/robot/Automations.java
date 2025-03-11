@@ -12,6 +12,7 @@ import monologue.Annotations.Log;
 import monologue.Logged;
 
 import static frc.robot.Constants.FieldConstants.*;
+import static frc.robot.Constants.NET_ID;
 
 public class Automations {
     Superstructure m_superstructure;
@@ -125,7 +126,17 @@ public class Automations {
     }
 
     public Command scoreAlgaeCommand() {
-        return Commands.none();
+        return new ConditionalCommand(
+                new SequentialCommandGroup(
+                        m_swerve.pidToPoseCommand(()->new Pose2d()),
+                        m_superstructure.alignToAlgaeCommand(NET_ID),
+                        m_superstructure.scoreAlgaeCommand(NET_ID),
+                        m_superstructure.startAutomationCommand(),
+                        m_superstructure.collapseCommand()
+                ),
+                new PrintCommand("has no algae"),
+                m_superstructure.hasAlgaeTrigger()
+        );
     }
 
     public Command L1Command(boolean right) {
