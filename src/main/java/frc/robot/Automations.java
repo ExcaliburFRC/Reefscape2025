@@ -3,11 +3,13 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.*;
+import frc.excalib.additional_utilities.AllianceUtils;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
 import frc.robot.superstructure.Superstructure;
 import monologue.Annotations.Log;
 
+import static frc.excalib.additional_utilities.AllianceUtils.*;
 import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.Constants.NET_ID;
 
@@ -22,9 +24,10 @@ public class Automations {
 
     @Log.NT
     public int getReefSlice() {
-        Translation2d robotTranslation = m_swerve.getPose2D().getTranslation();
-        robotTranslation = robotTranslation.minus(Constants.FieldConstants.REEF_CENTER);
-        double angle = robotTranslation.getAngle().getDegrees();
+        Pose2d robotPose = m_swerve.getPose2D();
+        Translation2d blueRobotTranslation = isBlueAlliance()? robotPose.getTranslation() : switchAlliance(robotPose).getTranslation();
+        blueRobotTranslation = blueRobotTranslation.minus(Constants.FieldConstants.REEF_CENTER);
+        double angle = blueRobotTranslation.getAngle().getDegrees();
         if (angle < 30 && angle > -30) {
             return 0;
         }
@@ -55,7 +58,7 @@ public class Automations {
             System.out.println("invalid angle");
             return m_swerve.getPose2D();
         }
-        return ALGAES[getReefSlice()];
+        return toAlliancePose(ALGAES[getReefSlice()]);
     }
 
     @Log.NT
@@ -78,13 +81,16 @@ public class Automations {
     }
 
     private Pose2d getNetPose() {
-        Pose2d pose = NET_POSES[0];
-        if (distance(m_swerve.getPose2D(), NET_POSES[1]) <
+        Pose2d net1 = toAlliancePose(NET_POSES[0]);
+        Pose2d net2 = toAlliancePose(NET_POSES[1]);
+        Pose2d net3 = toAlliancePose(NET_POSES[2]);
+        Pose2d pose = net1;
+        if (distance(m_swerve.getPose2D(), net2) <
                 distance(m_swerve.getPose2D(), pose)
-        ) pose = NET_POSES[1];
-        if (distance(m_swerve.getPose2D(), NET_POSES[2]) <
+        ) pose = net2;
+        if (distance(m_swerve.getPose2D(), net3) <
                 distance(m_swerve.getPose2D(), pose)
-        ) pose = NET_POSES[2];
+        ) pose = net3;
 
         return pose;
     }
@@ -94,7 +100,7 @@ public class Automations {
             System.out.println("invalid angle");
             return m_swerve.getPose2D();
         }
-        return POST_ALGAES[getReefSlice()];
+        return toAlliancePose(POST_ALGAES[getReefSlice()]);
     }
 
     private Pose2d getCoralScorePose(int level, boolean right) {
@@ -103,21 +109,21 @@ public class Automations {
             return m_swerve.getPose2D();
         }
         if (level == 1) {
-            return L1s[getReefSlice()];
+            return toAlliancePose(L1s[getReefSlice()]);
         }
         if (right) {
-            return RIGHT_BRANCHES[getReefSlice()];
+            return toAlliancePose(RIGHT_BRANCHES[getReefSlice()]);
         }
-        return LEFT_BRANCHES[getReefSlice()];
+        return toAlliancePose(LEFT_BRANCHES[getReefSlice()]);
     }
 
 
-    public Command intakeCoralCommand(boolean right) {
-        return new ParallelDeadlineGroup(
-                m_superstructure.intakeCoralCommand(),
-                m_swerve.pidToPoseCommand(() -> getCoralIntakePose(right))
-        ).andThen(m_superstructure.collapseCommand());
-    }
+//    public Command intakeCoralCommand(boolean right) {
+//        return new ParallelDeadlineGroup(
+//                m_superstructure.intakeCoralCommand(),
+//                m_swerve.pidToPoseCommand(() -> getCoralIntakePose(right))
+//        ).andThen(m_superstructure.collapseCommand());
+//    }
 
     public Command intakeAlgaeCommand() {
         return new ConditionalCommand(
