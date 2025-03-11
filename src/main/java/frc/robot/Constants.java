@@ -224,9 +224,9 @@ public final class Constants {
         };
 
         public static final Pose2d[] NET_POSES = {
-                new Pose2d(),
-                new Pose2d(),
-                new Pose2d()
+                new Pose2d(0,7.261, new Rotation2d()),
+                new Pose2d(0, 6.154, new Rotation2d()),
+                new Pose2d(0, 5.097, new Rotation2d())
         };
 
         //
