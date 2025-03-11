@@ -1,15 +1,12 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
 import frc.robot.superstructure.Superstructure;
-import monologue.Annotations;
 import monologue.Annotations.Log;
-import monologue.Logged;
 
 import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.Constants.NET_ID;
@@ -76,6 +73,21 @@ public class Automations {
         }
     }
 
+    private double distance(Pose2d first, Pose2d second) {
+        return first.getTranslation().getDistance(second.getTranslation());
+    }
+
+    private Pose2d getNetPose() {
+        Pose2d pose = NET_POSES[0];
+        if (distance(m_swerve.getPose2D(), NET_POSES[1]) <
+                distance(m_swerve.getPose2D(), pose)
+        ) pose = NET_POSES[1];
+        if (distance(m_swerve.getPose2D(), NET_POSES[2]) <
+                distance(m_swerve.getPose2D(), pose)
+        ) pose = NET_POSES[2];
+
+        return pose;
+    }
 
     private Pose2d getAlgaeIntakePostPose() {
         if (getReefSlice() == -1) {
@@ -125,10 +137,10 @@ public class Automations {
                 ), m_superstructure.hasAlgaeTrigger());
     }
 
-    public Command scoreAlgaeCommand() {
+    public Command netCommand() {
         return new ConditionalCommand(
                 new SequentialCommandGroup(
-                        m_swerve.pidToPoseCommand(()->new Pose2d()),
+                        m_swerve.pidToPoseCommand(this::getNetPose),
                         m_superstructure.alignToAlgaeCommand(NET_ID),
                         m_superstructure.scoreAlgaeCommand(NET_ID),
                         m_superstructure.startAutomationCommand(),
