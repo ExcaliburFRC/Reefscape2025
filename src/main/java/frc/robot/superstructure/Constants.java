@@ -1,5 +1,8 @@
 package frc.robot.superstructure;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Constants {
     //INTAKE Constants TODO
     public static final double INTAKE_ELEVATOR_HEIGHT = 0.23;
@@ -156,4 +159,5 @@ public class Constants {
     public static final double AUTOMATION_DEFAULT_ARM_ANGLE = 2.0586022173425302;
     public static final double AUTOMATION_DEFAULT_CORAL_WHEELS_VOLTAGE = 0;
     public static final double AUTOMATION_DEFAULT_ALGAE_WHEELS_VOLTAGE = 3;
+
 }

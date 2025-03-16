@@ -22,8 +22,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.excalib.additional_utilities.Color;
 import frc.excalib.additional_utilities.LEDs;
+import frc.excalib.commands.MapCommand;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
+import frc.robot.superstructure.State;
 import frc.robot.superstructure.Superstructure;
 import monologue.Logged;
 
@@ -75,6 +77,15 @@ public class RobotContainer implements Logged {
 
         m_driver.PS().onTrue(m_swerve.resetAngleCommand());
 
+        m_driver.triangle().toggleOnTrue(m_superstructure.alignToCoralCommand(4));
+        m_driver.circle().toggleOnTrue(m_superstructure.alignToCoralCommand(3));
+        m_driver.cross().toggleOnTrue(m_superstructure.alignToCoralCommand(1));
+
+        m_driver.create().onTrue(m_superstructure.collapseCommand());
+
+        m_driver.options().onTrue(new MapCommand<>(m_superstructure.m_map, () -> m_superstructure.getSuperstructureState()));
+
+        m_driver.L1().toggleOnTrue(m_superstructure.intakeCoralCommand().andThen(m_superstructure.collapseCommand()));
     }
 
 

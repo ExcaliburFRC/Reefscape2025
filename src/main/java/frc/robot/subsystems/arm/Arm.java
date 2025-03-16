@@ -67,7 +67,7 @@ public class Arm extends SubsystemBase implements Logged {
         m_radSupplier = () -> m_encoder.getPosition().getValueAsDouble() * ROTATIONS_TO_RAD;
 
         m_motorGroup.setMotorPosition(m_radSupplier.getAsDouble());
-        m_motorGroup.setCurrentLimit(0, 35);
+        m_motorGroup.setCurrentLimit(0, 20);
 
         m_voltageLimitInterpulator = new InterpolatingDoubleTreeMap();
         m_voltageLimitInterpulator.put(0.0, CLOSED_MAX_VOL);

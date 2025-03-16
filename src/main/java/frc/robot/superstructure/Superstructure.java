@@ -9,6 +9,8 @@ import frc.robot.subsystems.elevator.Elevator;
 import monologue.Annotations.Log;
 import monologue.Logged;
 
+import java.util.HashMap;
+
 public class Superstructure implements Logged {
     private Elevator m_elevator;
     private Arm m_arm;
@@ -18,6 +20,7 @@ public class Superstructure implements Logged {
     private State m_currentState;
     private Command runningCommand = null;
     private Command runningStateCommand = null;
+    public final HashMap<State, Command> m_map = new HashMap<>();
 
     public Superstructure() {
         m_elevator = new Elevator();
@@ -34,6 +37,10 @@ public class Superstructure implements Logged {
         m_toleranceTrigger = m_arm.m_toleranceTrigger.and(m_elevator.m_toleranceTrigger);
         m_currentState = State.DEFAULT;
         scheduleExclusiveStateCommand(State.DEFAULT).schedule();
+
+        m_map.put(State.PRE_L1, scoreCoralCommand(1));
+        m_map.put(State.PRE_L3, scoreCoralCommand(3));
+        m_map.put(State.PRE_L4, scoreCoralCommand(4));
     }
 
     private State getCoralPreState(int level) {
@@ -163,7 +170,7 @@ public class Superstructure implements Logged {
         }
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
-                        new WaitUntilCommand(m_toleranceTrigger).andThen(scoreCoralCommand(score, after)),
+                        new WaitUntilCommand(m_toleranceTrigger).andThen(scoreCoralCommand(score, after)).andThen(new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate())),
                         new PrintCommand("has no coral or not at correct state"),
                         m_coralSystem.m_hasCoralTrigger.and(() -> getCoralPreState(level).equals(m_currentState))
                 )
@@ -255,6 +262,10 @@ public class Superstructure implements Logged {
         return scheduleExclusiveCommand(scheduleExclusiveStateCommand(State.AUTOMATION_DEFAULT));
     }
 
+    @Log.NT
+    public State getSuperstructureState(){
+        return m_currentState;
+    }
     @Log.NT
     public String currentState() {
         return this.m_currentState.name();
