@@ -83,12 +83,12 @@ public class RobotContainer implements Logged {
         m_driver.povUp().toggleOnTrue(m_superstructure.alignToAlgaeCommand(4));
         m_driver.create().toggleOnTrue(m_superstructure.alignToAlgaeCommand(1));
 
-        m_driver.L2().onTrue(new MapCommand<>(m_superstructure.m_algaeMap, () -> m_superstructure.getSuperstructureState()));
+        m_driver.L2().onTrue(new MapCommand<>(m_superstructure.m_algaeMap, () -> m_superstructure.getState()));
 
         m_driver.povDown().onTrue(m_superstructure.ejectAlgaeCommand());
 
         m_driver.options().onTrue(m_superstructure.collapseCommand());
-        m_driver.R1().onTrue(new MapCommand<>(m_superstructure.m_coralMap, () -> m_superstructure.getSuperstructureState()));
+        m_driver.R1().onTrue(new MapCommand<>(m_superstructure.m_coralMap, () -> m_superstructure.getState()));
 
         m_driver.L1().toggleOnTrue(m_superstructure.intakeCoralCommand().andThen(m_superstructure.collapseCommand()));
     }
@@ -126,8 +126,6 @@ public class RobotContainer implements Logged {
         angleChooser.addOption("270", new Rotation2d(3 * Math.PI / 2));
 
         swerveTab.add("Angle Chooser", angleChooser);
-
-        SmartDashboard.putData("toggleHasCoral", m_superstructure.toggleCoralCommand());
 
 //        swerveTab.add("Turn To Angle",
 //                m_swerve.turnToAngleCommand(

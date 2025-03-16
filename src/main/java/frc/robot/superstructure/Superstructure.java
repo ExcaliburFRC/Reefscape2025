@@ -16,10 +16,13 @@ public class Superstructure implements Logged {
     private Arm m_arm;
     private CoralSystem m_coralSystem;
     private AlgaeSystem m_algaeSystem;
+
     public Trigger m_toleranceTrigger;
+
     private State m_currentState;
-    private Command runningCommand = null;
-    private Command runningStateCommand = null;
+
+    private Command m_runningCommand = null, m_runningStateCommand = null;
+
     public final HashMap<State, Command> m_coralMap = new HashMap<>();
     public final HashMap<State, Command> m_algaeMap = new HashMap<>();
 
@@ -93,34 +96,34 @@ public class Superstructure implements Logged {
     private Command scheduleExclusiveCommand(Command newCommand) {
         return new FunctionalCommand(
                 () -> {
-                    if (runningCommand != null && runningCommand.isScheduled()) {
-                        runningCommand.cancel();
+                    if (m_runningCommand != null && m_runningCommand.isScheduled()) {
+                        m_runningCommand.cancel();
                     }
-                    runningCommand = newCommand;
-                    runningCommand.schedule();
+                    m_runningCommand = newCommand;
+                    m_runningCommand.schedule();
                 },
                 () -> {
                 }, // No execute action needed
                 (interrupted) -> {
                 }, // No special end behavior needed
-                () -> !runningCommand.isScheduled() // Ends when the command is no longer scheduled
+                () -> !m_runningCommand.isScheduled() // Ends when the command is no longer scheduled
         );
     }
 
     private Command scheduleExclusiveStateCommand(Command stateCommand) {
         return new FunctionalCommand(
                 () -> {
-                    if (runningStateCommand != null && runningStateCommand.isScheduled()) {
-                        runningStateCommand.cancel();
+                    if (m_runningStateCommand != null && m_runningStateCommand.isScheduled()) {
+                        m_runningStateCommand.cancel();
                     }
-                    runningStateCommand = stateCommand;
-                    runningStateCommand.schedule();
+                    m_runningStateCommand = stateCommand;
+                    m_runningStateCommand.schedule();
                 },
                 () -> {
                 }, // No execute action needed
                 (interrupted) -> {
                 }, // No special end behavior needed
-                () -> !runningStateCommand.isScheduled() // Ends when the command is no longer scheduled
+                () -> !m_runningStateCommand.isScheduled() // Ends when the command is no longer scheduled
         );
     }
 
@@ -174,7 +177,11 @@ public class Superstructure implements Logged {
         }
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
-                        new WaitUntilCommand(m_toleranceTrigger).andThen(scoreCoralCommand(score, after)).andThen(new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate())),
+                        new SequentialCommandGroup(
+                                new WaitUntilCommand(m_toleranceTrigger),
+                                scoreCoralCommand(score, after),
+                                new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate())
+                        ),
                         new PrintCommand("has no coral or not at correct state"),
                         m_coralSystem.m_hasCoralTrigger.and(() -> getCoralPreState(level).equals(m_currentState))
                 )
@@ -281,7 +288,7 @@ public class Superstructure implements Logged {
     }
 
     @Log.NT
-    public State getSuperstructureState() {
+    public State getState() {
         return m_currentState;
     }
 
@@ -290,7 +297,7 @@ public class Superstructure implements Logged {
         return this.m_currentState.name();
     }
 
-    public String getRobotState() {
+    public String getCurrentRobotNamedSate() {
         if (currentState().equals("DEFUALT_ALGAE")) {
             return "Travel";
         } else if (currentState().equals("AUTOMATION_DEFAULT")) {
@@ -325,9 +332,5 @@ public class Superstructure implements Logged {
 
     public Trigger hasCoralTrigger() {
         return m_coralSystem.m_hasCoralTrigger;
-    }
-
-    public Command toggleCoralCommand() {
-        return m_coralSystem.toggleCoralCommand();
     }
 }

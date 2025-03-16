@@ -51,9 +51,4 @@ public class CoralSystem extends SubsystemBase implements Logged {
     public boolean hasCoral() {
         return m_hasCoralTrigger.getAsBoolean();
     }
-
-    public Command toggleCoralCommand() {
-        return new InstantCommand(() -> hasCoral = !hasCoral);
-    }
-
 }
