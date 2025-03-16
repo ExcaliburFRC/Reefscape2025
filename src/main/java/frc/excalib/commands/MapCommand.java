@@ -14,7 +14,6 @@ public class MapCommand<T> extends Command {
         m_map = map;
         m_t = t;
         map.forEach((key, value) -> this.addRequirements(value.getRequirements()));
-        CommandScheduler.getInstance().registerComposedCommands(m_command);
     }
 
     @Override
