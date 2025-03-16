@@ -140,7 +140,7 @@ public class Constants {
     public static final double EJECT_ALGAE_ELEVATOR_HEIGHT = 0;
     public static final double EJECT_ALGAE_ARM_ANGLE = 0;
     public static final double EJECT_ALGAE_CORAL_WHEELS_VOLTAGE = 0;
-    public static final double EJECT_ALGAE_ALGAE_WHEELS_VOLTAGE = 3;
+    public static final double EJECT_ALGAE_ALGAE_WHEELS_VOLTAGE = -3;
 
     // Default Constants TODO
     public static final double DEFAULT_ELEVATOR_HEIGHT = 0;

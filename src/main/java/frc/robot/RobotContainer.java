@@ -20,25 +20,20 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import frc.excalib.additional_utilities.Color;
 import frc.excalib.additional_utilities.LEDs;
 import frc.excalib.commands.MapCommand;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
-import frc.robot.superstructure.State;
 import frc.robot.superstructure.Superstructure;
 import monologue.Logged;
 
-import static frc.robot.Constants.NET_ID;
-import static frc.robot.Constants.PROCESSOR_ID;
 import static frc.robot.Constants.SwerveConstants.*;
-import static monologue.Annotations.Log.NT;
 
 public class RobotContainer implements Logged {
     private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
     // The robot's subsystems and commands are defined here...
 
-    private final Swerve m_swerve = Constants.SwerveConstants.configureSwerve(new Pose2d());
+        private final Swerve m_swerve = Constants.SwerveConstants.configureSwerve(new Pose2d());
     private Superstructure m_superstructure = new Superstructure();
     private final LEDs leds = LEDs.getInstance();
 
@@ -46,14 +41,15 @@ public class RobotContainer implements Logged {
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
     private final CommandPS5Controller m_test = new CommandPS5Controller(1);
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
-    private final Automations automations;
+//    private final Automations automations;
+
 
     private SendableChooser<Command> m_autoChooser;
 
     public RobotContainer() {
         m_decelerator.put(-1.0, 1.0);
         m_decelerator.put(1.0, 0.25);
-        automations = new Automations(m_swerve, m_superstructure);
+//        automations = new Automations(m_swerve, m_superstructure);
 
 
 //        initAutoChooser();
@@ -81,9 +77,18 @@ public class RobotContainer implements Logged {
         m_driver.circle().toggleOnTrue(m_superstructure.alignToCoralCommand(3));
         m_driver.cross().toggleOnTrue(m_superstructure.alignToCoralCommand(1));
 
-        m_driver.create().onTrue(m_superstructure.collapseCommand());
+        m_driver.povRight().toggleOnTrue(m_superstructure.intakeAlgaeCommand(3));
+        m_driver.povLeft().toggleOnTrue(m_superstructure.intakeAlgaeCommand(2));
 
-        m_driver.options().onTrue(new MapCommand<>(m_superstructure.m_map, () -> m_superstructure.getSuperstructureState()));
+        m_driver.povUp().toggleOnTrue(m_superstructure.alignToAlgaeCommand(4));
+        m_driver.create().toggleOnTrue(m_superstructure.alignToAlgaeCommand(1));
+
+        m_driver.L2().onTrue(new MapCommand<>(m_superstructure.m_algaeMap, () -> m_superstructure.getSuperstructureState()));
+
+        m_driver.povDown().onTrue(m_superstructure.ejectAlgaeCommand());
+
+        m_driver.options().onTrue(m_superstructure.collapseCommand());
+        m_driver.R1().onTrue(new MapCommand<>(m_superstructure.m_coralMap, () -> m_superstructure.getSuperstructureState()));
 
         m_driver.L1().toggleOnTrue(m_superstructure.intakeCoralCommand().andThen(m_superstructure.collapseCommand()));
     }
