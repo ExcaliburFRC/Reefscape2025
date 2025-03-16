@@ -1,8 +1,6 @@
 package frc.robot.subsystems.coral;
 
-import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -10,17 +8,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
 import frc.excalib.mechanisms.Mechanism;
-import monologue.Annotations;
 import monologue.Logged;
 
-import static edu.wpi.first.wpilibj.I2C.Port.kMXP;
-import static edu.wpi.first.wpilibj.I2C.Port.kOnboard;
 import static frc.robot.subsystems.coral.Constants.*;
 import static monologue.Annotations.*;
 
 public class CoralSystem extends SubsystemBase implements Logged {
     public final Trigger m_hasCoralTrigger;
-    public final DigitalInput m_bumperSwitch = new DigitalInput(BUMPER_SWITCH_ID);
+    public final DigitalInput m_limitSwitch = new DigitalInput(BUMPER_SWITCH_ID);
     boolean hasCoral = false;
     private final Mechanism m_coralWheel;
     private double m_voltageState;
@@ -28,11 +23,11 @@ public class CoralSystem extends SubsystemBase implements Logged {
     public CoralSystem() {
         this.m_coralWheel = new Mechanism(new TalonFXMotor(MOTOR_ID));
 
-        this.m_hasCoralTrigger = new Trigger(
-                () -> hasCoral
-        ).debounce(HAS_CORAL_DEBOUNCE);
+//        this.m_hasCoralTrigger = new Trigger(
+//                () -> hasCoral
+//        ).debounce(HAS_CORAL_DEBOUNCE);
 
-//        this.m_hasCoralTrigger = new Trigger(()-> m_bumperSwitch.get()).debounce(HAS_CORAL_DEBOUNCE);
+        this.m_hasCoralTrigger = new Trigger(() -> !m_limitSwitch.get()).debounce(HAS_CORAL_DEBOUNCE);
         this.m_voltageState = 0;
         this.setDefaultCommand(defaultCommand());
     }
@@ -55,11 +50,6 @@ public class CoralSystem extends SubsystemBase implements Logged {
     @Log.NT
     public boolean hasCoral() {
         return m_hasCoralTrigger.getAsBoolean();
-    }
-
-    @Log.NT
-    public int getProximity() {
-        return 0;//m_colorSensor.getProximity();
     }
 
     public Command toggleCoralCommand() {

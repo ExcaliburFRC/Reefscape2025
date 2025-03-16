@@ -50,7 +50,7 @@ public class Swerve extends SubsystemBase implements Logged {
     private final IMU m_imu;
     private final Odometry m_odometry;
     private ChassisSpeeds m_desiredChassisSpeeds = new ChassisSpeeds();
-    private final PhotonAprilTagsCamera m_frontCamera;//, m_backCamera,;
+    private final PhotonAprilTagsCamera m_frontCamera, m_backCamera;
     private Trigger finishTrigger;
     private Rotation2d pi = new Rotation2d(Math.PI);
 
@@ -99,7 +99,7 @@ public class Swerve extends SubsystemBase implements Logged {
                 initialPosition
         );
         m_frontCamera = new PhotonAprilTagsCamera("Front", k2025Reefscape, new Transform3d(0.08671062685, 0.28129984689, 0.359, new Rotation3d(0, 0, Math.toRadians(-30.96227128))));
-//        m_backCamera = new PhotonAprilTagsCamera("Back", k2025ReefscapeWelded, new Transform3d(-0.1455338456, 0.2979238, 0.94232478177, new Rotation3d(0, Math.toRadians(-48), Math.toRadians(180))));
+        m_backCamera = new PhotonAprilTagsCamera("Back", k2025Reefscape, new Transform3d(-0.1455338456, 0.2979238, 0.94232478177, new Rotation3d(0, Math.toRadians(-48), Math.toRadians(180))));
 
         m_swerveDriveKinematics = m_MODULES.getSwerveDriveKinematics();
 
@@ -274,10 +274,10 @@ public class Swerve extends SubsystemBase implements Logged {
     public void updateOdometry() {
         m_odometry.updateOdometry(m_MODULES.getModulesPositions());
 
-//        Optional<EstimatedRobotPose> backPose = m_backCamera.getEstimatedGlobalPose(m_odometry.getEstimatedPosition());
-//        if (backPose.isPresent()) {
-//            m_odometry.addVisionMeasurement(backPose.get().estimatedPose.toPose2d(), backPose.get().timestampSeconds);
-//        }
+        Optional<EstimatedRobotPose> backPose = m_backCamera.getEstimatedGlobalPose(m_odometry.getEstimatedPosition());
+        if (backPose.isPresent()) {
+            m_odometry.addVisionMeasurement(backPose.get().estimatedPose.toPose2d(), backPose.get().timestampSeconds);
+        }
 
         Optional<EstimatedRobotPose> frontPose = m_frontCamera.getEstimatedGlobalPose(m_odometry.getEstimatedPosition());
         if (frontPose.isPresent()) {

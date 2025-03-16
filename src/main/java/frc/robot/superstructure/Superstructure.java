@@ -177,7 +177,7 @@ public class Superstructure implements Logged {
                                 scheduleExclusiveStateCommand(State.INTAKE).until(m_coralSystem.m_hasCoralTrigger),
                                 new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger)
                         ),
-                        new PrintCommand("cant intake"),
+                        new PrintCommand("can't intake - intake coral command"),
                         m_coralSystem.m_hasCoralTrigger.negate().and(() -> !m_algaeSystem.hasAlgae())));
     }
 

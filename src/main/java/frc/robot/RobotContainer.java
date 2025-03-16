@@ -38,7 +38,7 @@ public class RobotContainer implements Logged {
 
     private final Swerve m_swerve = Constants.SwerveConstants.configureSwerve(new Pose2d());
     private Superstructure m_superstructure = new Superstructure();
-//    private final LEDs leds = LEDs.getInstance();
+    private final LEDs leds = LEDs.getInstance();
 
 
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
