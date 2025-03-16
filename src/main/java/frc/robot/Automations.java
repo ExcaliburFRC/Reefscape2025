@@ -7,9 +7,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
 import frc.robot.superstructure.Superstructure;
-import monologue.Annotations;
 import monologue.Annotations.Log;
-import monologue.Logged;
 
 import static frc.robot.Constants.FieldConstants.*;
 

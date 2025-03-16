@@ -2,7 +2,7 @@ package frc.robot.superstructure;
 
 public class Constants {
     //INTAKE Constants TODO
-    public static final double INTAKE_ELEVATOR_HEIGHT = 0.2484445461082967;
+    public static final double INTAKE_ELEVATOR_HEIGHT = 0.23;
     public static final double INTAKE_ARM_ANGLE = -1.7748157715836868;
     public static final double INTAKE_CORAL_WHEELS_VOLTAGE = -3;
     public static final double INTAKE_ALGAE_WHEELS_VOLTAGE = 3;
@@ -52,7 +52,7 @@ public class Constants {
     // L3 Constants TODO
     public static final double L3_ELEVATOR_HEIGHT = 0.0794 + 0.04;
     public static final double L3_ARM_ANGLE = 1.2502;// + Math.PI * 3.0 / 180.0;
-    public static final double L3_CORAL_WHEELS_VOLTAGE = 5;
+    public static final double L3_CORAL_WHEELS_VOLTAGE = 7;
     public static final double L3_ALGAE_WHEELS_VOLTAGE = 3;
 
     // POST L3 Constants TODO
@@ -63,7 +63,7 @@ public class Constants {
 
     // PRE L4 Constants TODO
     public static final double PRE_L4_ELEVATOR_HEIGHT = 0.69;
-    public static final double PRE_L4_ARM_ANGLE = 1.5 - 0.017435839227423353;
+    public static final double PRE_L4_ARM_ANGLE = 1.4825641607725766;
     public static final double PRE_L4_CORAL_WHEELS_VOLTAGE = 0;
     public static final double PRE_L4_ALGAE_WHEELS_VOLTAGE = 3;
 
@@ -92,22 +92,22 @@ public class Constants {
     public static final double INTAKE_ALGAE3_ALGAE_WHEELS_VOLTAGE = 5;
 
     //PRE NET Constants TODO
-    public static final double PRE_NET_ELEVATOR_HEIGHT = 0.5;
-    public static final double PRE_NET_ARM_ANGLE = 1.5;
+    public static final double PRE_NET_ELEVATOR_HEIGHT = 0.6;
+    public static final double PRE_NET_ARM_ANGLE = 1.5; //2
     public static final double PRE_NET_CORAL_WHEELS_VOLTAGE = 0;
     public static final double PRE_NET_ALGAE_WHEELS_VOLTAGE = 5.5;
 
     //NET Constants TODO
     public static final double NET_ELEVATOR_HEIGHT = 0.68;
-    public static final double NET_ARM_ANGLE = 2;
+    public static final double NET_ARM_ANGLE = 1.25; //2
     public static final double NET_CORAL_WHEELS_VOLTAGE = 0;
-    public static final double NET_ALGAE_WHEELS_VOLTAGE = -11;
+    public static final double NET_ALGAE_WHEELS_VOLTAGE = -12;
 
     //POST NET Constants TODO
     public static final double POST_NET_ELEVATOR_HEIGHT = 0.68;
     public static final double POST_NET_ARM_ANGLE = 2;
     public static final double POST_NET_CORAL_WHEELS_VOLTAGE = 0;
-    public static final double POST_NET_ALGAE_WHEELS_VOLTAGE = -11;
+    public static final double POST_NET_ALGAE_WHEELS_VOLTAGE = -12;
 
     //PRE PROCESSOR Constants TODO
     public static final double PRE_PROCESSOR_ELEVATOR_HEIGHT = 0.221;
@@ -142,7 +142,7 @@ public class Constants {
     // Default Constants TODO
     public static final double DEFAULT_ELEVATOR_HEIGHT = 0;
     public static final double DEFAULT_ARM_ANGLE = -1.5063691337036997;
-    public static final double DEFAULT_CORAL_WHEELS_VOLTAGE = 0;
+    public static final double DEFAULT_CORAL_WHEELS_VOLTAGE = -0.1;
     public static final double DEFAULT_ALGAE_WHEELS_VOLTAGE = 3;
 
     //Algae Default Constants TODO

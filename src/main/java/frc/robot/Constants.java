@@ -229,13 +229,6 @@ public final class Constants {
                 new Pose2d()
         };
 
-        //
-//        B5(
-//                new Pose2d(3.66, 3.03,Rotation2d.fromDegrees(60)),
-//                new
-//
-//        Pose2d(3.87,2.8,Rotation2d.fromDegrees(240))
-//                )
     }
 
     public static final int PROCESSOR_ID = 1;

@@ -12,8 +12,8 @@ import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
  * @author Shai Grossman
  */
 public class AllianceUtils {
-    public static final double FIELD_LENGTH_METERS = 16.54;
-    public static final double FIELD_WIDTH_METERS = 8.02;
+    public static final double FIELD_LENGTH_METERS = 17.544;
+    public static final double FIELD_WIDTH_METERS = 8.05;
 
     /**
      * @return whether the robot is on the blue alliance
@@ -33,12 +33,12 @@ public class AllianceUtils {
     /**
      * Converts a pose to the pose relative to the current driver station alliance.
      *
-     * @param pose the current blue alliance pose
+     * @param bluePose the current blue alliance pose
      * @return the converted pose
      */
-    public static Pose2d toAlliancePose(Pose2d pose) {
-        if (isBlueAlliance()) return pose;
-        return mirrorAlliance(pose);
+    public static Pose2d toAlliancePose(Pose2d bluePose) {
+        if (isBlueAlliance()) return bluePose;
+        return switchAlliance(bluePose);
     }
 
     public static Pose2d switchAlliance(Pose2d pose) {

@@ -194,8 +194,9 @@ public class Swerve extends SubsystemBase implements Logged {
                                     m_yController.calculate(getPose2D().getY(), poseSetpoint.get().getY())
                             );
 
-                            vel.setMagnitude(Math.min(vel.getDistance(), 2.3));
-                            return vel;
+                            vel.setMagnitude(Math.min(vel.getDistance(), 0.9));
+                        if(!AllianceUtils.isBlueAlliance()) return vel.rotate(pi);
+                        return vel;
                         },
                         () -> m_angleController.calculate(getRotation2D().getRadians(), poseSetpoint.get().getRotation().getRadians()),
                         () -> true

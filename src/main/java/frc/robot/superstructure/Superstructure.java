@@ -118,8 +118,7 @@ public class Superstructure implements Logged {
     }
 
     private Command scoreCoralCommand(State score, State after) {
-        return
-                new SequentialCommandGroup(
+        return new SequentialCommandGroup(
                         scheduleExclusiveStateCommand(score),
                         new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate()).withTimeout(0.1),
                         scheduleExclusiveStateCommand(after),
