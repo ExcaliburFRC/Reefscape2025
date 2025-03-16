@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.excalib.additional_utilities.LEDs;
-import frc.excalib.commands.MapCommand;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
 import frc.robot.superstructure.Superstructure;
@@ -41,7 +40,7 @@ public class RobotContainer implements Logged {
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
     private final CommandPS5Controller m_test = new CommandPS5Controller(1);
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
-//    private final Automations automations;
+    private final Automations m_automations;
 
 
     private SendableChooser<Command> m_autoChooser;
@@ -49,7 +48,7 @@ public class RobotContainer implements Logged {
     public RobotContainer() {
         m_decelerator.put(-1.0, 1.0);
         m_decelerator.put(1.0, 0.25);
-//        automations = new Automations(m_swerve, m_superstructure);
+        m_automations = new Automations(m_swerve, m_superstructure);
 
 
 //        initAutoChooser();
@@ -73,22 +72,11 @@ public class RobotContainer implements Logged {
 
         m_driver.PS().onTrue(m_swerve.resetAngleCommand());
 
-        m_driver.triangle().toggleOnTrue(m_superstructure.alignToCoralCommand(4));
-        m_driver.circle().toggleOnTrue(m_superstructure.alignToCoralCommand(3));
-        m_driver.cross().toggleOnTrue(m_superstructure.alignToCoralCommand(1));
-
-        m_driver.povRight().toggleOnTrue(m_superstructure.intakeAlgaeCommand(3));
-        m_driver.povLeft().toggleOnTrue(m_superstructure.intakeAlgaeCommand(2));
-
-        m_driver.povUp().toggleOnTrue(m_superstructure.alignToAlgaeCommand(4));
-        m_driver.create().toggleOnTrue(m_superstructure.alignToAlgaeCommand(1));
-
-        m_driver.L2().onTrue(m_superstructure.scoreAlgaeCommand());
-
-        m_driver.povDown().onTrue(m_superstructure.ejectAlgaeCommand());
+        m_driver.square().toggleOnTrue(m_automations.alignToL3Command(false));
+        m_driver.circle().toggleOnTrue(m_automations.alignToL3Command(true));
+        m_driver.R1().onTrue(m_automations.scoreCoralCommand());
 
         m_driver.options().onTrue(m_superstructure.collapseCommand());
-        m_driver.R1().onTrue(m_superstructure.scoreCoralCommand());
 
         m_driver.L1().toggleOnTrue(m_superstructure.intakeCoralCommand().andThen(m_superstructure.collapseCommand()));
     }

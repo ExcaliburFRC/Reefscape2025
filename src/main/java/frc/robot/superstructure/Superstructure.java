@@ -156,6 +156,7 @@ public class Superstructure implements Logged {
     public Command scoreCoralCommand(){
         return new MapCommand<State>(m_coralMap, this::getState);
     }
+
     private Command scoreCoralCommand(int level) {
         State score, after;
         switch (level) {
