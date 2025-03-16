@@ -134,7 +134,7 @@ public class Automations {
                         m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.1),
                         m_superstructure.alignToCoralCommand(1),
                         new WaitCommand(1),
-                        m_superstructure.scoreCoralCommand(1)
+                        m_superstructure.scoreCoralCommand()
                 ), m_superstructure.hasCoralTrigger().negate());
     }
 
@@ -147,7 +147,7 @@ public class Automations {
                         m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.1),
                         m_superstructure.alignToCoralCommand(4),
                         new WaitCommand(1),
-                        m_superstructure.scoreCoralCommand(4),
+                        m_superstructure.scoreCoralCommand(),
                         m_superstructure.startAutomationCommand()
                 ), m_superstructure.hasCoralTrigger().negate());
     }
@@ -161,7 +161,7 @@ public class Automations {
                         m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.1),
                         m_superstructure.alignToCoralCommand(3),
                         new WaitCommand(0.5),
-                        m_superstructure.scoreCoralCommand(3),
+                        m_superstructure.scoreCoralCommand(),
                         m_superstructure.startAutomationCommand()
                 ), m_superstructure.hasCoralTrigger().negate());
     }
@@ -175,7 +175,7 @@ public class Automations {
                         m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.1),
                         new WaitCommand(1),
                         new PrintCommand("whhhhhaa"),
-                        m_superstructure.scoreCoralCommand(2),
+                        m_superstructure.scoreCoralCommand(),
                         m_superstructure.startAutomationCommand()
                 ), m_superstructure.hasCoralTrigger().negate());
     }

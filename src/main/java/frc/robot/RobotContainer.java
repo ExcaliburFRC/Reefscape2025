@@ -83,12 +83,12 @@ public class RobotContainer implements Logged {
         m_driver.povUp().toggleOnTrue(m_superstructure.alignToAlgaeCommand(4));
         m_driver.create().toggleOnTrue(m_superstructure.alignToAlgaeCommand(1));
 
-        m_driver.L2().onTrue(new MapCommand<>(m_superstructure.m_algaeMap, () -> m_superstructure.getState()));
+        m_driver.L2().onTrue(m_superstructure.scoreAlgaeCommand());
 
         m_driver.povDown().onTrue(m_superstructure.ejectAlgaeCommand());
 
         m_driver.options().onTrue(m_superstructure.collapseCommand());
-        m_driver.R1().onTrue(new MapCommand<>(m_superstructure.m_coralMap, () -> m_superstructure.getState()));
+        m_driver.R1().onTrue(m_superstructure.scoreCoralCommand());
 
         m_driver.L1().toggleOnTrue(m_superstructure.intakeCoralCommand().andThen(m_superstructure.collapseCommand()));
     }

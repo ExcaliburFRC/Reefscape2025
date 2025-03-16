@@ -2,6 +2,7 @@ package frc.robot.superstructure;
 
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.excalib.commands.MapCommand;
 import frc.robot.subsystems.algae.AlgaeSystem;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.coral.CoralSystem;
@@ -152,7 +153,10 @@ public class Superstructure implements Logged {
                 ));
     }
 
-    public Command scoreCoralCommand(int level) {
+    public Command scoreCoralCommand(){
+        return new MapCommand<State>(m_coralMap, this::getState);
+    }
+    private Command scoreCoralCommand(int level) {
         State score, after;
         switch (level) {
             case 1 -> {
@@ -218,6 +222,7 @@ public class Superstructure implements Logged {
                 ));
     }
 
+
     private Command scoreAlgaeCommand(State score, State after) {
         return scheduleExclusiveCommand(
                 new SequentialCommandGroup(
@@ -227,6 +232,11 @@ public class Superstructure implements Logged {
                 )
         );
     }
+
+    public Command scoreAlgaeCommand(){
+        return new MapCommand<State>(m_algaeMap, this::getState);
+    }
+
 
     public Command scoreAlgaeCommand(int level) {
         State score, after;
