@@ -177,6 +177,7 @@ public class Arm extends SubsystemBase implements Logged {
         return m_setpointAngle;
     }
 
+    @Log.NT
     public double getLimitedSetpoint() {
         return m_softLimit.limit(getSetpoint());
     }

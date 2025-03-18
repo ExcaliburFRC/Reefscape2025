@@ -1,7 +1,7 @@
 package frc.excalib.control.limits;
 
-import monologue.Annotations;
 import monologue.Annotations.Log;
+import monologue.Logged;
 
 import java.util.function.DoubleSupplier;
 
@@ -11,7 +11,7 @@ import java.util.function.DoubleSupplier;
  *
  * @author Yoav Cohen
  */
-public class SoftLimit {
+public class SoftLimit implements Logged {
     private final DoubleSupplier m_minLimit, m_maxLimit;
 
     /**

@@ -7,9 +7,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
 import frc.robot.superstructure.Superstructure;
-import monologue.Annotations;
 import monologue.Annotations.Log;
-import monologue.Logged;
 
 import static frc.robot.Constants.FieldConstants.*;
 
@@ -48,41 +46,40 @@ public class Automations {
         return -1;
     }
 
-    private Pose2d getCoralIntakePose(boolean right) {
-        return m_swerve.getPose2D();
-    }
+//    private Pose2d getCoralIntakePose(boolean right) {
+//        return m_swerve.getPose2D();
+//    }
+//
+//    private Pose2d getAlgaeIntakePose() {
+//        if (getReefSlice() == -1) {
+//            System.out.println("invalid angle");
+//            return m_swerve.getPose2D();
+//        }
+//        return ALGAES[getReefSlice()];
+//    }
 
-    private Pose2d getAlgaeIntakePose() {
-        if (getReefSlice() == -1) {
-            System.out.println("invalid angle");
-            return m_swerve.getPose2D();
-        }
-        return ALGAES[getReefSlice()];
-    }
+//    @Log.NT
+//    private int getAlgaeIntakeLevel() {
+//        switch (getReefSlice()) {
+//            case 0, 2, 4 -> {
+//                return 2;
+//            }
+//            case 1, 3, 5 -> {
+//                return 3;
+//            }
+//            default -> {
+//                return -1;
+//            }
+//        }
+//    }
 
-    @Log.NT
-    private int getAlgaeIntakeLevel() {
-        switch (getReefSlice()) {
-            case 0, 2, 4 -> {
-                return 2;
-            }
-            case 1, 3, 5 -> {
-                return 3;
-            }
-            default -> {
-                return -1;
-            }
-        }
-    }
-
-
-    private Pose2d getAlgaeIntakePostPose() {
-        if (getReefSlice() == -1) {
-            System.out.println("invalid angle");
-            return m_swerve.getPose2D();
-        }
-        return POST_ALGAES[getReefSlice()];
-    }
+//    private Pose2d getAlgaeIntakePostPose() {
+//        if (getReefSlice() == -1) {
+//            System.out.println("invalid angle");
+//            return m_swerve.getPose2D();
+//        }
+//        return POST_ALGAES[getReefSlice()];
+//    }
 
     private Pose2d getCoralScorePose(int level, boolean right) {
         if (getReefSlice() == -1) {
@@ -90,95 +87,84 @@ public class Automations {
             return m_swerve.getPose2D();
         }
         if (level == 1) {
-            return L1s[getReefSlice()];
+            return L1s[getReefSlice()].get();
         }
         if (right) {
-            return RIGHT_BRANCHES[getReefSlice()];
+            return RIGHT_BRANCHES[getReefSlice()].get();
         }
-        return LEFT_BRANCHES[getReefSlice()];
+        return LEFT_BRANCHES[getReefSlice()].get();
     }
 
 
-    public Command intakeCoralCommand(boolean right) {
-        return new ParallelDeadlineGroup(
-                m_superstructure.intakeCoralCommand(),
-                m_swerve.pidToPoseCommand(() -> getCoralIntakePose(right))
-        ).andThen(m_superstructure.collapseCommand());
-    }
+//    public Command intakeCoralCommand(boolean right) {
+//        return new ParallelDeadlineGroup(
+//                m_superstructure.intakeCoralCommand(),
+//                m_swerve.pidToPoseCommand(() -> getCoralIntakePose(right))
+//        ).andThen(m_superstructure.collapseCommand());
+//    }
 
-    public Command intakeAlgaeCommand() {
-        return new ConditionalCommand(
-                new PrintCommand("has algae, cant intake one"),
-                new SequentialCommandGroup(
-                        new ConditionalCommand(
-                                m_superstructure.intakeAlgaeCommand(2),
-                                m_superstructure.intakeAlgaeCommand(3),
-                                () -> getAlgaeIntakeLevel() == 2
-                        ),
-                        m_swerve.pidToPoseCommand(this::getAlgaeIntakePose),
-                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.01),
-                        new WaitUntilCommand(m_superstructure.hasAlgaeTrigger()),
-                        m_swerve.pidToPoseCommand(this::getAlgaeIntakePostPose),
-                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.01),
-                        m_superstructure.collapseCommand()
-                ), m_superstructure.hasAlgaeTrigger());
-    }
+//    public Command intakeAlgaeCommand() {
+//        return new ConditionalCommand(
+//                new PrintCommand("has algae, cant intake one"),
+//                new SequentialCommandGroup(
+//                        new ConditionalCommand(
+//                                m_superstructure.intakeAlgaeCommand(2),
+//                                m_superstructure.intakeAlgaeCommand(3),
+//                                () -> getAlgaeIntakeLevel() == 2
+//                        ),
+//                        m_swerve.pidToPoseCommand(this::getAlgaeIntakePose),
+//                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.01),
+//                        new WaitUntilCommand(m_superstructure.hasAlgaeTrigger()),
+//                        m_swerve.pidToPoseCommand(this::getAlgaeIntakePostPose),
+//                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.01),
+//                        m_superstructure.collapseCommand()
+//                ), m_superstructure.hasAlgaeTrigger());
+//    }
 
-    public Command scoreAlgaeCommand() {
-        return Commands.none();
-    }
+//    public Command scoreAlgaeCommand() {
+//        return Commands.none();
+//    }
 
-    public Command L1Command(boolean right) {
+    public Command alignToL1Command(boolean right) {
         return new ConditionalCommand(
                 new PrintCommand("doesn't have coral, cant score one"),
                 new SequentialCommandGroup(
                         m_swerve.pidToPoseCommand(() -> getCoralScorePose(1, false)),
                         m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.1),
-                        m_superstructure.alignToCoralCommand(1),
-                        new WaitCommand(1),
-                        m_superstructure.scoreCoralCommand(1)
+                        m_superstructure.alignToCoralCommand(1)
                 ), m_superstructure.hasCoralTrigger().negate());
     }
 
-    public Command L4Command(boolean right) {
+    public Command alignToL4Command(boolean right) {
         return new ConditionalCommand(
                 new PrintCommand("doesn't have coral, cant score one"),
                 new SequentialCommandGroup(
                         m_superstructure.startAutomationCommand(),
                         m_swerve.pidToPoseCommand(() -> getCoralScorePose(4, right)),
                         m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.1),
-                        m_superstructure.alignToCoralCommand(4),
-                        new WaitCommand(1),
-                        m_superstructure.scoreCoralCommand(4),
-                        m_superstructure.startAutomationCommand()
+                        m_superstructure.alignToCoralCommand(4)
                 ), m_superstructure.hasCoralTrigger().negate());
     }
 
-    public Command L3Command(boolean right) {
+    public Command alignToL3Command(boolean right) {
         return new ConditionalCommand(
                 new PrintCommand("doesn't have coral, cant score one"),
                 new SequentialCommandGroup(
                         m_superstructure.startAutomationCommand(),
                         m_swerve.pidToPoseCommand(() -> getCoralScorePose(3, right)),
                         m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.1),
-                        m_superstructure.alignToCoralCommand(3),
-                        new WaitCommand(0.5),
-                        m_superstructure.scoreCoralCommand(3),
-                        m_superstructure.startAutomationCommand()
+                        m_superstructure.alignToCoralCommand(3)
                 ), m_superstructure.hasCoralTrigger().negate());
     }
 
-    public Command L2Command(boolean right) {
+    public Command scoreCoralCommand() {
         return new ConditionalCommand(
                 new PrintCommand("doesn't have coral, cant score one"),
                 new SequentialCommandGroup(
-                        m_superstructure.alignToCoralCommand(2),
-                        m_swerve.pidToPoseCommand(() -> getCoralScorePose(2, true)),
-                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.1),
-                        new WaitCommand(1),
-                        new PrintCommand("whhhhhaa"),
-                        m_superstructure.scoreCoralCommand(2),
+                        m_superstructure.scoreCoralCommand(),
                         m_superstructure.startAutomationCommand()
-                ), m_superstructure.hasCoralTrigger().negate());
+                ),
+                m_superstructure.hasCoralTrigger().negate()
+        );
     }
 }

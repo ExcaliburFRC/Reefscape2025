@@ -12,6 +12,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import frc.excalib.additional_utilities.AllianceUtils;
+import frc.excalib.additional_utilities.AllianceUtils.AlliancePose;
 import frc.excalib.control.gains.Gains;
 import frc.excalib.control.imu.IMU;
 import frc.excalib.control.imu.Pigeon;
@@ -100,7 +102,7 @@ public final class Constants {
 
         private static final IMU GYRO = new Pigeon(GYRO_ID, SWERVE_CANBUS, new Rotation3d());
 
-        public static final double DEADBAND_VALUE = 0.05;
+        public static final double DEADBAND_VALUE = 0.15;
 
         public static Swerve configureSwerve(Pose2d initialPose) {
             return new Swerve(
@@ -164,78 +166,70 @@ public final class Constants {
     }
 
     public static class FieldConstants {
-        public static final Translation2d REEF_CENTER = new Translation2d(4.4893484, 4.025);
-        private static final Translation2d B5 = new Translation2d(3.66, 3.03), B6 = new Translation2d(3.22, 3.88);
-        private static final Translation2d BASE_L1 = new Translation2d();
-        private static final Translation2d BASE_ALGAE = new Translation2d(3.75, 2.83); //S3
-        private static final Translation2d BASE_POST_ALGAE = new Translation2d(3.5, 2.58);
+        public static final Translation2d REEF_CENTER = new Translation2d(4.4893484, 4.026);
+        private static final Translation2d B1 = new Translation2d(5.7668696, 3.86156696), B12 = new Translation2d(5.7668696, 4.19023304);
+        private static final Translation2d BASE_L1 = new Translation2d(5.7668696, 4.0259);
+        private static final Translation2d BASE_ALGAE = new Translation2d(5.7668696 + 1, 4.0259); //TODO: find x
+        private static final Translation2d BASE_POST_ALGAE = new Translation2d(5.7668696 + 1, 4.0259); //TODO: find x
 
-        public static final Pose2d[] LEFT_BRANCHES = {
-                new Pose2d(B5.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(180)),
-                new Pose2d(B5.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(120)),
-                new Pose2d(B5, Rotation2d.fromDegrees(60)),
-                new Pose2d(B5.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), new Rotation2d()),
-                new Pose2d(B5.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-60)),
-                new Pose2d(B5.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(-120)),
+        public static final AlliancePose[] LEFT_BRANCHES = {
+                new AlliancePose(B1, Rotation2d.fromDegrees(180)),
+                new AlliancePose(B1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(120)),
+                new AlliancePose(B1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(60)),
+                new AlliancePose(B1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), new Rotation2d()),
+                new AlliancePose(B1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-60)),
+                new AlliancePose(B1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(-120)),
         };
-        public static final Pose2d[] RIGHT_BRANCHES = {
-                new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(180)),
-                new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(120)),
-                new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(60)),
-                new Pose2d(B6, new Rotation2d(0)),
-                new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(-60)),
-                new Pose2d(B6.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-120))
-        };
-
-        public static final Pose2d[] L1s = {
-                new Pose2d(BASE_L1, Rotation2d.fromDegrees(180)),
-                new Pose2d(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(120)),
-                new Pose2d(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(60)),
-                new Pose2d(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(0)),
-                new Pose2d(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-60)),
-                new Pose2d(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(-120)),
+        public static final AlliancePose[] RIGHT_BRANCHES = {
+                new AlliancePose(B12, Rotation2d.fromDegrees(180)),
+                new AlliancePose(B12.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(120)),
+                new AlliancePose(B12.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(60)),
+                new AlliancePose(B12.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), new Rotation2d()),
+                new AlliancePose(B12.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-60)),
+                new AlliancePose(B12.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(-120))
         };
 
-        public static final Pose2d[] ALGAES = {
-                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(180)),
-                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(120)),
-                new Pose2d(BASE_ALGAE, Rotation2d.fromDegrees(60)),
-                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(0)),
-                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-60)),
-                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(-120)),
-        };
-        public static final Pose2d[] POST_ALGAES = {
-                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(180)),
-                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(120)),
-                new Pose2d(BASE_POST_ALGAE, Rotation2d.fromDegrees(60)),
-                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(0)),
-                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-60)),
-                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-120)),
-        };
-        //S3 new Pose2d(3.47, 2.55, Rotation2d.fromDegrees(60)
-
-        public static final Pose2d[] FEADERS_POSES = {
-                new Pose2d(),
-                new Pose2d(),
-                new Pose2d(),
-                new Pose2d(),
-                new Pose2d(),
-                new Pose2d()
+        public static final AlliancePose[] L1s = {
+                new AlliancePose(BASE_L1, Rotation2d.fromDegrees(180)),
+                new AlliancePose(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(120)),
+                new AlliancePose(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(60)),
+                new AlliancePose(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(0)),
+                new AlliancePose(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-60)),
+                new AlliancePose(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(-120)),
         };
 
-        public static final Pose2d[] NET_POSES = {
-                new Pose2d(),
-                new Pose2d(),
-                new Pose2d()
-        };
-
-        //
-//        B5(
-//                new Pose2d(3.66, 3.03,Rotation2d.fromDegrees(60)),
-//                new
+//        public static final Pose2d[] ALGAES = {
+//                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(180)),
+//                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(120)),
+//                new Pose2d(BASE_ALGAE, Rotation2d.fromDegrees(60)),
+//                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(0)),
+//                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-60)),
+//                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(-120)),
+//        };
+//        public static final Pose2d[] POST_ALGAES = {
+//                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(180)),
+//                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(120)),
+//                new Pose2d(BASE_POST_ALGAE, Rotation2d.fromDegrees(60)),
+//                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(0)),
+//                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-60)),
+//                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-120)),
+//        };
 //
-//        Pose2d(3.87,2.8,Rotation2d.fromDegrees(240))
-//                )
+//        public static final Pose2d[] FEADERS_POSES = {
+//                new Pose2d(),
+//                new Pose2d(),
+//                new Pose2d(),
+//                new Pose2d(),
+//                new Pose2d(),
+//                new Pose2d()
+//        };
+//
+//        public static final Pose2d[] NET_POSES = {
+//                new Pose2d(),
+//                new Pose2d(),
+//                new Pose2d()
+//        };
+//
     }
 
     public static final int PROCESSOR_ID = 1;

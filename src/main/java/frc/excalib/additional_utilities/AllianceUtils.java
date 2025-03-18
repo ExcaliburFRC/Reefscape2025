@@ -2,6 +2,7 @@ package frc.excalib.additional_utilities;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
@@ -12,8 +13,8 @@ import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
  * @author Shai Grossman
  */
 public class AllianceUtils {
-    public static final double FIELD_LENGTH_METERS = 16.54;
-    public static final double FIELD_WIDTH_METERS = 8.02;
+    public static final double FIELD_LENGTH_METERS = 17.548;
+    public static final double FIELD_WIDTH_METERS = 8.052;
 
     /**
      * @return whether the robot is on the blue alliance
@@ -33,12 +34,12 @@ public class AllianceUtils {
     /**
      * Converts a pose to the pose relative to the current driver station alliance.
      *
-     * @param pose the current blue alliance pose
+     * @param bluePose the current blue alliance pose
      * @return the converted pose
      */
-    public static Pose2d toAlliancePose(Pose2d pose) {
-        if (isBlueAlliance()) return pose;
-        return mirrorAlliance(pose);
+    public static Pose2d toAlliancePose(Pose2d bluePose) {
+        if (isBlueAlliance()) return bluePose;
+        return switchAlliance(bluePose);
     }
 
     public static Pose2d switchAlliance(Pose2d pose) {
@@ -61,6 +62,10 @@ public class AllianceUtils {
 
         public AlliancePose(double x, double y, double degrees){
             this.pose = new Pose2d(x, y, Rotation2d.fromDegrees(degrees));
+        }
+
+        public AlliancePose(Translation2d translation, Rotation2d rotation) {
+            this.pose = new Pose2d(translation, rotation);
         }
 
         public AlliancePose(double degrees){

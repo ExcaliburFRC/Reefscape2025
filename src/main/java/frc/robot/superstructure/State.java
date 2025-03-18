@@ -4,6 +4,7 @@ import static frc.robot.superstructure.Constants.*;
 
 public enum State {
     INTAKE(INTAKE_ELEVATOR_HEIGHT, INTAKE_ARM_ANGLE, INTAKE_CORAL_WHEELS_VOLTAGE, INTAKE_ALGAE_WHEELS_VOLTAGE),
+    EJECT_ALGAE(EJECT_ALGAE_ELEVATOR_HEIGHT, EJECT_ALGAE_ARM_ANGLE, EJECT_ALGAE_CORAL_WHEELS_VOLTAGE, EJECT_ALGAE_ALGAE_WHEELS_VOLTAGE),
 
     PRE_L1(PRE_L1_ELEVATOR_HEIGHT, PRE_L1_ARM_ANGLE, PRE_L1_CORAL_WHEELS_VOLTAGE, PRE_L1_ALGAE_WHEELS_VOLTAGE),
     L1(L1_ELEVATOR_HEIGHT, L1_ARM_ANGLE, L1_CORAL_WHEELS_VOLTAGE, L1_ALGAE_WHEELS_VOLTAGE),
@@ -41,6 +42,8 @@ public enum State {
             m_coralVoltage,
             m_algaeVoltage;
 
+
+
     State(
             double elevatorHeight,
             double armAngle,
@@ -51,6 +54,7 @@ public enum State {
         m_armAngle = armAngle;
         m_coralVoltage = coralVoltage;
         m_algaeVoltage = algaeVoltage;
+
     }
 }
 
