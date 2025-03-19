@@ -1,11 +1,11 @@
 package frc.excalib.additional_utilities;
 
 public class Color extends edu.wpi.first.wpilibj.util.Color {
-    public Color(double red, double green, double blue) {
+    public Color(double green, double red, double blue) {
         super(green, red, blue);
     }
 
-    public Color(int red, int green, int blue) {
+    public Color(int green, int red, int blue) {
         super(red, green, blue);
     }
 
@@ -27,7 +27,7 @@ public class Color extends edu.wpi.first.wpilibj.util.Color {
         TEAM_GOLD(new Color(255, 170, 0)),
         TEAM_BLUE(new Color(1, 30, 202)),
 
-        RED(new Color(255, 0, 0)),
+        RED(new Color(0, 255, 0)),
         GREEN(new Color(0, 255, 0)),
         BLUE(new Color(0, 0, 255)),
 
