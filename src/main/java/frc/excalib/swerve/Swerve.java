@@ -5,12 +5,10 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -24,7 +22,6 @@ import frc.excalib.additional_utilities.AllianceUtils;
 import frc.excalib.additional_utilities.Elastic;
 import frc.excalib.control.gains.SysidConfig;
 import frc.excalib.control.imu.IMU;
-import frc.excalib.control.math.MathUtils;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.slam.mapper.Odometry;
 import frc.excalib.slam.mapper.PhotonAprilTagsCamera;
@@ -42,6 +39,8 @@ import java.util.function.Supplier;
 import static edu.wpi.first.apriltag.AprilTagFields.k2025Reefscape;
 import static edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets.kTextView;
 import static frc.excalib.additional_utilities.Elastic.Notification.NotificationLevel.WARNING;
+import static frc.robot.Constants.FieldConstants.BLUE_REEF_CENTER;
+import static frc.robot.Constants.FieldConstants.RED_REEF_CENTER;
 import static frc.robot.Constants.SwerveConstants.*;
 import static monologue.Annotations.Log;
 
@@ -371,7 +370,9 @@ public class Swerve extends SubsystemBase implements Logged {
 
     @Log.NT
     public double distanceFromReefCenter() {
-        return Constants.FieldConstants.REEF_CENTER.getDistance(getPose2D().getTranslation());
+        return AllianceUtils.isBlueAlliance() ?
+                BLUE_REEF_CENTER.getDistance(getPose2D().getTranslation()) :
+                RED_REEF_CENTER.getDistance(getPose2D().getTranslation());
     }
 
     /**

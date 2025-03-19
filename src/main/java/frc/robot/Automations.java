@@ -3,8 +3,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.excalib.additional_utilities.Color;
-import frc.excalib.additional_utilities.Color.Colors;
+import frc.excalib.additional_utilities.AllianceUtils;
 import frc.excalib.additional_utilities.LEDs;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
@@ -12,6 +11,8 @@ import frc.robot.superstructure.State;
 import frc.robot.superstructure.Superstructure;
 import monologue.Annotations.Log;
 
+import static frc.excalib.additional_utilities.AllianceUtils.FIELD_LENGTH_METERS;
+import static frc.excalib.additional_utilities.AllianceUtils.FIELD_WIDTH_METERS;
 import static frc.excalib.additional_utilities.Color.Colors.*;
 import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.superstructure.State.POST_L1;
@@ -31,7 +32,10 @@ public class Automations {
     @Log.NT
     public int getReefSlice() {
         Translation2d robotTranslation = m_swerve.getPose2D().getTranslation();
-        robotTranslation = robotTranslation.minus(Constants.FieldConstants.REEF_CENTER);
+        if(AllianceUtils.isRedAlliance()) {
+            robotTranslation = new Translation2d(FIELD_LENGTH_METERS - robotTranslation.getX(), FIELD_WIDTH_METERS - robotTranslation.getY());
+        }
+        robotTranslation = robotTranslation.minus(Constants.FieldConstants.BLUE_REEF_CENTER);
         double angle = robotTranslation.getAngle().getDegrees();
         if (angle < 30 && angle > -30) {
             return 0;

@@ -24,6 +24,8 @@ import frc.excalib.additional_utilities.LEDs;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
 import frc.robot.superstructure.Superstructure;
+import monologue.Annotations;
+import monologue.Annotations.Log;
 import monologue.Logged;
 
 import static frc.robot.Constants.SwerveConstants.*;
@@ -133,5 +135,10 @@ public class RobotContainer implements Logged {
 
     public Command getAutonomousCommand() {
         return Commands.none();
+    }
+
+    @Log.NT
+    public int getReefSlice() {
+        return m_automations.getReefSlice();
     }
 }

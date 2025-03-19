@@ -24,6 +24,7 @@ import frc.excalib.swerve.Swerve;
 import frc.excalib.swerve.SwerveModule;
 
 import static com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless;
+import static frc.excalib.additional_utilities.AllianceUtils.FIELD_LENGTH_METERS;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -166,7 +167,8 @@ public final class Constants {
     }
 
     public static class FieldConstants {
-        public static final Translation2d REEF_CENTER = new Translation2d(4.4893484, 4.026);
+        public static final Translation2d BLUE_REEF_CENTER = new Translation2d(4.4893484, 4.026);
+        public static final Translation2d RED_REEF_CENTER = new Translation2d(FIELD_LENGTH_METERS - BLUE_REEF_CENTER.getX(), BLUE_REEF_CENTER.getY());
         private static final Translation2d B1 = new Translation2d(5.7668696, 3.86156696), B12 = new Translation2d(5.7668696, 4.19023304);
         private static final Translation2d BASE_L1 = new Translation2d(5.7668696, 4.0259);
         private static final Translation2d BASE_ALGAE = new Translation2d(5.7668696 + 1, 4.0259); //TODO: find x
@@ -174,28 +176,28 @@ public final class Constants {
 
         public static final AlliancePose[] LEFT_BRANCHES = {
                 new AlliancePose(B1, Rotation2d.fromDegrees(180)),
-                new AlliancePose(B1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(120)),
-                new AlliancePose(B1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(60)),
-                new AlliancePose(B1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), new Rotation2d()),
-                new AlliancePose(B1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-60)),
-                new AlliancePose(B1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(-120)),
+                new AlliancePose(B1.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(120)),
+                new AlliancePose(B1.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(60)),
+                new AlliancePose(B1.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-180)), new Rotation2d()),
+                new AlliancePose(B1.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-60)),
+                new AlliancePose(B1.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(-120)),
         };
         public static final AlliancePose[] RIGHT_BRANCHES = {
                 new AlliancePose(B12, Rotation2d.fromDegrees(180)),
-                new AlliancePose(B12.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(120)),
-                new AlliancePose(B12.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(60)),
-                new AlliancePose(B12.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), new Rotation2d()),
-                new AlliancePose(B12.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-60)),
-                new AlliancePose(B12.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(-120))
+                new AlliancePose(B12.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(120)),
+                new AlliancePose(B12.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(60)),
+                new AlliancePose(B12.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-180)), new Rotation2d()),
+                new AlliancePose(B12.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-60)),
+                new AlliancePose(B12.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(-120))
         };
 
         public static final AlliancePose[] L1s = {
                 new AlliancePose(BASE_L1, Rotation2d.fromDegrees(0)),
-                new AlliancePose(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(-60)),
-                new AlliancePose(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-120)),
-                new AlliancePose(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(180)),
-                new AlliancePose(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(120)),
-                new AlliancePose(BASE_L1.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(60)),
+                new AlliancePose(BASE_L1.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(-60)),
+                new AlliancePose(BASE_L1.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-120)),
+                new AlliancePose(BASE_L1.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(180)),
+                new AlliancePose(BASE_L1.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(120)),
+                new AlliancePose(BASE_L1.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(60)),
         };
 
 //        public static final Pose2d[] ALGAES = {
