@@ -32,9 +32,11 @@ public class RobotContainer implements Logged {
     private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
     // The robot's subsystems and commands are defined here...
 
-        private final Swerve m_swerve = Constants.SwerveConstants.configureSwerve(new Pose2d());
+    private final Swerve m_swerve = Constants.SwerveConstants.configureSwerve(new Pose2d());
     private Superstructure m_superstructure = new Superstructure();
     private final LEDs leds = LEDs.getInstance();
+
+    public final Runnable m_odometryUpdater = m_swerve::updateOdometry;
 
 
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
@@ -72,11 +74,14 @@ public class RobotContainer implements Logged {
 
         m_driver.PS().onTrue(m_swerve.resetAngleCommand());
 
+        m_driver.cross().toggleOnTrue(m_automations.alignToL1Command());
         m_driver.square().toggleOnTrue(m_automations.alignToL3Command(false));
         m_driver.circle().toggleOnTrue(m_automations.alignToL3Command(true));
+        m_driver.triangle().toggleOnTrue(m_automations.alignToL4Command(true));
         m_driver.R1().onTrue(m_automations.scoreCoralCommand());
 
         m_driver.options().onTrue(m_superstructure.collapseCommand());
+
 
         m_driver.L1().toggleOnTrue(m_superstructure.intakeCoralCommand().andThen(m_superstructure.collapseCommand()));
     }

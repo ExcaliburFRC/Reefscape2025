@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
 //        addPeriodic(Monologue::updateAll, 0.5);
 //        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
-//        addPeriodic(m_robotContainer.updateOdometry, 0.01);
+        addPeriodic(m_robotContainer.m_odometryUpdater, 0.01);
     }
 
     /**

@@ -1,23 +1,31 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.*;
+import frc.excalib.additional_utilities.Color;
+import frc.excalib.additional_utilities.Color.Colors;
+import frc.excalib.additional_utilities.LEDs;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
+import frc.robot.superstructure.State;
 import frc.robot.superstructure.Superstructure;
 import monologue.Annotations.Log;
 
+import static frc.excalib.additional_utilities.Color.Colors.*;
 import static frc.robot.Constants.FieldConstants.*;
+import static frc.robot.superstructure.State.POST_L1;
 
 public class Automations {
     Superstructure m_superstructure;
     Swerve m_swerve;
+    private Command m_runningCommand;
+    private final LEDs m_leds = LEDs.getInstance();
 
     public Automations(Swerve swerve, Superstructure superstructure) {
         this.m_superstructure = superstructure;
         this.m_swerve = swerve;
+        this.m_runningCommand = null;
     }
 
     @Log.NT
@@ -125,46 +133,82 @@ public class Automations {
 //        return Commands.none();
 //    }
 
-    public Command alignToL1Command(boolean right) {
-        return new ConditionalCommand(
-                new PrintCommand("doesn't have coral, cant score one"),
-                new SequentialCommandGroup(
-                        m_swerve.pidToPoseCommand(() -> getCoralScorePose(1, false)),
-                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.1),
-                        m_superstructure.alignToCoralCommand(1)
-                ), m_superstructure.hasCoralTrigger().negate());
+    public Command alignToL1Command() {
+        return scheduleExclusiveCommand(
+                new ConditionalCommand(
+                        new PrintCommand("doesn't have coral, cant score one"),
+                        m_leds.setPattern(LEDs.LEDPattern.SOLID, ORANGE.color).withDeadline(
+                                new SequentialCommandGroup(
+                                        m_swerve.pidToPoseCommand(() -> getCoralScorePose(1, false)),
+                                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.1),
+                                        m_superstructure.alignToCoralCommand(1)
+                                )
+                        ), m_superstructure.hasCoralTrigger().negate())
+        );
     }
 
     public Command alignToL4Command(boolean right) {
-        return new ConditionalCommand(
-                new PrintCommand("doesn't have coral, cant score one"),
-                new SequentialCommandGroup(
-                        m_superstructure.startAutomationCommand(),
-                        m_swerve.pidToPoseCommand(() -> getCoralScorePose(4, right)),
-                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.1),
-                        m_superstructure.alignToCoralCommand(4)
-                ), m_superstructure.hasCoralTrigger().negate());
+        return scheduleExclusiveCommand(
+                new ConditionalCommand(
+                        new PrintCommand("doesn't have coral, cant score one"),
+                        m_leds.setPattern(LEDs.LEDPattern.SOLID, ORANGE.color).withDeadline(
+                                new SequentialCommandGroup(
+                                        m_superstructure.startAutomationCommand(),
+                                        m_swerve.pidToPoseCommand(() -> getCoralScorePose(4, right)),
+                                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.1),
+                                        m_superstructure.alignToCoralCommand(4)
+                                )
+                        ), m_superstructure.hasCoralTrigger().negate())
+        );
     }
 
     public Command alignToL3Command(boolean right) {
-        return new ConditionalCommand(
-                new PrintCommand("doesn't have coral, cant score one"),
-                new SequentialCommandGroup(
-                        m_superstructure.startAutomationCommand(),
-                        m_swerve.pidToPoseCommand(() -> getCoralScorePose(3, right)),
-                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.1),
-                        m_superstructure.alignToCoralCommand(3)
-                ), m_superstructure.hasCoralTrigger().negate());
+        return scheduleExclusiveCommand(
+                new ConditionalCommand(
+                        new PrintCommand("doesn't have coral, cant score one"),
+                        m_leds.setPattern(LEDs.LEDPattern.SOLID, ORANGE.color).withDeadline(new SequentialCommandGroup(
+                                        m_superstructure.startAutomationCommand(),
+                                        m_swerve.pidToPoseCommand(() -> getCoralScorePose(3, right)),
+                                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.1),
+                                        m_superstructure.alignToCoralCommand(3)
+                                )
+                        ), m_superstructure.hasCoralTrigger().negate())
+        );
     }
 
     public Command scoreCoralCommand() {
-        return new ConditionalCommand(
-                new PrintCommand("doesn't have coral, cant score one"),
-                new SequentialCommandGroup(
-                        m_superstructure.scoreCoralCommand(),
-                        m_superstructure.startAutomationCommand()
-                ),
-                m_superstructure.hasCoralTrigger().negate()
+        return scheduleExclusiveCommand(
+                new ConditionalCommand(
+                        new PrintCommand("doesn't have coral, cant score one"),
+                        m_leds.setPattern(LEDs.LEDPattern.BLINKING, GREEN.color).withDeadline(
+                                new SequentialCommandGroup(
+                                        m_superstructure.scoreCoralCommand(),
+                                        new ConditionalCommand(
+                                                m_superstructure.collapseCommand(),
+                                                m_superstructure.startAutomationCommand(),
+                                                () -> m_superstructure.getState().equals(POST_L1) || m_superstructure.getState().equals(State.L1) || m_superstructure.getState().equals(State.DEFAULT)
+                                        )
+                                )
+                        ),
+                        m_superstructure.hasCoralTrigger().negate()
+                ));
+    }
+
+    private Command scheduleExclusiveCommand(Command newCommand) {
+        return new FunctionalCommand(
+                () -> {
+                    if (m_runningCommand != null && m_runningCommand.isScheduled()) {
+                        m_runningCommand.cancel();
+                    }
+                    m_runningCommand = newCommand;
+                    m_runningCommand.schedule();
+                },
+                () -> {
+                }, // No execute action needed
+                (interrupted) -> {
+                }, // No special end behavior needed
+                () -> !m_runningCommand.isScheduled() // Ends when the command is no longer scheduled
         );
     }
+
 }

@@ -7,6 +7,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -23,9 +24,11 @@ import frc.excalib.additional_utilities.AllianceUtils;
 import frc.excalib.additional_utilities.Elastic;
 import frc.excalib.control.gains.SysidConfig;
 import frc.excalib.control.imu.IMU;
+import frc.excalib.control.math.MathUtils;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.slam.mapper.Odometry;
 import frc.excalib.slam.mapper.PhotonAprilTagsCamera;
+import frc.robot.Constants;
 import monologue.Logged;
 import org.json.simple.parser.ParseException;
 import org.photonvision.EstimatedRobotPose;
@@ -53,6 +56,7 @@ public class Swerve extends SubsystemBase implements Logged {
     private final PhotonAprilTagsCamera m_frontCamera, m_backCamera;
     private Trigger finishTrigger;
     private Rotation2d pi = new Rotation2d(Math.PI);
+    private InterpolatingDoubleTreeMap velocityLimit = new InterpolatingDoubleTreeMap();
 
 //    private AuroraClient m_auroraClient = new AuroraClient(5800);
 
@@ -102,6 +106,9 @@ public class Swerve extends SubsystemBase implements Logged {
         m_backCamera = new PhotonAprilTagsCamera("Back", k2025Reefscape, new Transform3d(-0.1455338456, 0.2979238, 0.94232478177, new Rotation3d(0, Math.toRadians(-48), Math.toRadians(180))));
 
         m_swerveDriveKinematics = m_MODULES.getSwerveDriveKinematics();
+        velocityLimit.put(1.285981078050534, 0.4);
+        velocityLimit.put(1.785981078050534, 1.0);
+        velocityLimit.put(2.785981078050534, MAX_VEL);
 
         initAutoBuilder();
         initElastic();
@@ -193,10 +200,14 @@ public class Swerve extends SubsystemBase implements Logged {
                                     m_xController.calculate(getPose2D().getX(), poseSetpoint.get().getX()),
                                     m_yController.calculate(getPose2D().getY(), poseSetpoint.get().getY())
                             );
-
-                            vel.setMagnitude(Math.min(vel.getDistance(), 0.9));
-                        if(!AllianceUtils.isBlueAlliance()) return vel.rotate(pi);
-                        return vel;
+                            double distance = distanceFromReefCenter();
+                            vel.setMagnitude(Math.min(vel.getDistance(), velocityLimit.get(distance)));
+//                            vel = vel.rotate(poseSetpoint.get().getRotation());
+//                            vel.setX(Math.signum(vel.getX()) * Math.min(Math.abs(vel.getX()), 1.2));
+//                            vel.setY(Math.signum(vel.getY()) * Math.min(Math.abs(vel.getY()), 0.4));
+//                            vel = vel.rotate(poseSetpoint.get().getRotation().unaryMinus());
+                            if (!AllianceUtils.isBlueAlliance()) return vel.rotate(pi);
+                            return vel;
                         },
                         () -> m_angleController.calculate(getRotation2D().getRadians(), poseSetpoint.get().getRotation().getRadians()),
                         () -> true
@@ -358,6 +369,11 @@ public class Swerve extends SubsystemBase implements Logged {
         return m_desiredChassisSpeeds;
     }
 
+    @Log.NT
+    public double distanceFromReefCenter() {
+        return Constants.FieldConstants.REEF_CENTER.getDistance(getPose2D().getTranslation());
+    }
+
     /**
      * A function that initialize the AutoBuilder for pathplanner.
      */
@@ -505,7 +521,7 @@ public class Swerve extends SubsystemBase implements Logged {
     @Override
     public void periodic() {
         m_MODULES.periodic();
-        updateOdometry();
+//        updateOdometry();
         m_field.setRobotPose(getPose2D());
     }
 }
