@@ -77,15 +77,19 @@ public class RobotContainer implements Logged {
         m_driver.PS().onTrue(m_swerve.resetAngleCommand());
 
         m_driver.cross().toggleOnTrue(m_automations.alignToL1Command());
-        m_driver.square().toggleOnTrue(m_automations.alignToL3Command(false));
-        m_driver.circle().toggleOnTrue(m_automations.alignToL3Command(true));
+        m_driver.povDown().toggleOnTrue(m_automations.alignToL1Command());
+
+        m_driver.square().toggleOnTrue(m_automations.alignToL3Command(true));
+        m_driver.povRight().toggleOnTrue(m_automations.alignToL3Command(false));
+
         m_driver.triangle().toggleOnTrue(m_automations.alignToL4Command(true));
+        m_driver.povUp().toggleOnTrue(m_automations.alignToL4Command(false));
+
+        m_driver.L1().toggleOnTrue(m_superstructure.intakeCoralCommand().andThen(m_superstructure.collapseCommand()));
+
         m_driver.R1().onTrue(m_automations.scoreCoralCommand());
 
         m_driver.options().onTrue(m_superstructure.collapseCommand());
-
-
-        m_driver.L1().toggleOnTrue(m_superstructure.intakeCoralCommand().andThen(m_superstructure.collapseCommand()));
     }
 
 
