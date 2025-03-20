@@ -169,7 +169,7 @@ public final class Constants {
     public static class FieldConstants {
         public static final Translation2d BLUE_REEF_CENTER = new Translation2d(4.4893484, 4.026);
         public static final Translation2d RED_REEF_CENTER = new Translation2d(FIELD_LENGTH_METERS - BLUE_REEF_CENTER.getX(), BLUE_REEF_CENTER.getY());
-        private static final Translation2d B1 = new Translation2d(5.7668696, 3.86156696), B12 = new Translation2d(5.7668696, 4.19023304);
+        private static final Translation2d B1 = new Translation2d(5.7668696, 3.812), B12 = new Translation2d(5.7668696, 4.142);
         private static final Translation2d BASE_L1 = new Translation2d(5.7668696, 4.0259);
         private static final Translation2d BASE_ALGAE = new Translation2d(5.7668696, 4.0259); //TODO: find x
         private static final Translation2d BASE_POST_ALGAE = new Translation2d(6.3, 4.0259); //TODO: find x

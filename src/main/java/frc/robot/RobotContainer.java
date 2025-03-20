@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -85,11 +86,17 @@ public class RobotContainer implements Logged {
         m_driver.triangle().toggleOnTrue(m_automations.alignToL4Command(true));
         m_driver.povUp().toggleOnTrue(m_automations.alignToL4Command(false));
 
+
         m_driver.L1().toggleOnTrue(m_superstructure.intakeCoralCommand().andThen(m_superstructure.collapseCommand()));
+
+        m_driver.R2().toggleOnTrue(m_automations.intakeAlgaeCommand());
+        m_driver.create().onTrue(m_superstructure.ejectAlgaeCommand());
 
         m_driver.R1().onTrue(m_automations.scoreCoralCommand());
 
         m_driver.options().onTrue(m_superstructure.collapseCommand());
+
+
     }
 
 
@@ -110,6 +117,7 @@ public class RobotContainer implements Logged {
     }
 
     private void initElastic() {
+//        SmartDashboard.putData("match time", DriverStation.getMatchTime());
         PowerDistribution PDH = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
         SmartDashboard.putData("PDH", PDH);
 
