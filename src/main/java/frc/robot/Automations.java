@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.excalib.additional_utilities.AllianceUtils;
@@ -32,7 +33,7 @@ public class Automations {
     @Log.NT
     public int getReefSlice() {
         Translation2d robotTranslation = m_swerve.getPose2D().getTranslation();
-        if(AllianceUtils.isRedAlliance()) {
+        if (AllianceUtils.isRedAlliance()) {
             robotTranslation = new Translation2d(FIELD_LENGTH_METERS - robotTranslation.getX(), FIELD_WIDTH_METERS - robotTranslation.getY());
         }
         robotTranslation = robotTranslation.minus(Constants.FieldConstants.BLUE_REEF_CENTER);
@@ -58,40 +59,44 @@ public class Automations {
         return -1;
     }
 
-//    private Pose2d getCoralIntakePose(boolean right) {
+    //    private Pose2d getCoralIntakePose(boolean right) {
 //        return m_swerve.getPose2D();
 //    }
 //
-//    private Pose2d getAlgaeIntakePose() {
-//        if (getReefSlice() == -1) {
-//            System.out.println("invalid angle");
-//            return m_swerve.getPose2D();
-//        }
-//        return ALGAES[getReefSlice()];
-//    }
+    private AllianceUtils.AlliancePose getAlgaeIntakePose() {
+        if (getReefSlice() == -1) {
+            System.out.println("invalid angle");
+            return new AllianceUtils.AlliancePose(
+                    m_swerve.getPose2D().getTranslation(),
+                    new Rotation2d(m_swerve.getPose2D().getRotation().getDegrees()
+                    )
+            );
+        }
+        return ALGAES[getReefSlice()];
+    }
 
-//    @Log.NT
-//    private int getAlgaeIntakeLevel() {
-//        switch (getReefSlice()) {
-//            case 0, 2, 4 -> {
-//                return 2;
-//            }
-//            case 1, 3, 5 -> {
-//                return 3;
-//            }
-//            default -> {
-//                return -1;
-//            }
-//        }
-//    }
+    @Log.NT
+    private int getAlgaeIntakeLevel() {
+        switch (getReefSlice()) {
+            case 0, 2, 4 -> {
+                return 2;
+            }
+            case 1, 3, 5 -> {
+                return 3;
+            }
+            default -> {
+                return -1;
+            }
+        }
+    }
 
-//    private Pose2d getAlgaeIntakePostPose() {
-//        if (getReefSlice() == -1) {
-//            System.out.println("invalid angle");
-//            return m_swerve.getPose2D();
-//        }
-//        return POST_ALGAES[getReefSlice()];
-//    }
+    private AllianceUtils.AlliancePose getAlgaeIntakePostPose() {
+        if (getReefSlice() == -1) {
+            System.out.println("invalid angle");
+            return new AllianceUtils.AlliancePose(m_swerve.getPose2D().getTranslation(), m_swerve.getRotation2D());
+        }
+        return POST_ALGAES[getReefSlice()];
+    }
 
     private Pose2d getCoralScorePose(int level, boolean right) {
         if (getReefSlice() == -1) {
@@ -115,23 +120,27 @@ public class Automations {
 //        ).andThen(m_superstructure.collapseCommand());
 //    }
 
-//    public Command intakeAlgaeCommand() {
-//        return new ConditionalCommand(
-//                new PrintCommand("has algae, cant intake one"),
-//                new SequentialCommandGroup(
-//                        new ConditionalCommand(
-//                                m_superstructure.intakeAlgaeCommand(2),
-//                                m_superstructure.intakeAlgaeCommand(3),
-//                                () -> getAlgaeIntakeLevel() == 2
-//                        ),
-//                        m_swerve.pidToPoseCommand(this::getAlgaeIntakePose),
-//                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.01),
-//                        new WaitUntilCommand(m_superstructure.hasAlgaeTrigger()),
-//                        m_swerve.pidToPoseCommand(this::getAlgaeIntakePostPose),
-//                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.01),
-//                        m_superstructure.collapseCommand()
-//                ), m_superstructure.hasAlgaeTrigger());
-//    }
+    public Command intakeAlgaeCommand() {
+        return new ConditionalCommand(
+                new PrintCommand("has algae, cant intake one"),
+                new SequentialCommandGroup(
+                        new ConditionalCommand(
+                                m_superstructure.intakeAlgaeCommand(2),
+                                m_superstructure.intakeAlgaeCommand(3),
+                                () -> getAlgaeIntakeLevel() == 2
+                        ),
+                        m_swerve.pidToPoseCommand(() -> getAlgaeIntakePostPose().get()),
+                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.05),
+                        m_swerve.pidToPoseCommand(() -> getAlgaeIntakePose().get()),
+                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.05),
+                        new WaitUntilCommand(m_superstructure.hasAlgaeTrigger()),
+                        m_swerve.pidToPoseCommand(() -> getAlgaeIntakePostPose().get()),
+                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.05),
+                        m_superstructure.collapseCommand()
+                ), m_superstructure.hasAlgaeTrigger()).alongWith(new PrintCommand(
+                getAlgaeIntakePose().toString()
+        ));
+    }
 
 //    public Command scoreAlgaeCommand() {
 //        return Commands.none();

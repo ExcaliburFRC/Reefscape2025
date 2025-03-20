@@ -172,7 +172,7 @@ public final class Constants {
         private static final Translation2d B1 = new Translation2d(5.7668696, 3.86156696), B12 = new Translation2d(5.7668696, 4.19023304);
         private static final Translation2d BASE_L1 = new Translation2d(5.7668696, 4.0259);
         private static final Translation2d BASE_ALGAE = new Translation2d(5.7668696, 4.0259); //TODO: find x
-        private static final Translation2d BASE_POST_ALGAE = new Translation2d(7, 4.0259); //TODO: find x
+        private static final Translation2d BASE_POST_ALGAE = new Translation2d(6.3, 4.0259); //TODO: find x
 
         public static final AlliancePose[] LEFT_BRANCHES = {
                 new AlliancePose(B1, Rotation2d.fromDegrees(180)),
