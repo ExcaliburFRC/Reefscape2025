@@ -95,8 +95,6 @@ public class RobotContainer implements Logged {
         m_driver.R1().onTrue(m_automations.scoreCoralCommand());
 
         m_driver.options().onTrue(m_superstructure.collapseCommand());
-
-
     }
 
 
@@ -117,7 +115,7 @@ public class RobotContainer implements Logged {
     }
 
     private void initElastic() {
-//        SmartDashboard.putData("match time", DriverStation.getMatchTime());
+        SmartDashboard.putNumber("match time", DriverStation.getMatchTime());
         PowerDistribution PDH = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
         SmartDashboard.putData("PDH", PDH);
 
