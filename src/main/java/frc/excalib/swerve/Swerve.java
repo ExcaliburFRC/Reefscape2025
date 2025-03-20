@@ -105,9 +105,9 @@ public class Swerve extends SubsystemBase implements Logged {
         m_backCamera = new PhotonAprilTagsCamera("Back", k2025Reefscape, new Transform3d(-0.1455338456, 0.2979238, 0.94232478177, new Rotation3d(0, Math.toRadians(-48), Math.toRadians(180))));
 
         m_swerveDriveKinematics = m_MODULES.getSwerveDriveKinematics();
-        velocityLimit.put(1.285981078050534, 0.4);
-        velocityLimit.put(1.785981078050534, 1.0);
-        velocityLimit.put(2.785981078050534, MAX_VEL);
+        velocityLimit.put(0.1, 0.3);
+        velocityLimit.put(0.4, 0.6);
+        velocityLimit.put(1.5, MAX_VEL);
 
         initAutoBuilder();
         initElastic();
@@ -199,7 +199,7 @@ public class Swerve extends SubsystemBase implements Logged {
                                     m_xController.calculate(getPose2D().getX(), poseSetpoint.get().getX()),
                                     m_yController.calculate(getPose2D().getY(), poseSetpoint.get().getY())
                             );
-                            double distance = distanceFromReefCenter();
+                            double distance = getPose2D().getTranslation().getDistance(poseSetpoint.get().getTranslation());
                             vel.setMagnitude(Math.min(vel.getDistance(), velocityLimit.get(distance)));
 //                            vel = vel.rotate(poseSetpoint.get().getRotation());
 //                            vel.setX(Math.signum(vel.getX()) * Math.min(Math.abs(vel.getX()), 1.2));
