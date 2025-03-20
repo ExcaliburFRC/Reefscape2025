@@ -171,8 +171,8 @@ public final class Constants {
         public static final Translation2d RED_REEF_CENTER = new Translation2d(FIELD_LENGTH_METERS - BLUE_REEF_CENTER.getX(), BLUE_REEF_CENTER.getY());
         private static final Translation2d B1 = new Translation2d(5.7668696, 3.86156696), B12 = new Translation2d(5.7668696, 4.19023304);
         private static final Translation2d BASE_L1 = new Translation2d(5.7668696, 4.0259);
-        private static final Translation2d BASE_ALGAE = new Translation2d(5.7668696 + 1, 4.0259); //TODO: find x
-        private static final Translation2d BASE_POST_ALGAE = new Translation2d(5.7668696 + 1, 4.0259); //TODO: find x
+        private static final Translation2d BASE_ALGAE = new Translation2d(5.7668696, 4.0259); //TODO: find x
+        private static final Translation2d BASE_POST_ALGAE = new Translation2d(7, 4.0259); //TODO: find x
 
         public static final AlliancePose[] LEFT_BRANCHES = {
                 new AlliancePose(B1, Rotation2d.fromDegrees(180)),
@@ -200,22 +200,22 @@ public final class Constants {
                 new AlliancePose(BASE_L1.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(60)),
         };
 
-//        public static final Pose2d[] ALGAES = {
-//                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(180)),
-//                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(120)),
-//                new Pose2d(BASE_ALGAE, Rotation2d.fromDegrees(60)),
-//                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(0)),
-//                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-60)),
-//                new Pose2d(BASE_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(-120)),
-//        };
-//        public static final Pose2d[] POST_ALGAES = {
-//                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(180)),
-//                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(120)),
-//                new Pose2d(BASE_POST_ALGAE, Rotation2d.fromDegrees(60)),
-//                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(0)),
-//                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-60)),
-//                new Pose2d(BASE_POST_ALGAE.rotateAround(REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-120)),
-//        };
+        public static final AlliancePose[] ALGAES = {
+                new AlliancePose(BASE_ALGAE, Rotation2d.fromDegrees(180)),
+                new AlliancePose(BASE_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(-240)),
+                new AlliancePose(BASE_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-300)),
+                new AlliancePose(BASE_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(-180)),
+                new AlliancePose(BASE_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-60)),
+                new AlliancePose(BASE_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(-120)),
+        };
+        public static final AlliancePose[] POST_ALGAES = {
+                new AlliancePose(BASE_POST_ALGAE, Rotation2d.fromDegrees(180)),
+                new AlliancePose(BASE_POST_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(-240)),
+                new AlliancePose(BASE_POST_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-120)), Rotation2d.fromDegrees(-300)),
+                new AlliancePose(BASE_POST_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-180)), Rotation2d.fromDegrees(-180)),
+                new AlliancePose(BASE_POST_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-60)),
+                new AlliancePose(BASE_POST_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(-120)),
+        };
 //
 //        public static final Pose2d[] FEADERS_POSES = {
 //                new Pose2d(),
