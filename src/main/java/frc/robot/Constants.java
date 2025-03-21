@@ -217,14 +217,10 @@ public final class Constants {
                 new AlliancePose(BASE_POST_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(-120)),
         };
 //
-//        public static final Pose2d[] FEADERS_POSES = {
-//                new Pose2d(),
-//                new Pose2d(),
-//                new Pose2d(),
-//                new Pose2d(),
-//                new Pose2d(),
-//                new Pose2d()
-//        };
+        public static final AlliancePose[] FEADERS_POSES = {
+                new AlliancePose(new Translation2d(1.097, 0.952), new Rotation2d(-125)),
+                new AlliancePose(new Translation2d(1.172, 7.038), new Rotation2d(125))
+        };
 //
 //        public static final Pose2d[] NET_POSES = {
 //                new Pose2d(),

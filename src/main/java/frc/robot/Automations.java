@@ -12,10 +12,10 @@ import frc.robot.superstructure.State;
 import frc.robot.superstructure.Superstructure;
 import monologue.Annotations.Log;
 
-import static frc.excalib.additional_utilities.AllianceUtils.FIELD_LENGTH_METERS;
-import static frc.excalib.additional_utilities.AllianceUtils.FIELD_WIDTH_METERS;
+import static frc.excalib.additional_utilities.AllianceUtils.*;
 import static frc.excalib.additional_utilities.Color.Colors.*;
 import static frc.robot.Constants.FieldConstants.*;
+import static frc.robot.superstructure.State.INTAKE;
 import static frc.robot.superstructure.State.POST_L1;
 
 public class Automations {
@@ -59,10 +59,14 @@ public class Automations {
         return -1;
     }
 
-    //    private Pose2d getCoralIntakePose(boolean right) {
-//        return m_swerve.getPose2D();
-//    }
-//
+    private AllianceUtils.AlliancePose getCoralIntakePose(boolean right) {
+        if (isRedAlliance())
+            if (m_swerve.getPose2D().getY() < FIELD_WIDTH_METERS / 2) {
+                return FEADERS_POSES[0];
+            }
+        return FEADERS_POSES[1];
+    }
+
     private AllianceUtils.AlliancePose getAlgaeIntakePose() {
         if (getReefSlice() == -1) {
             System.out.println("invalid angle");
@@ -113,12 +117,12 @@ public class Automations {
     }
 
 
-//    public Command intakeCoralCommand(boolean right) {
-//        return new ParallelDeadlineGroup(
-//                m_superstructure.intakeCoralCommand(),
-//                m_swerve.pidToPoseCommand(() -> getCoralIntakePose(right))
-//        ).andThen(m_superstructure.collapseCommand());
-//    }
+    public Command intakeCoralCommand(boolean right) {
+        return new ParallelDeadlineGroup(
+                m_superstructure.intakeCoralCommand(),
+                m_swerve.pidToPoseCommand(() -> getCoralIntakePose(right).get())
+        ).andThen(m_superstructure.collapseCommand());
+    }
 
     public Command intakeAlgaeCommand() {
         return new ConditionalCommand(
