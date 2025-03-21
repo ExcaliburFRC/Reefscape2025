@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.excalib.additional_utilities.LEDs;
 import frc.excalib.control.math.Vector2D;
@@ -80,10 +81,10 @@ public class RobotContainer implements Logged {
         m_driver.cross().toggleOnTrue(m_automations.alignToL1Command());
         m_driver.povDown().toggleOnTrue(m_automations.alignToL1Command());
 
-        m_driver.square().toggleOnTrue(m_automations.alignToL3Command(true));
+        m_driver.square().toggleOnTrue(m_automations.alignToL3Command(true).andThen(new WaitCommand(0.25)).andThen(m_automations.scoreCoralCommand()));
         m_driver.povRight().toggleOnTrue(m_automations.alignToL3Command(false));
 
-        m_driver.triangle().toggleOnTrue(m_automations.alignToL4Command(true));
+        m_driver.triangle().toggleOnTrue(m_automations.alignToL4Command(true).andThen(new WaitCommand(0.25)).andThen(m_automations.scoreCoralCommand()));
         m_driver.povUp().toggleOnTrue(m_automations.alignToL4Command(false));
 
 

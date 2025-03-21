@@ -113,7 +113,6 @@ public class Automations {
     }
 
 
-
 //    public Command intakeCoralCommand(boolean right) {
 //        return new ParallelDeadlineGroup(
 //                m_superstructure.intakeCoralCommand(),
@@ -165,11 +164,12 @@ public class Automations {
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
                         new PrintCommand("doesn't have coral, cant score one"),
-                        m_leds.setPattern(LEDs.LEDPattern.SOLID, ORANGE.color).withDeadline(
+                        m_leds.setPattern(LEDs.LEDPattern.BLINKING, GREEN.color).withDeadline(
                                 new SequentialCommandGroup(
-                                        m_superstructure.startAutomationCommand(),
-                                        m_swerve.pidToPoseCommand(() -> getCoralScorePose(4, right)),
-                                        m_swerve.driveCommand(() -> new Vector2D(0.5, 0), () -> 0, () -> false).withTimeout(0.3),
+                                        m_superstructure.startAutomationCommand().alongWith(
+                                                m_swerve.pidToPoseCommand(() -> getCoralScorePose(4, right))),
+                                        m_swerve.driveCommand(() -> new Vector2D(0.5, 0), () -> 0, () -> false).withTimeout(0.2),
+                                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> false).withTimeout(0.05),
                                         m_superstructure.alignToCoralCommand(4)
                                 )
                         ), m_superstructure.hasCoralTrigger().negate())
@@ -180,9 +180,8 @@ public class Automations {
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
                         new PrintCommand("doesn't have coral, cant score one"),
-                        m_leds.setPattern(LEDs.LEDPattern.SOLID, ORANGE.color).withDeadline(new SequentialCommandGroup(
-                                        m_superstructure.startAutomationCommand(),
-                                        m_swerve.pidToPoseCommand(() -> getCoralScorePose(3, right)),
+                        m_leds.setPattern(LEDs.LEDPattern.BLINKING, GREEN.color).withDeadline(new SequentialCommandGroup(
+                                        m_superstructure.startAutomationCommand().alongWith(m_swerve.pidToPoseCommand(() -> getCoralScorePose(3, right))),
                                         m_swerve.driveCommand(() -> new Vector2D(0.5, 0), () -> 0, () -> false).withTimeout(0.3),
                                         m_superstructure.alignToCoralCommand(3)
                                 )
