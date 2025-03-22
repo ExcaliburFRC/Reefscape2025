@@ -39,8 +39,8 @@ import java.util.function.Supplier;
 import static edu.wpi.first.apriltag.AprilTagFields.k2025Reefscape;
 import static edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets.kTextView;
 import static frc.excalib.additional_utilities.Elastic.Notification.NotificationLevel.WARNING;
-import static frc.robot.Constants.FieldConstants.BLUE_REEF_CENTER;
-import static frc.robot.Constants.FieldConstants.RED_REEF_CENTER;
+import static frc.robot.automations.Constants.FieldConstants.BLUE_REEF_CENTER;
+import static frc.robot.automations.Constants.FieldConstants.RED_REEF_CENTER;
 import static frc.robot.Constants.SwerveConstants.*;
 import static monologue.Annotations.Log;
 

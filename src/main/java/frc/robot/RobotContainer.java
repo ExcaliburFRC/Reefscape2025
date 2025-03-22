@@ -25,8 +25,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.excalib.additional_utilities.LEDs;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
+import frc.robot.automations.Automations;
+import frc.robot.automations.Slice;
 import frc.robot.superstructure.Superstructure;
-import monologue.Annotations;
 import monologue.Annotations.Log;
 import monologue.Logged;
 
@@ -66,13 +67,22 @@ public class RobotContainer implements Logged {
 
     private void configureBindings() {
 
+//        m_swerve.setDefaultCommand(
+//                m_swerve.driveCommand(
+//                        () -> new Vector2D(
+//                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
+//                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
+//                        () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * (!m_driver.L2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.065),
+//                        () -> true
+//                )
+//        );
+
         m_swerve.setDefaultCommand(
-                m_swerve.driveCommand(
+                m_automations.defaultSwerveCommand(
                         () -> new Vector2D(
                                 deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
                                 deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
-                        () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * (!m_driver.L2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.065),
-                        () -> true
+                        () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * (!m_driver.L2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.065)
                 )
         );
 
@@ -96,6 +106,9 @@ public class RobotContainer implements Logged {
         m_driver.R1().onTrue(m_automations.scoreCoralCommand());
 
         m_driver.options().onTrue(m_superstructure.collapseCommand());
+
+        m_driver.circle().onTrue(m_automations.changeRightSlice());
+        m_driver.povLeft().onTrue(m_automations.changeLeftSlice());
     }
 
 
@@ -149,7 +162,12 @@ public class RobotContainer implements Logged {
     }
 
     @Log.NT
-    public int getReefSlice() {
-        return m_automations.getReefSlice();
+    public String getReefSlice() {
+        return Slice.getSlice(m_swerve.getPose2D().getTranslation()).name();
+    }
+
+    @Log.NT
+    public String getTragetSlice() {
+        return m_automations.getTargetSlice().name();
     }
 }
