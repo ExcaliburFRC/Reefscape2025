@@ -106,7 +106,7 @@ public class Swerve extends SubsystemBase implements Logged {
 
         m_swerveDriveKinematics = m_MODULES.getSwerveDriveKinematics();
         velocityLimit.put(0.1, 0.3);
-        velocityLimit.put(0.4, 0.6);
+        velocityLimit.put(0.7, 1.5);
         velocityLimit.put(1.5, MAX_VEL);
 
         initAutoBuilder();
@@ -375,6 +375,10 @@ public class Swerve extends SubsystemBase implements Logged {
                 RED_REEF_CENTER.getDistance(getPose2D().getTranslation());
     }
 
+    public Command stopCommand() {
+        return driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true);
+    }
+
     /**
      * A function that initialize the AutoBuilder for pathplanner.
      */
@@ -466,6 +470,7 @@ public class Swerve extends SubsystemBase implements Logged {
                 )
         );
     }
+
 
     /**
      * Runs a system identification routine on a specific module's angle.

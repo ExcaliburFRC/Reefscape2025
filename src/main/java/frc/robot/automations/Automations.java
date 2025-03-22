@@ -1,6 +1,10 @@
 package frc.robot.automations;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.excalib.additional_utilities.AllianceUtils;
 import frc.excalib.additional_utilities.LEDs;
 import frc.excalib.control.math.Vector2D;
@@ -13,8 +17,6 @@ import java.util.function.Supplier;
 
 import static frc.excalib.additional_utilities.AllianceUtils.*;
 import static frc.excalib.additional_utilities.Color.Colors.*;
-import static frc.robot.Constants.SwerveConstants.MAX_OMEGA_RAD_PER_SEC;
-import static frc.robot.Constants.SwerveConstants.MAX_VEL;
 import static frc.robot.automations.Constants.FieldConstants.*;
 import static frc.robot.superstructure.State.POST_L1;
 
@@ -24,11 +26,13 @@ public class Automations {
     private Command m_runningCommand;
     private Slice m_tragetSlice = Slice.FIRST;
     private final LEDs m_leds = LEDs.getInstance();
+    private Trigger m_atTargetSlicePose;
 
     public Automations(Swerve swerve, Superstructure superstructure) {
         this.m_superstructure = superstructure;
         this.m_swerve = swerve;
         this.m_runningCommand = null;
+        this.m_atTargetSlicePose = new Trigger(() -> poseAtTolerance(m_swerve.getPose2D(), m_tragetSlice.generalPose.get()));
     }
 
     private AllianceUtils.AlliancePose getCoralIntakePose(boolean right) {
@@ -56,12 +60,12 @@ public class Automations {
                                 () -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).ALGAE_LEVEL == 2
                         ),
                         m_swerve.pidToPoseCommand(() -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).generalPose.get()),
-                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.05),
+                        m_swerve.stopCommand().withTimeout(0.05),
                         m_swerve.pidToPoseCommand(() -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).alagePose.get()),
-                        m_swerve.driveCommand(() -> new Vector2D(1, 0), () -> 0, () -> false).withTimeout(0.1),
+                        m_swerve.stopCommand().withTimeout(0.1),
                         new WaitUntilCommand(m_superstructure.hasAlgaeTrigger()),
                         m_swerve.pidToPoseCommand(() -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).generalPose.get()),
-                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.05),
+                        m_swerve.stopCommand().withTimeout(0.05),
                         m_superstructure.collapseCommand()
                 ), m_superstructure.hasAlgaeTrigger()).alongWith(new PrintCommand(
                 Slice.getSlice(m_swerve.getPose2D().getTranslation()).alagePose.toString()
@@ -72,49 +76,70 @@ public class Automations {
 //        return Commands.none();
 //    }
 
-    public Command alignToL1Command() {
+    public Command L1Command() {
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
                         new PrintCommand("doesn't have coral, cant score one"),
-                        m_leds.setPattern(LEDs.LEDPattern.SOLID, ORANGE.color).withDeadline(
-                                new SequentialCommandGroup(
-                                        m_swerve.pidToPoseCommand(() -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).l1Pose.get()),
-                                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true).withTimeout(0.1),
-                                        m_superstructure.alignToCoralCommand(1)
-                                )
+                        new SequentialCommandGroup(
+                                m_leds.setPattern(LEDs.LEDPattern.SOLID, ORANGE.color).withDeadline(
+                                        new SequentialCommandGroup(
+                                                m_swerve.turnToAngleCommand(
+                                                        () -> new Vector2D(0, 0),
+                                                        () -> Slice.getSlice(
+                                                                m_swerve.getPose2D().getTranslation()).l1Pose.get().getRotation()
+                                                ).withTimeout(1),
+                                                m_swerve.pidToPoseCommand(() -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).l1Pose.get()),
+                                                m_swerve.stopCommand().withTimeout(0.1),
+                                                m_superstructure.alignToCoralCommand(1)
+                                        )
+                                ),
+                                new WaitCommand(0.1),
+                                scoreCoralCommand(),
+                                new WaitCommand(3)
+
                         ), m_superstructure.hasCoralTrigger().negate())
         );
     }
 
-    public Command alignToL4Command(boolean right) {
+    public Command L4Command(boolean right) {
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
                         new PrintCommand("doesn't have coral, cant score one"),
-                        m_leds.setPattern(LEDs.LEDPattern.BLINKING, GREEN.color).withDeadline(
-                                new SequentialCommandGroup(
-                                        m_superstructure.startAutomationCommand(),
+                        new SequentialCommandGroup(
 
-                                        m_swerve.pidToPoseCommand(() -> Slice.getBranchPose(right, m_swerve.getPose2D().getTranslation()).get()),
-                                        m_swerve.driveCommand(() -> new Vector2D(0.5, 0), () -> 0, () -> false).withTimeout(0.2),
-                                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> false).withTimeout(0.05),
-                                        m_superstructure.alignToCoralCommand(4)
-                                )
+                                m_leds.setPattern(LEDs.LEDPattern.BLINKING, GREEN.color).withDeadline(
+                                        new SequentialCommandGroup(
+                                                m_superstructure.startAutomationCommand(),
+                                                m_swerve.pidToPoseCommand(() -> Slice.getBranchPose(right, m_swerve.getPose2D().getTranslation()).get()),
+                                                m_swerve.driveCommand(() -> new Vector2D(0.5, 0), () -> 0, () -> false).withTimeout(0.2),
+                                                m_swerve.stopCommand().withTimeout(0.05),
+                                                m_superstructure.alignToCoralCommand(4)
+                                        )
+                                ),
+                                new WaitCommand(0.25),
+                                scoreCoralCommand()
+
                         ), m_superstructure.hasCoralTrigger().negate())
         );
     }
 
-    public Command alignToL3Command(boolean right) {
+    public Command L3Command(boolean right) {
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
                         new PrintCommand("doesn't have coral, cant score one"),
-                        m_leds.setPattern(LEDs.LEDPattern.BLINKING, GREEN.color).withDeadline(new SequentialCommandGroup(
-                                        m_superstructure.startAutomationCommand().alongWith(
-                                                m_swerve.pidToPoseCommand(() -> Slice.getBranchPose(right, m_swerve.getPose2D().getTranslation()).get())
-                                        ),
-                                        m_swerve.driveCommand(() -> new Vector2D(0.2, 0), () -> 0, () -> false).withTimeout(0.3),
-                                        m_superstructure.alignToCoralCommand(3)
-                                )
-                        ), m_superstructure.hasCoralTrigger().negate())
+                        new SequentialCommandGroup(
+                                m_leds.setPattern(LEDs.LEDPattern.BLINKING, GREEN.color).withDeadline(
+                                        new SequentialCommandGroup(
+                                                m_superstructure.startAutomationCommand(),
+                                                m_swerve.pidToPoseCommand(() -> Slice.getBranchPose(right, m_swerve.getPose2D().getTranslation()).get()),
+                                                m_swerve.driveCommand(() -> new Vector2D(0.2, 0), () -> 0, () -> false).withTimeout(0.3),
+                                                m_superstructure.alignToCoralCommand(3)
+                                        )
+                                ),
+                                new WaitCommand(0.25),
+                                scoreCoralCommand()
+                        ),
+                        m_superstructure.hasCoralTrigger().negate())
         );
     }
 
@@ -178,7 +203,12 @@ public class Automations {
 
     public Command defaultSwerveCommand(Supplier<Vector2D> velocityVectorSupplier, DoubleSupplier omegaRadPerSec) {
         return new ConditionalCommand(
-                m_swerve.pidToPoseCommand(() -> getTargetSlice().generalPose.get()).until(() -> !m_tragetSlice.equals(Slice.getSlice(m_swerve.getPose2D().getTranslation()))),
+                new SequentialCommandGroup(
+                        m_swerve.pidToPoseCommand(() -> getTargetSlice().generalPose.get()),
+                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true),
+                        new RunCommand(() -> {
+                        })
+                ).until(() -> !m_tragetSlice.equals(Slice.getSlice(m_swerve.getPose2D().getTranslation()))),
                 m_swerve.driveCommand(
                         velocityVectorSupplier,
                         omegaRadPerSec,
@@ -188,5 +218,9 @@ public class Automations {
         ).repeatedly();
     }
 
-
+    private boolean poseAtTolerance(Pose2d pose1, Pose2d pose2) {
+        Translation2d delta = pose1.minus(pose2).getTranslation();
+        Rotation2d deltaAngle = pose1.getRotation().minus(pose2.getRotation());
+        return Math.abs(delta.getX()) < 0.1 && Math.abs(delta.getY()) < 0.1 && Math.abs(deltaAngle.getRadians()) < 0.1;
+    }
 }
