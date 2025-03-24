@@ -121,10 +121,13 @@ public class Automations {
                                 m_leds.setPattern(LEDs.LEDPattern.BLINKING, GREEN.color).withDeadline(
                                         new SequentialCommandGroup(
                                                 m_superstructure.startAutomationCommand(),
-                                                m_swerve.pidToPoseCommand(() -> Slice.getBranchPose(right, m_swerve.getPose2D().getTranslation()).get()),
-                                                m_swerve.driveCommand(() -> new Vector2D(0.5, 0), () -> 0, () -> false).withTimeout(0.2),
-                                                m_swerve.stopCommand().withTimeout(0.05),
-                                                m_superstructure.alignToCoralCommand(4)
+                                                m_superstructure.alignToCoralCommand(4).alongWith(
+                                                        new SequentialCommandGroup(
+                                                                m_swerve.pidToPoseCommand(() -> Slice.getBranchPose(right, m_swerve.getPose2D().getTranslation()).get()),
+                                                                m_swerve.driveCommand(() -> new Vector2D(0.5, 0), () -> 0, () -> false).withTimeout(0.2),
+                                                                m_swerve.stopCommand().withTimeout(0.05)
+                                                        )
+                                                )
                                         )
                                 ),
                                 new WaitCommand(0.25),
@@ -145,9 +148,13 @@ public class Automations {
                                 m_leds.setPattern(LEDs.LEDPattern.BLINKING, GREEN.color).withDeadline(
                                         new SequentialCommandGroup(
                                                 m_superstructure.startAutomationCommand(),
-                                                m_swerve.pidToPoseCommand(() -> Slice.getBranchPose(right, m_swerve.getPose2D().getTranslation()).get()),
-                                                m_swerve.driveCommand(() -> new Vector2D(0.2, 0), () -> 0, () -> false).withTimeout(0.3),
-                                                m_superstructure.alignToCoralCommand(3)
+                                                m_superstructure.alignToCoralCommand(3).alongWith(
+                                                        new SequentialCommandGroup(
+                                                                m_swerve.pidToPoseCommand(() -> Slice.getBranchPose(right, m_swerve.getPose2D().getTranslation()).get()),
+                                                                m_swerve.driveCommand(() -> new Vector2D(0.2, 0), () -> 0, () -> false).withTimeout(0.2),
+                                                                m_swerve.stopCommand().withTimeout(0.05)
+                                                        )
+                                                )
                                         )
                                 ),
                                 new WaitCommand(0.5),
@@ -248,7 +255,7 @@ public class Automations {
     public Command toggleAutoMode() {
         return new InstantCommand(() -> {
             autoMode = !autoMode;
-            if(autoMode) m_tragetSlice = Slice.getSlice(m_swerve.getPose2D().getTranslation());
+            if (autoMode) m_tragetSlice = Slice.getSlice(m_swerve.getPose2D().getTranslation());
         });
     }
 }
