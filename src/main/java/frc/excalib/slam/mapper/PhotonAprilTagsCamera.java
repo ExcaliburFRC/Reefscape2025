@@ -4,6 +4,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -16,12 +17,14 @@ import static org.photonvision.PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY
 import static org.photonvision.PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
 
 public class PhotonAprilTagsCamera {
-    PhotonCamera m_camera;
-    AprilTagFieldLayout m_fieldLayout;
+    private final PhotonCamera m_camera;
+    private final AprilTagFieldLayout m_fieldLayout;
 
-    private PhotonPoseEstimator m_photonPoseEstimator;
+    private final PhotonPoseEstimator m_photonPoseEstimator;
 
     private final Transform3d kRobotToCamera;
+
+    private final double TOO_FAR = 3.5; //m
 
     public PhotonAprilTagsCamera(String cameraName, AprilTagFields aprilTagField, Transform3d robotToCamera) {
         m_camera = new PhotonCamera(cameraName);
@@ -57,8 +60,11 @@ public class PhotonAprilTagsCamera {
         PhotonPipelineResult result = m_camera.getLatestResult();
 
         if (result.hasTargets() && result.getBestTarget().getPoseAmbiguity() < 0.2) {
-            m_photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-            return m_photonPoseEstimator.update(result);
+            Translation2d targetTranslation = result.getBestTarget().getBestCameraToTarget().getTranslation().toTranslation2d();
+            if (targetTranslation.getDistance(new Translation2d(0, 0)) < TOO_FAR) {
+                m_photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+                return m_photonPoseEstimator.update(result);
+            }
         }
 
         return Optional.empty();
