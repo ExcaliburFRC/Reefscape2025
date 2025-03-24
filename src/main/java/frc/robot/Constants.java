@@ -8,11 +8,9 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import frc.excalib.additional_utilities.AllianceUtils;
 import frc.excalib.additional_utilities.AllianceUtils.AlliancePose;
 import frc.excalib.control.gains.Gains;
 import frc.excalib.control.imu.IMU;
@@ -24,7 +22,7 @@ import frc.excalib.swerve.Swerve;
 import frc.excalib.swerve.SwerveModule;
 
 import static com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless;
-import static frc.excalib.additional_utilities.AllianceUtils.FIELD_LENGTH_METERS;
+import static frc.excalib.additional_utilities.AllianceUtils.FIELD_WIDTH_METERS;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -103,7 +101,7 @@ public final class Constants {
 
         private static final IMU GYRO = new Pigeon(GYRO_ID, SWERVE_CANBUS, new Rotation3d());
 
-        public static final double DEADBAND_VALUE = 0.09;
+        public static final double DEADBAND_VALUE = 0.06;
 
         public static Swerve configureSwerve(Pose2d initialPose) {
             return new Swerve(
@@ -170,4 +168,6 @@ public final class Constants {
 
     public static final int PROCESSOR_ID = 1;
     public static final int NET_ID = 4;
+    public static final AlliancePose RIGHT_AUTO_POSE = new AlliancePose(7.147, 2.0, 140);
+    public static final AlliancePose LEFT_AUTO_POSE = new AlliancePose(7.147, 6.052, -140);
 }

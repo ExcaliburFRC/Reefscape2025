@@ -153,7 +153,7 @@ public class Superstructure implements Logged {
                 ));
     }
 
-    public Command scoreCoralCommand(){
+    public Command scoreCoralCommand() {
         return new MapCommand<State>(m_coralMap, this::getState);
     }
 
@@ -234,7 +234,7 @@ public class Superstructure implements Logged {
         );
     }
 
-    public Command scoreAlgaeCommand(){
+    public Command scoreAlgaeCommand() {
         return new MapCommand<State>(m_algaeMap, this::getState);
     }
 
@@ -279,10 +279,15 @@ public class Superstructure implements Logged {
     public Command collapseCommand() {
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
-                        scheduleExclusiveStateCommand(State.ALGAE_DEFAULT),
-                        scheduleExclusiveStateCommand(State.DEFAULT),
-                        () -> m_algaeSystem.hasAlgae()
-                ));
+                        scheduleExclusiveStateCommand(State.AUTOMATION_DEFAULT),
+                        new ConditionalCommand(
+                                scheduleExclusiveStateCommand(State.ALGAE_DEFAULT),
+                                scheduleExclusiveStateCommand(State.DEFAULT),
+                                () -> m_algaeSystem.hasAlgae()
+                        ),
+                        hasCoralTrigger()
+                )
+        );
     }
 
     public Command coastCommand() {
@@ -308,6 +313,7 @@ public class Superstructure implements Logged {
         return this.m_currentState.name();
     }
 
+    @Log.NT
     public String getCurrentRobotNamedSate() {
         if (currentState().equals("DEFUALT_ALGAE")) {
             return "Travel";

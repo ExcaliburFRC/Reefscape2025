@@ -32,6 +32,7 @@ import monologue.Annotations.Log;
 import monologue.Logged;
 
 import static frc.robot.Constants.PROCESSOR_ID;
+import static frc.robot.Constants.RIGHT_AUTO_POSE;
 import static frc.robot.Constants.SwerveConstants.*;
 import static frc.robot.automations.Constants.FieldConstants.getReefCenter;
 import static monologue.Annotations.*;
@@ -165,10 +166,25 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
+        // AUTO 1 L4
+//        return new SequentialCommandGroup(
+//                m_automations.toggleAutoMode(),
+//                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+//                m_automations.L4Command(false),
+//                m_superstructure.collapseCommand()
+//        );
         return new SequentialCommandGroup(
+                //AUTO 2 L4
+                new InstantCommand(() -> m_swerve.resetOdometry(RIGHT_AUTO_POSE.get())),
+                m_automations.toggleAutoMode(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.L4Command(true),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.intakeCoralCommand(),
                 m_automations.toggleAutoMode(),
                 new WaitUntilCommand(m_automations.m_atTargetSlicePose),
                 m_automations.L4Command(false),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
                 m_superstructure.collapseCommand()
         );
     }
@@ -184,8 +200,12 @@ public class RobotContainer implements Logged {
     }
 
     @Log.NT
-    public String getRightBranch() {
-        return right ? "RIGHT" : "LEFT";
+    public boolean getRightBranch() {
+        return right;
+    }
+    @Log.NT
+    public boolean getLeftBranch() {
+        return !right;
     }
 
     @Log.NT

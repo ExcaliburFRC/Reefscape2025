@@ -12,8 +12,6 @@ import frc.excalib.swerve.Swerve;
 import frc.robot.superstructure.State;
 import frc.robot.superstructure.Superstructure;
 
-import java.util.function.BooleanSupplier;
-
 import static frc.excalib.additional_utilities.AllianceUtils.*;
 import static frc.excalib.additional_utilities.Color.Colors.*;
 import static frc.robot.automations.Constants.FieldConstants.*;
@@ -52,7 +50,7 @@ public class Automations {
     public Command intakeCoralCommand() {
         return scheduleExclusiveCommand(
                 new ParallelDeadlineGroup(
-                        m_superstructure.intakeCoralCommand(),//.alongWith(m_leds.setPattern(LEDs.LEDPattern.SOLID, ORANGE.color)),
+                        m_superstructure.intakeCoralCommand(),
                         new InstantCommand(() -> autoMode = false),
                         m_swerve.pidToPoseCommand(() -> getCoralIntakePose().get())
                 ).andThen(m_superstructure.collapseCommand())
@@ -90,7 +88,7 @@ public class Automations {
                 new ConditionalCommand(
                         new PrintCommand("doesn't have coral, cant score one"),
                         new SequentialCommandGroup(
-                                m_leds.setPattern(LEDs.LEDPattern.SOLID, ORANGE.color).withDeadline(
+                                m_leds.setPattern(LEDs.LEDPattern.TRAIN_CIRCLE, PURPLE.color, WHITE.color).withDeadline(
                                         new SequentialCommandGroup(
 //                                                m_swerve.turnToAngleCommand(
 //                                                        () -> new Vector2D(0, 0),
@@ -117,7 +115,7 @@ public class Automations {
                 new ConditionalCommand(
                         new PrintCommand("doesn't have coral, cant score one"),
                         new SequentialCommandGroup(
-                                m_leds.setPattern(LEDs.LEDPattern.BLINKING, GREEN.color).withDeadline(
+                                m_leds.setPattern(LEDs.LEDPattern.TRAIN_CIRCLE, PURPLE.color, WHITE.color).withDeadline(
                                         new SequentialCommandGroup(
                                                 m_superstructure.startAutomationCommand(),
                                                 m_superstructure.alignToCoralCommand(4).alongWith(
@@ -143,7 +141,7 @@ public class Automations {
                 new ConditionalCommand(
                         new PrintCommand("doesn't have coral, cant score one"),
                         new SequentialCommandGroup(
-                                m_leds.setPattern(LEDs.LEDPattern.BLINKING, GREEN.color).withDeadline(
+                                m_leds.setPattern(LEDs.LEDPattern.TRAIN_CIRCLE, PURPLE.color, WHITE.color).withDeadline(
                                         new SequentialCommandGroup(
                                                 m_superstructure.startAutomationCommand(),
                                                 m_superstructure.alignToCoralCommand(3).alongWith(
