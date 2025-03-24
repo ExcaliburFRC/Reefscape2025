@@ -6,7 +6,7 @@ import java.util.Map;
 public class Constants {
     //INTAKE Constants TODO
     public static final double INTAKE_ELEVATOR_HEIGHT = 0.23;
-    public static final double INTAKE_ARM_ANGLE = -1.7748157715836868;
+    public static final double INTAKE_ARM_ANGLE = -1.77+0.05;
     public static final double INTAKE_CORAL_WHEELS_VOLTAGE = -3;
     public static final double INTAKE_ALGAE_WHEELS_VOLTAGE = 3;
 
@@ -146,7 +146,7 @@ public class Constants {
     public static final double DEFAULT_ELEVATOR_HEIGHT = 0;
     public static final double DEFAULT_ARM_ANGLE = -1.5063691337036997;
     public static final double DEFAULT_CORAL_WHEELS_VOLTAGE = -0.1;
-    public static final double DEFAULT_ALGAE_WHEELS_VOLTAGE = 3;
+    public static final double DEFAULT_ALGAE_WHEELS_VOLTAGE = 0;
 
     //Algae Default Constants TODO
     public static final double ALGAE_DEFAULT_ELEVATOR_HEIGHT = 0;

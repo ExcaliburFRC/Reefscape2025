@@ -5,15 +5,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.excalib.additional_utilities.AllianceUtils;
 import frc.excalib.additional_utilities.LEDs;
+import frc.excalib.control.math.MathUtils;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
 import frc.robot.superstructure.State;
 import frc.robot.superstructure.Superstructure;
-
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 import static frc.excalib.additional_utilities.AllianceUtils.*;
 import static frc.excalib.additional_utilities.Color.Colors.*;
@@ -24,7 +21,7 @@ public class Automations {
     Superstructure m_superstructure;
     Swerve m_swerve;
     private Command m_runningCommand;
-    private Slice m_tragetSlice = Slice.FIRST;
+    private Slice m_tragetSlice = Slice.SECOND;
     private final LEDs m_leds = LEDs.getInstance();
     private Trigger m_atTargetSlicePose;
 
@@ -35,19 +32,24 @@ public class Automations {
         this.m_atTargetSlicePose = new Trigger(() -> poseAtTolerance(m_swerve.getPose2D(), m_tragetSlice.generalPose.get()));
     }
 
-    private AllianceUtils.AlliancePose getCoralIntakePose(boolean right) {
-        if (isRedAlliance())
-            if (m_swerve.getPose2D().getY() < FIELD_WIDTH_METERS / 2) {
-                return FEADERS_POSES[0];
+    private AlliancePose getCoralIntakePose() {
+        Translation2d robot = m_swerve.getPose2D().getTranslation();
+        AlliancePose feeder = FEEDERS_POSES[0];
+        double distance = feeder.get().getTranslation().getDistance(robot);
+        for (int i = 1; i < FEEDERS_POSES.length; i++) {
+            if (distance > robot.getDistance(FEEDERS_POSES[i].get().getTranslation())) {
+                feeder = FEEDERS_POSES[i];
+                distance = robot.getDistance(feeder.get().getTranslation());
             }
-        return FEADERS_POSES[1];
+        }
+        return feeder;
     }
 
-    public Command intakeCoralCommand(boolean right) {
-        return new ParallelDeadlineGroup(
+    public Command intakeCoralCommand() {
+        return scheduleExclusiveCommand(new ParallelDeadlineGroup(
                 m_superstructure.intakeCoralCommand(),
-                m_swerve.pidToPoseCommand(() -> getCoralIntakePose(right).get())
-        ).andThen(m_superstructure.collapseCommand());
+                m_swerve.pidToPoseCommand(() -> getCoralIntakePose().get())
+        ).andThen(m_superstructure.collapseCommand()));
     }
 
     public Command intakeAlgaeCommand() {
@@ -201,26 +203,29 @@ public class Automations {
         return m_tragetSlice;
     }
 
-    public Command defaultSwerveCommand(Supplier<Vector2D> velocityVectorSupplier, DoubleSupplier omegaRadPerSec) {
-        return new ConditionalCommand(
-                new SequentialCommandGroup(
-                        m_swerve.pidToPoseCommand(() -> getTargetSlice().generalPose.get()),
-                        m_swerve.driveCommand(() -> new Vector2D(0, 0), () -> 0, () -> true),
-                        new RunCommand(() -> {
-                        })
-                ).until(() -> !m_tragetSlice.equals(Slice.getSlice(m_swerve.getPose2D().getTranslation()))),
-                m_swerve.driveCommand(
-                        velocityVectorSupplier,
-                        omegaRadPerSec,
-                        () -> true
-                ).until(() -> m_tragetSlice.equals(Slice.getSlice(m_swerve.getPose2D().getTranslation()))),
-                () -> m_tragetSlice.equals(Slice.getSlice(m_swerve.getPose2D().getTranslation()))
-        ).repeatedly();
+    public Command autoSwerveCommand() {
+        return new SequentialCommandGroup(
+                m_swerve.pidToPoseCommand(
+                        () -> new Pose2d(
+                                MathUtils.getTargetPose(
+                                        m_swerve.getPose2D().getTranslation(),
+                                        getTargetSlice().generalPose.get().getTranslation(),
+                                        getReefCenter()
+                                ),
+                                Slice.getSlice(
+                                        m_swerve.getPose2D().getTranslation()
+                                ).generalPose.get().getRotation()
+                        )
+                ).until(m_atTargetSlicePose),
+                m_swerve.stopCommand().until(m_atTargetSlicePose.negate())
+        );
     }
 
     private boolean poseAtTolerance(Pose2d pose1, Pose2d pose2) {
         Translation2d delta = pose1.minus(pose2).getTranslation();
         Rotation2d deltaAngle = pose1.getRotation().minus(pose2.getRotation());
-        return Math.abs(delta.getX()) < 0.1 && Math.abs(delta.getY()) < 0.1 && Math.abs(deltaAngle.getRadians()) < 0.1;
+        return (Math.abs(delta.getX()) < x_TOLERANCE) &&
+                (Math.abs(delta.getY()) < Y_TOLERANCE) &&
+                (Math.abs(deltaAngle.getRadians()) < ANGLE_TOLERANCE);
     }
 }

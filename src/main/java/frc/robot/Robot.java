@@ -89,7 +89,6 @@ public class Robot extends TimedRobot {
         }
 
 //        this.m_robotContainer.superstructure.setStateCommand(State.DEFAULT, ()-> true).schedule();
-        System.out.println("sdfghjkl;");
     }
 
     /**

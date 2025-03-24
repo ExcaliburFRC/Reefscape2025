@@ -1,5 +1,6 @@
 package frc.excalib.control.math;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class Circle {
@@ -22,18 +23,20 @@ public class Circle {
     }
 
     public Line[] getTangents(Translation2d point) {
-        if (point.getDistance(this.center) < this.r) return new Line[0];
-        else if (point.getDistance(this.center) == this.r) {
+        if (point.getDistance(this.center) < this.r) {
+            return new Line[0];
+        }else if (point.getDistance(this.center) == this.r) {
             return new Line[]{
                     getTangent(point)
             };
         }
         double centersDistance = this.center.getDistance(point);
-        double newRad = Math.sqrt(Math.pow(this.r, 2) - Math.pow(centersDistance, 2));
+        double newRad = Math.sqrt(Math.pow(centersDistance, 2) - Math.pow(this.r, 2));
         Circle newCircle = new Circle(point.getX(), point.getY(), newRad);
         Translation2d[] intersections = getInterSections(newCircle);
         Translation2d firstTanPoint = intersections[0];
         Translation2d secondTanPoint = intersections[1];
+
 
         return new Line[]{
                 getTangent(firstTanPoint),
@@ -42,26 +45,27 @@ public class Circle {
     }
 
     public Translation2d[] getInterSections(Circle other) {
-        double d = this.center.getDistance(other.center);
-        if (d > this.r + other.r || d < Math.abs(this.r - other.r)) {
-            return new Translation2d[0]; // No intersection
+
+        if (other.center.getDistance(this.center) > other.r + r) return new Translation2d[0];
+        if (other.center.getDistance(this.center) < Math.abs(other.r - this.r)) return new Translation2d[0];
+
+        if (other.center.getDistance(this.center) == other.r + r) {
+            return new Translation2d[]{
+                    this.center.plus(new Translation2d(this.r, other.center.minus(this.center).getAngle()))
+            };
         }
-
-        double a = (this.r * this.r - other.r * other.r + d * d) / (2 * d);
-        double h = Math.sqrt(this.r * this.r - a * a);
-
-        double x0 = this.center.getX() + a * (other.center.getX() - this.center.getX()) / d;
-        double y0 = this.center.getY() + a * (other.center.getY() - this.center.getY()) / d;
-
-        double rx = -(other.center.getY() - this.center.getY()) * (h / d);
-        double ry = (other.center.getX() - this.center.getX()) * (h / d);
-
-        Translation2d p1 = new Translation2d(x0 + rx, y0 + ry);
-        Translation2d p2 = new Translation2d(x0 - rx, y0 - ry);
-
-        if (d == this.r + other.r || d == Math.abs(this.r - other.r)) {
-            return new Translation2d[]{p1}; // One intersection (tangential circles)
+        if (other.center.getDistance(this.center) < Math.abs(other.r - this.r)) {
+            return new Translation2d[]{//check
+                    this.center.plus(new Translation2d(this.r, other.center.minus(this.center).getAngle()))
+            };
         }
-        return new Translation2d[]{p1, p2}; // Two intersections
+        Rotation2d alpha = new Rotation2d(Math.acos(
+                (Math.pow(other.r, 2) - Math.pow(this.r, 2) - Math.pow(this.center.getDistance(other.center), 2))
+                        / (-2 * this.center.getDistance(other.center) * this.r)
+        ));
+        return new Translation2d[]{
+                this.center.plus(new Translation2d(this.r, other.center.minus(this.center).getAngle().plus(alpha))),
+                this.center.plus(new Translation2d(this.r, other.center.minus(this.center).getAngle().minus(alpha)))
+        };
     }
 }

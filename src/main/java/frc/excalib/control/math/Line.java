@@ -10,10 +10,15 @@ public class Line {
         this.b = b;
         this.c = c;
     }
-    public Translation2d findIntersection(Line other){
+
+    public Translation2d findIntersection(Line other) {
         return new Translation2d(
                 (other.b * c - b * other.c) / (b * other.a - other.b * a),
-                (other.a * c - a * other.c) / (a * other. b- other.a * b)
+                (other.a * c - a * other.c) / (a * other.b - other.a * b)
         );
+    }
+    @Override
+    public String toString(){
+        return "a: "+a+", b: "+b+", c: "+c;
     }
 }
