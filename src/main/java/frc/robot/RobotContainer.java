@@ -87,7 +87,6 @@ public class RobotContainer implements Logged {
 
         m_driver.PS().onTrue(m_swerve.resetAngleCommand());
 
-//        m_driver.cross().toggleOnTrue(m_automations.L1Command());
 //        m_driver.povDown().toggleOnTrue(m_automations.L1Command());
 
         m_driver.square().toggleOnTrue(
@@ -106,6 +105,7 @@ public class RobotContainer implements Logged {
                 )
         );
 
+        m_driver.cross().toggleOnTrue(m_automations.L1Command());
 
         m_driver.povRight().onTrue(m_automations.toggleAutoMode());
         m_driver.povUp().toggleOnTrue(m_automations.intakeCoralCommand());

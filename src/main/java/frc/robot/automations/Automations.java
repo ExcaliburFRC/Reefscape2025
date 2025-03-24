@@ -92,21 +92,20 @@ public class Automations {
                         new SequentialCommandGroup(
                                 m_leds.setPattern(LEDs.LEDPattern.SOLID, ORANGE.color).withDeadline(
                                         new SequentialCommandGroup(
-                                                m_swerve.turnToAngleCommand(
-                                                        () -> new Vector2D(0, 0),
-                                                        () -> Slice.getSlice(
-                                                                m_swerve.getPose2D().getTranslation()).l1Pose.get().getRotation()
-                                                ).withTimeout(1),
+//                                                m_swerve.turnToAngleCommand(
+//                                                        () -> new Vector2D(0, 0),
+//                                                        () -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).l1Pose.get().getRotation()
+//                                                ).withTimeout(1),
                                                 m_swerve.pidToPoseCommand(() -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).l1Pose.get()),
-                                                m_swerve.stopCommand().withTimeout(0.1),
+                                                m_swerve.driveCommand(() -> new Vector2D(-0.5, 0), () -> 0, () -> false).withTimeout(0.2),
+                                                m_swerve.stopCommand().withTimeout(0.05),
                                                 m_superstructure.alignToCoralCommand(1)
                                         )
                                 ),
-                                new WaitCommand(0.1),
                                 scoreCoralCommand(),
-                                new WaitCommand(3)
-
-                        ), m_superstructure.hasCoralTrigger().negate().or(
+                                new WaitCommand(0.3),
+                                m_swerve.driveCommand(() -> new Vector2D(2, 0), () -> 0, () -> false).withTimeout(0.2)),
+                        m_superstructure.hasCoralTrigger().negate().or(
                         m_autoMode.negate()).or(
                         m_atTargetSlicePose.negate())
                 )
@@ -132,7 +131,6 @@ public class Automations {
                                 ),
                                 new WaitCommand(0.25),
                                 scoreCoralCommand()
-
                         ), m_superstructure.hasCoralTrigger().negate().or(
                         m_autoMode.negate()).or(
                         m_atTargetSlicePose.negate())
@@ -169,21 +167,20 @@ public class Automations {
     }
 
     public Command scoreCoralCommand() {
-        return scheduleExclusiveCommand(
-                new ConditionalCommand(
-                        new PrintCommand("doesn't have coral, cant score one"),
-                        m_leds.setPattern(LEDs.LEDPattern.BLINKING, GREEN.color).withDeadline(
-                                new SequentialCommandGroup(
-                                        m_superstructure.scoreCoralCommand(),
-                                        new ConditionalCommand(
-                                                m_superstructure.collapseCommand(),
-                                                m_superstructure.startAutomationCommand(),
-                                                () -> m_superstructure.getState().equals(POST_L1) || m_superstructure.getState().equals(State.L1) || m_superstructure.getState().equals(State.DEFAULT)
-                                        )
+        return new ConditionalCommand(
+                new PrintCommand("doesn't have coral, cant score one"),
+                m_leds.setPattern(LEDs.LEDPattern.BLINKING, GREEN.color).withDeadline(
+                        new SequentialCommandGroup(
+                                m_superstructure.scoreCoralCommand(),
+                                new ConditionalCommand(
+                                        m_superstructure.collapseCommand(),
+                                        m_superstructure.startAutomationCommand(),
+                                        () -> m_superstructure.getState().equals(POST_L1) || m_superstructure.getState().equals(State.L1) || m_superstructure.getState().equals(State.DEFAULT)
                                 )
-                        ),
-                        m_superstructure.hasCoralTrigger().negate()
-                ));
+                        )
+                ),
+                m_superstructure.hasCoralTrigger().negate()
+        );
     }
 
     private Command scheduleExclusiveCommand(Command newCommand) {
