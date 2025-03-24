@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.excalib.additional_utilities.LEDs;
 import frc.excalib.control.math.MathUtils;
 import frc.excalib.control.math.Vector2D;
@@ -30,6 +31,7 @@ import monologue.Annotations;
 import monologue.Annotations.Log;
 import monologue.Logged;
 
+import static frc.robot.Constants.PROCESSOR_ID;
 import static frc.robot.Constants.SwerveConstants.*;
 import static frc.robot.automations.Constants.FieldConstants.getReefCenter;
 import static monologue.Annotations.*;
@@ -47,10 +49,10 @@ public class RobotContainer implements Logged {
 
 
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
+    private final CommandPS5Controller m_operator = new CommandPS5Controller(1);
     //    private final CommandPS5Controller m_operator = new CommandPS5Controller(1);
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
     private final Automations m_automations;
-    private boolean autoMode = false;
 
 
     private SendableChooser<Command> m_autoChooser;
@@ -72,14 +74,14 @@ public class RobotContainer implements Logged {
 
         m_swerve.setDefaultCommand(
                 new SequentialCommandGroup(
-                        m_automations.autoSwerveCommand().until(() -> !autoMode),
+                        m_automations.autoSwerveCommand().until(m_automations.m_autoMode.negate()),
                         m_swerve.driveCommand(
                                 () -> new Vector2D(
                                         deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
                                         deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
                                 () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * (!m_driver.L2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.065),
                                 () -> true
-                        ).until(() -> autoMode)
+                        ).until(m_automations.m_autoMode)
                 )
         );
 
@@ -105,7 +107,7 @@ public class RobotContainer implements Logged {
         );
 
 
-        m_driver.povRight().onTrue(new InstantCommand(() -> autoMode = !autoMode));
+        m_driver.povRight().onTrue(m_automations.toggleAutoMode());
         m_driver.povUp().toggleOnTrue(m_automations.intakeCoralCommand());
         m_driver.R2().toggleOnTrue(m_automations.intakeAlgaeCommand());
 
@@ -116,12 +118,12 @@ public class RobotContainer implements Logged {
 
 
 //
-//        m_operator.R1().onTrue(new InstantCommand(() -> this.right = true));
-//        m_operator.L1().onTrue(new InstantCommand(() -> this.right = false));
+        m_operator.R1().onTrue(new InstantCommand(() -> this.right = true));
+        m_operator.L1().onTrue(new InstantCommand(() -> this.right = false));
 //
-//        m_operator.circle().onTrue(m_superstructure.ejectAlgaeCommand());
-//        m_operator.triangle().onTrue(m_superstructure.startAutomationCommand());
-//        m_operator.povDown().onTrue(m_superstructure.scoreAlgaeCommand(PROCESSOR_ID));
+        m_operator.circle().onTrue(m_superstructure.ejectAlgaeCommand());
+        m_operator.triangle().onTrue(m_superstructure.startAutomationCommand());
+        m_operator.povDown().onTrue(m_superstructure.scoreAlgaeCommand(PROCESSOR_ID));
 
     }
 
@@ -160,19 +162,15 @@ public class RobotContainer implements Logged {
 
         swerveTab.add("Angle Chooser", angleChooser);
 
-//        swerveTab.add("Turn To Angle",
-//                m_swerve.turnToAngleCommand(
-//                        () -> new Vector2D(
-//                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
-//                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)
-//                                )
-//                        ),
-//                        angleChooser::getSelected
-//                ));
     }
 
     public Command getAutonomousCommand() {
-        return Commands.none();
+        return new SequentialCommandGroup(
+                m_automations.toggleAutoMode(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.L4Command(false),
+                m_superstructure.collapseCommand()
+        );
     }
 
     @Log.NT
@@ -196,7 +194,7 @@ public class RobotContainer implements Logged {
     }
 
     @Log.NT
-    public boolean isAutoMode() {
-        return autoMode;
+    public Trigger atAutoMode() {
+        return m_automations.m_autoMode;
     }
 }
