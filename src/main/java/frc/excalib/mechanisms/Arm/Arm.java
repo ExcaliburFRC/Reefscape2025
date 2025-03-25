@@ -43,16 +43,24 @@ public class Arm extends Mechanism {
      * @param toleranceConsumer gets updated if the measurement is at tolerance.
      * @return a command that moves the arm to the specified dynamic setpoint.
      */
-
-    public Command anglePositionControlCommand(DoubleSupplier setPointSupplier, Consumer<Boolean> toleranceConsumer, double maxOffSet, SubsystemBase... requirements) {
+    public Command anglePositionControlCommand(
+            DoubleSupplier setPointSupplier,
+            Consumer<Boolean> toleranceConsumer,
+            double maxOffSet,
+            SubsystemBase... requirements) {
         final double dutyCycle = 0.02;
-        return new RunCommand(() -> {
+        return new RunCommand(
+                () -> {
             double error = setPointSupplier.getAsDouble() - ANGLE_SUPPLIER.getAsDouble();
             double velocitySetpoint = error / dutyCycle;
             velocitySetpoint = m_VELOCITY_LIMIT.limit(velocitySetpoint);
             double phyOutput =
-                    m_ks * Math.signum(velocitySetpoint) + m_kg * m_mass.getCenterOfMass().getX();
-            double pid = m_PIDController.calculate(ANGLE_SUPPLIER.getAsDouble(), setPointSupplier.getAsDouble());
+                    m_ks * Math.signum(velocitySetpoint) +
+                            m_kg * m_mass.getCenterOfMass().getX();
+            double pid = m_PIDController.calculate(
+                    ANGLE_SUPPLIER.getAsDouble(),
+                    setPointSupplier.getAsDouble()
+            );
             double output = phyOutput + pid;
             super.setVoltage(m_VELOCITY_LIMIT.limit(output));
             toleranceConsumer.accept(Math.abs(error) < maxOffSet);

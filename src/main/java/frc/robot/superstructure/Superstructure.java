@@ -279,13 +279,9 @@ public class Superstructure implements Logged {
     public Command collapseCommand() {
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
-                        scheduleExclusiveStateCommand(State.AUTOMATION_DEFAULT),
-                        new ConditionalCommand(
-                                scheduleExclusiveStateCommand(State.ALGAE_DEFAULT),
-                                scheduleExclusiveStateCommand(State.DEFAULT),
-                                () -> m_algaeSystem.hasAlgae()
-                        ),
-                        hasCoralTrigger()
+                        scheduleExclusiveStateCommand(State.ALGAE_DEFAULT),
+                        scheduleExclusiveStateCommand(State.DEFAULT),
+                        () -> m_algaeSystem.hasAlgae()
                 )
         );
     }

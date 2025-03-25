@@ -101,11 +101,12 @@ public class Automations {
                                         )
                                 ),
                                 scoreCoralCommand(),
+                                resetSuperstructureCommand(),
                                 new WaitCommand(0.3),
                                 m_swerve.driveCommand(() -> new Vector2D(2, 0), () -> 0, () -> false).withTimeout(0.2)),
                         m_superstructure.hasCoralTrigger().negate().or(
-                        m_autoMode.negate()).or(
-                        m_atTargetSlicePose.negate())
+                                m_autoMode.negate()).or(
+                                m_atTargetSlicePose.negate())
                 )
         );
     }
@@ -128,7 +129,12 @@ public class Automations {
                                         )
                                 ),
                                 new WaitCommand(0.25),
-                                scoreCoralCommand()
+                                scoreCoralCommand(),
+                                resetSuperstructureCommand().alongWith(
+                                        m_swerve.pidToPoseCommand(
+                                                () -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).generalPose.get()
+                                        ).until(m_atTargetSlicePose)
+                                )
                         ), m_superstructure.hasCoralTrigger().negate().or(
                         m_autoMode.negate()).or(
                         m_atTargetSlicePose.negate())
@@ -154,7 +160,12 @@ public class Automations {
                                         )
                                 ),
                                 new WaitCommand(0.5),
-                                scoreCoralCommand()
+                                scoreCoralCommand(),
+                                resetSuperstructureCommand().alongWith(
+                                        m_swerve.pidToPoseCommand(
+                                                () -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).generalPose.get()
+                                        ).until(m_atTargetSlicePose)
+                                )
                         ),
                         m_superstructure.hasCoralTrigger().negate().or(
                                 m_autoMode.negate()).or(
@@ -167,16 +178,7 @@ public class Automations {
     public Command scoreCoralCommand() {
         return new ConditionalCommand(
                 new PrintCommand("doesn't have coral, cant score one"),
-                m_leds.setPattern(LEDs.LEDPattern.BLINKING, GREEN.color).withDeadline(
-                        new SequentialCommandGroup(
-                                m_superstructure.scoreCoralCommand(),
-                                new ConditionalCommand(
-                                        m_superstructure.collapseCommand(),
-                                        m_superstructure.startAutomationCommand(),
-                                        () -> m_superstructure.getState().equals(POST_L1) || m_superstructure.getState().equals(State.L1) || m_superstructure.getState().equals(State.DEFAULT)
-                                )
-                        )
-                ),
+                m_leds.setPattern(LEDs.LEDPattern.BLINKING, GREEN.color).withDeadline(m_superstructure.scoreCoralCommand()),
                 m_superstructure.hasCoralTrigger().negate()
         );
     }
@@ -232,7 +234,9 @@ public class Automations {
                                 ),
                                 Slice.getSlice(
                                         m_swerve.getPose2D().getTranslation()
-                                ).generalPose.get().getRotation()
+                                ).equals(m_tragetSlice) ? m_tragetSlice.generalPose.get().getRotation() :
+                                        getReefCenter().minus(m_swerve.getPose2D().getTranslation()).getAngle()
+
                         )
                 ).until(m_atTargetSlicePose),
                 m_swerve.stopCommand().until(m_atTargetSlicePose.negate())
@@ -252,5 +256,25 @@ public class Automations {
             autoMode = !autoMode;
             if (autoMode) m_tragetSlice = Slice.getSlice(m_swerve.getPose2D().getTranslation());
         });
+    }
+
+    private Command resetSuperstructureCommand() {
+        return new ConditionalCommand(
+                m_superstructure.collapseCommand(),
+                m_superstructure.startAutomationCommand(),
+                () -> m_superstructure.getState().equals(POST_L1) ||
+                        m_superstructure.getState().equals(State.L1) ||
+                        m_superstructure.getState().equals(State.DEFAULT)
+        );
+    }
+
+    public Command cancelAutomationCommand() {
+        return scheduleExclusiveCommand(
+                new ConditionalCommand(
+                        m_superstructure.collapseCommand(),
+                        new InstantCommand(),
+                        () -> m_superstructure.getState().equals(State.INTAKE)
+                )
+        );
     }
 }

@@ -86,9 +86,7 @@ public class RobotContainer implements Logged {
                 )
         );
 
-        m_driver.PS().onTrue(m_swerve.resetAngleCommand());
-
-//        m_driver.povDown().toggleOnTrue(m_automations.L1Command());
+        m_driver.povDown().toggleOnTrue(m_automations.L1Command());
 
         m_driver.square().toggleOnTrue(
                 new ConditionalCommand(
@@ -108,23 +106,24 @@ public class RobotContainer implements Logged {
 
         m_driver.cross().toggleOnTrue(m_automations.L1Command());
 
-        m_driver.povRight().onTrue(m_automations.toggleAutoMode());
+        m_driver.povRight().onTrue(m_automations.toggleAutoMode().alongWith(m_superstructure.startAutomationCommand()));
         m_driver.povUp().toggleOnTrue(m_automations.intakeCoralCommand());
         m_driver.R2().toggleOnTrue(m_automations.intakeAlgaeCommand());
 
         m_driver.options().onTrue(m_superstructure.collapseCommand());
+        m_driver.create().onTrue(m_automations.cancelAutomationCommand());
 
         m_driver.R1().onTrue(m_automations.changeRightSlice());
         m_driver.L1().onTrue(m_automations.changeLeftSlice());
 
-
-//
         m_operator.R1().onTrue(new InstantCommand(() -> this.right = true));
         m_operator.L1().onTrue(new InstantCommand(() -> this.right = false));
-//
+
         m_operator.circle().onTrue(m_superstructure.ejectAlgaeCommand());
         m_operator.triangle().onTrue(m_superstructure.startAutomationCommand());
         m_operator.povDown().onTrue(m_superstructure.scoreAlgaeCommand(PROCESSOR_ID));
+
+        m_operator.square().onTrue(m_automations.cancelAutomationCommand());
 
     }
 
@@ -188,6 +187,7 @@ public class RobotContainer implements Logged {
                 m_superstructure.collapseCommand()
         );
     }
+
 
     @Log.NT
     public String getReefSlice() {
