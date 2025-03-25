@@ -54,7 +54,7 @@ public class RobotContainer implements Logged {
     private final Automations m_automations;
 
 
-    private SendableChooser<Command> m_autoChooser;
+    private SendableChooser<Command> m_autoChooser = new SendableChooser<>();
 
     public RobotContainer() {
         m_decelerator.put(-1.0, 1.0);
