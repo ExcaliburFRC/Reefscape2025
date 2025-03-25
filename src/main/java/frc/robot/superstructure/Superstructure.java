@@ -19,9 +19,7 @@ public class Superstructure implements Logged {
     private AlgaeSystem m_algaeSystem;
 
     public Trigger m_toleranceTrigger;
-
     private State m_currentState;
-
     private Command m_runningCommand = null, m_runningStateCommand = null;
 
     public final HashMap<State, Command> m_coralMap = new HashMap<>();
@@ -154,7 +152,7 @@ public class Superstructure implements Logged {
     }
 
     public Command scoreCoralCommand() {
-        return new MapCommand<State>(m_coralMap, this::getState);
+        return new MapCommand<>(m_coralMap, this::getState);
     }
 
     private Command scoreCoralCommand(int level) {
@@ -235,7 +233,7 @@ public class Superstructure implements Logged {
     }
 
     public Command scoreAlgaeCommand() {
-        return new MapCommand<State>(m_algaeMap, this::getState);
+        return new MapCommand<>(m_algaeMap, this::getState);
     }
 
 
@@ -311,7 +309,7 @@ public class Superstructure implements Logged {
 
     @Log.NT
     public String getCurrentRobotNamedSate() {
-        if (currentState().equals("DEFUALT_ALGAE")) {
+        if (currentState().equals("DEFUALT")) {
             return "Travel";
         } else if (currentState().equals("AUTOMATION_DEFAULT")) {
             return "Automating...";
@@ -336,7 +334,7 @@ public class Superstructure implements Logged {
         } else if (currentState().equals("PRE_NET") || currentState().equals("NET") || currentState().equals("POST_NET")) {
             return "Scoring Net";
         }
-        return "DISABLED";
+        return "Disabled";
     }
 
     public Trigger hasAlgaeTrigger() {

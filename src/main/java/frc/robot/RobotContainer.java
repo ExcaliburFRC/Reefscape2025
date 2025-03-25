@@ -106,7 +106,7 @@ public class RobotContainer implements Logged {
 
         m_driver.cross().toggleOnTrue(m_automations.L1Command());
 
-        m_driver.povRight().onTrue(m_automations.toggleAutoMode().alongWith(m_superstructure.startAutomationCommand()));
+        m_driver.povRight().onTrue(m_automations.toggleAutoMode());
         m_driver.povUp().toggleOnTrue(m_automations.intakeCoralCommand());
         m_driver.R2().toggleOnTrue(m_automations.intakeAlgaeCommand());
 
@@ -214,7 +214,7 @@ public class RobotContainer implements Logged {
     }
 
     @Log.NT
-    public Trigger atAutoMode() {
-        return m_automations.m_autoMode;
+    public boolean atAutoMode() {
+        return m_automations.m_autoMode.getAsBoolean();
     }
 }

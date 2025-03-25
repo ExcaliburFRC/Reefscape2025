@@ -29,14 +29,11 @@ public class Elevator extends SubsystemBase implements Logged {
     private final MotorGroup m_motorGroup;
     private final LinearExtension m_extensionMechanism;
     private double m_setpoint;
-    public final Trigger m_toleranceTrigger;
-    public final Trigger m_defultTrigger;
-    public DoubleSupplier m_heightSupplier;
-    private DoubleSupplier m_armRadSupplier;
+    public final Trigger m_toleranceTrigger, m_defultTrigger, m_closedTrigger;
+    public DoubleSupplier m_heightSupplier, m_armRadSupplier;
     private SoftLimit m_softLimit;
     private double m_prevVel = 0;
     private double m_accel = 0;
-    private final Trigger m_closedTrigger;
     private Trigger m_hasCoralTrigger = new Trigger(() -> true);
 
     private final ShuffleboardTab m_superstructureTab = Shuffleboard.getTab("Superstructure");
@@ -61,16 +58,17 @@ public class Elevator extends SubsystemBase implements Logged {
         this.m_closedTrigger = new Trigger(() -> getCurrent() > STALL_THRESHOLD && m_setpoint == MIN_HEIGHT_LIMIT && Math.abs(getHeight()) <= 0.1).debounce(0.35);
         this.m_closedTrigger.onTrue(resetHeightCommand());
 
+        m_heightSupplier = () -> m_firstMotor.getMotorPosition();
+
         m_extensionMechanism = new LinearExtension(
                 m_motorGroup,
-                this.m_motorGroup::getMotorPosition,
+                m_heightSupplier,
                 () -> ELEVATOR_ANGLE,
                 ELEVATOR_GAINS,
                 CONSTRAINTS,
                 TOLERANCE
         );
 
-        m_heightSupplier = m_extensionMechanism::logPosition;
 
         m_toleranceTrigger = new Trigger(() -> Math.abs(this.m_setpoint - m_heightSupplier.getAsDouble()) < TOLERANCE);
         m_defultTrigger = new Trigger(() -> Math.abs(State.DEFAULT.m_elevatorHeight - m_heightSupplier.getAsDouble()) < TOLERANCE);
@@ -193,8 +191,9 @@ public class Elevator extends SubsystemBase implements Logged {
         m_elevatorSetpointEntry.setDouble(getSetpoint());
         m_elevatorAtSetpointEntry.setBoolean(atSetpoint());
     }
+
     @Log.NT
-    public boolean collisionAngle(){
+    public boolean collisionAngle() {
         return m_hasCoralTrigger.getAsBoolean();// ? CORAL_COLLISION_TRIGGER : ARM_COLLISION_TRIGGER;
     }
 

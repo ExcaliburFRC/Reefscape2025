@@ -90,10 +90,7 @@ public class Automations {
                         new SequentialCommandGroup(
                                 m_leds.setPattern(LEDs.LEDPattern.TRAIN_CIRCLE, PURPLE.color, WHITE.color).withDeadline(
                                         new SequentialCommandGroup(
-//                                                m_swerve.turnToAngleCommand(
-//                                                        () -> new Vector2D(0, 0),
-//                                                        () -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).l1Pose.get().getRotation()
-//                                                ).withTimeout(1),
+                                                m_superstructure.collapseCommand(),
                                                 m_swerve.pidToPoseCommand(() -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).l1Pose.get()),
                                                 m_swerve.driveCommand(() -> new Vector2D(-0.5, 0), () -> 0, () -> false).withTimeout(0.2),
                                                 m_swerve.stopCommand().withTimeout(0.05),
@@ -101,7 +98,7 @@ public class Automations {
                                         )
                                 ),
                                 scoreCoralCommand(),
-                                resetSuperstructureCommand(),
+                                m_superstructure.collapseCommand(),
                                 new WaitCommand(0.3),
                                 m_swerve.driveCommand(() -> new Vector2D(2, 0), () -> 0, () -> false).withTimeout(0.2)),
                         m_superstructure.hasCoralTrigger().negate().or(
@@ -236,10 +233,14 @@ public class Automations {
                                         m_swerve.getPose2D().getTranslation()
                                 ).equals(m_tragetSlice) ? m_tragetSlice.generalPose.get().getRotation() :
                                         getReefCenter().minus(m_swerve.getPose2D().getTranslation()).getAngle()
-
                         )
                 ).until(m_atTargetSlicePose),
                 m_swerve.stopCommand().until(m_atTargetSlicePose.negate())
+        ).alongWith(
+                new ConditionalCommand(
+                        m_superstructure.startAutomationCommand(),
+                        new InstantCommand(),
+                        m_autoMode)
         );
     }
 

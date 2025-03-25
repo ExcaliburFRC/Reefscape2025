@@ -64,7 +64,7 @@ public class LinearExtension extends Mechanism {
     }
 
     public double logPosition() {
-        return m_motor.getMotorPosition();
+        return m_positionSupplier.getAsDouble();
     }
 
 }
