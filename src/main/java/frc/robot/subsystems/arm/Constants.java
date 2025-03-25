@@ -9,21 +9,20 @@ public class Constants {
     public static final int CAN_CODER_ID = 32;
 
     //Gains for PID and FF
-    private static final double kp = 6.5; //TODO
-    private static final double ki = 0; // TODO
-    private static final double kd = 0.1; // TODO
-    private static final double ka = 0; // TODO
-    private static final double kv = 0; //1.6548; TODO
+    private static final double kp = 6.5;
+    private static final double ki = 0;
+    private static final double kd = 0.1;
+    private static final double ka = 0;
+    private static final double kv = 0;
     private static final double kg = 0.3;
-    private static final double ks = 0; // TODO
+    private static final double ks = 0;
     public static final Gains ANGLE_GAINS = new Gains(kp, ki, kd, ks, kv, ka, kg);
-
 
     //Physical Properties
     public static final double MASS = 1;
-    public static final double TOLERANCE = 0.07; // TODO
-    public static final double ROTATIONS_TO_RAD = 2 * Math.PI;
-    public static final double POSITION_CONVERSION_FACTOR = 1 / 7.5498750273499192965754627065202;
+    public static final double TOLERANCE = 0.07;
+    public static final double ROTATIONS_TO_RAD = -2 * Math.PI;
+    public static final double POSITION_CONVERSION_FACTOR = -1 / 7.5498750273499192965754627065202;
     public static final double RPS_TO_RAD_PER_SEC = 1 / 7.5498750273499192965754627065202;
 
     public static final double MAX_RAD_LIMIT = 2.0586022173425302;
