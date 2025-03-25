@@ -31,8 +31,7 @@ import monologue.Annotations;
 import monologue.Annotations.Log;
 import monologue.Logged;
 
-import static frc.robot.Constants.PROCESSOR_ID;
-import static frc.robot.Constants.RIGHT_AUTO_POSE;
+import static frc.robot.Constants.*;
 import static frc.robot.Constants.SwerveConstants.*;
 import static frc.robot.automations.Constants.FieldConstants.getReefCenter;
 import static monologue.Annotations.*;
@@ -51,7 +50,6 @@ public class RobotContainer implements Logged {
 
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
     private final CommandPS5Controller m_operator = new CommandPS5Controller(1);
-    //    private final CommandPS5Controller m_operator = new CommandPS5Controller(1);
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
     private final Automations m_automations;
 
@@ -125,6 +123,7 @@ public class RobotContainer implements Logged {
 
         m_operator.square().onTrue(m_automations.cancelAutomationCommand());
 
+        m_operator.touchpad().whileTrue(m_superstructure.coastCommand().alongWith(m_swerve.coastCommand()).ignoringDisable(true));
     }
 
 
@@ -133,15 +132,48 @@ public class RobotContainer implements Logged {
     }
 
     private void initAutoChooser() {
-        EventTrigger releaseCoral = new EventTrigger("atPoseTrigger");
+        Command centerAutoCommand = new SequentialCommandGroup(
+                m_automations.toggleAutoMode(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.L4Command(false),
+                m_superstructure.collapseCommand()
+        );
 
-//         Build an auto chooser. This will use Commands.none() as the default option.
-        m_autoChooser = AutoBuilder.buildAutoChooser();
-        m_autoChooser.addOption("Calibration Auto", new PathPlannerAuto("calibrationAuto"));
-        m_autoChooser.addOption("Test Path", new PathPlannerAuto("testAuto"));
-        m_autoChooser.addOption("Test Auto", new PathPlannerAuto("testAuto2"));
+        Command leftAutoCommand = new SequentialCommandGroup(
+                new InstantCommand(() -> m_swerve.resetOdometry(LEFT_AUTO_POSE.get())),
+                m_automations.toggleAutoMode(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.L4Command(true),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.intakeCoralCommand(),
+                m_automations.toggleAutoMode(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.L4Command(false),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_superstructure.collapseCommand()
+        );
 
-        SmartDashboard.putData("Auto Chooser", m_autoChooser);
+        Command rightAutoCommand = new SequentialCommandGroup(
+                new InstantCommand(() -> m_swerve.resetOdometry(RIGHT_AUTO_POSE.get())),
+                m_automations.toggleAutoMode(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.L4Command(true),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.intakeCoralCommand(),
+                m_automations.toggleAutoMode(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.L4Command(false),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_superstructure.collapseCommand()
+        );
+
+        m_autoChooser.setDefaultOption("empty auto", new InstantCommand());
+        m_autoChooser.addOption("exit from line", m_swerve.driveCommand(() -> new Vector2D(1, 0), () -> 0, () -> false).withTimeout(2));
+        m_autoChooser.addOption("center auto", centerAutoCommand);
+        m_autoChooser.addOption("left auto", leftAutoCommand);
+        m_autoChooser.addOption("right auto", rightAutoCommand);
+
+        SmartDashboard.putData("auto chooser", m_autoChooser);
     }
 
     private void initElastic() {
@@ -165,27 +197,7 @@ public class RobotContainer implements Logged {
     }
 
     public Command getAutonomousCommand() {
-        // AUTO 1 L4
-//        return new SequentialCommandGroup(
-//                m_automations.toggleAutoMode(),
-//                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
-//                m_automations.L4Command(false),
-//                m_superstructure.collapseCommand()
-//        );
-        return new SequentialCommandGroup(
-                //AUTO 2 L4
-                new InstantCommand(() -> m_swerve.resetOdometry(RIGHT_AUTO_POSE.get())),
-                m_automations.toggleAutoMode(),
-                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
-                m_automations.L4Command(true),
-                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
-                m_automations.intakeCoralCommand(),
-                m_automations.toggleAutoMode(),
-                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
-                m_automations.L4Command(false),
-                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
-                m_superstructure.collapseCommand()
-        );
+        return m_autoChooser.getSelected();
     }
 
 
@@ -203,6 +215,7 @@ public class RobotContainer implements Logged {
     public boolean getRightBranch() {
         return right;
     }
+
     @Log.NT
     public boolean getLeftBranch() {
         return !right;

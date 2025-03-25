@@ -289,7 +289,7 @@ public class Superstructure implements Logged {
                 new ParallelCommandGroup(
                         m_arm.coastCommand(),
                         m_elevator.coastCommand()
-                )
+                ).ignoringDisable(true)
         );
     }
 
