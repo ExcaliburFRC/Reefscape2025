@@ -24,11 +24,12 @@ public final class Constants {
             return RED_REEF_CENTER;
         }
 
-        private static final Translation2d B1 = new Translation2d(5.7668696, 3.812), B12 = new Translation2d(5.7668696, 4.142);
+        private static final Translation2d B1 = new Translation2d(5.7668696, 3.812+0.02), B12 = new Translation2d(5.7668696, 4.142+0.02);
         private static final Translation2d BASE_L1 = new Translation2d(5.7668696, 4.0259);
-        private static final Translation2d BASE_ALGAE = new Translation2d(5.7668696, 4.0259); //TODO: find x
-        private static final Translation2d BASE_POST_ALGAE = new Translation2d(6.3, 4.0259); //TODO: find x
+        private static final Translation2d BASE_ALGAE = new Translation2d(5.7668696, 4.0259+0.02); //TODO: find x
+        private static final Translation2d BASE_POST_ALGAE = new Translation2d(6.3, 4.0259+0.02); //TODO: find x
         private static final Translation2d BASE_GENERAL = new Translation2d(6.3, 4.0259);
+        private static final double NET_X_VALUE = 7.718;
 
         public static AlliancePose[] GENERAL_POSES = {
                 new AlliancePose(BASE_GENERAL, Rotation2d.fromDegrees(180)),
@@ -83,7 +84,6 @@ public final class Constants {
         };
         //
         public static final AlliancePose[] FEEDERS_POSES = {
-//                new AlliancePose(new Translation2d(1.02, 0.92), new Rotation2d(Units.degreesToRadians(54))),
                 new AlliancePose(new Translation2d(0.91, FIELD_WIDTH_METERS - 6.96), new Rotation2d(Units.degreesToRadians(54))),
                 new AlliancePose(new Translation2d(1.12, FIELD_WIDTH_METERS - 7.02), new Rotation2d(Units.degreesToRadians(54))),
                 new AlliancePose(new Translation2d(1.25, FIELD_WIDTH_METERS - 7.19), new Rotation2d(Units.degreesToRadians(54))),
@@ -91,12 +91,15 @@ public final class Constants {
                 new AlliancePose(new Translation2d(1.12, 7.02), new Rotation2d(Units.degreesToRadians(306))),
                 new AlliancePose(new Translation2d(1.25, 7.19), new Rotation2d(Units.degreesToRadians(306)))
         };
-//
-//        public static final Pose2d[] NET_POSES = {
-//                new Pose2d(),
-//                new Pose2d(),
-//                new Pose2d()
-//        };
-//
+
+        public static final AlliancePose[] NET_POSES = {
+                new AlliancePose(NET_X_VALUE, 7.5, 0),
+                new AlliancePose(NET_X_VALUE, 7.0, 0),
+                new AlliancePose(NET_X_VALUE, 6.5, 0),
+                new AlliancePose(NET_X_VALUE, 5, 0),
+                new AlliancePose(NET_X_VALUE, 5.5, 0),
+                new AlliancePose(NET_X_VALUE, 5, 0)
+        };
+
     }
 }

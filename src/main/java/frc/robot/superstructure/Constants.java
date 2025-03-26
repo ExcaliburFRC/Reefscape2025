@@ -47,19 +47,19 @@ public class Constants {
     public static final double POST_L2_ALGAE_WHEELS_VOLTAGE = 3;
 
     // PRE L3 Constants TODO
-    public static final double PRE_L3_ELEVATOR_HEIGHT = 0.0794 + 0.04;
+    public static final double PRE_L3_ELEVATOR_HEIGHT = 0.0794 + 0.09;
     public static final double PRE_L3_ARM_ANGLE = 1.2502;// + Math.PI * 3.0 / 180.0;
     public static final double PRE_L3_CORAL_WHEELS_VOLTAGE = 0;
     public static final double PRE_L3_ALGAE_WHEELS_VOLTAGE = 3;
 
     // L3 Constants TODO
-    public static final double L3_ELEVATOR_HEIGHT = 0.0794 + 0.04;
+    public static final double L3_ELEVATOR_HEIGHT = 0.0794 + 0.09;
     public static final double L3_ARM_ANGLE = 1.2502;// + Math.PI * 3.0 / 180.0;
     public static final double L3_CORAL_WHEELS_VOLTAGE = 7;
     public static final double L3_ALGAE_WHEELS_VOLTAGE = 3;
 
     // POST L3 Constants TODO
-    public static final double POST_L3_ELEVATOR_HEIGHT = 0.0794 + 0.04;
+    public static final double POST_L3_ELEVATOR_HEIGHT = 0.0794 + 0.0;
     public static final double POST_L3_ARM_ANGLE = 1.2502;// + Math.PI * 3.0 / 180.0;
     public static final double POST_L3_CORAL_WHEELS_VOLTAGE = 5;
     public static final double POST_L3_ALGAE_WHEELS_VOLTAGE = 3;
@@ -124,13 +124,11 @@ public class Constants {
     public static final double PROCESSOR_CORAL_WHEELS_VOLTAGE = 0;
     public static final double PROCESSOR_ALGAE_WHEELS_VOLTAGE = -1;
 
-    //POST PROCESSOR Constants TODO
     public static final double POST_PROCESSOR_ELEVATOR_HEIGHT = 0.261;
     public static final double POST_PROCESSOR_ARM_ANGLE = -1.3897;
     public static final double POST_PROCESSOR_CORAL_WHEELS_VOLTAGE = 0;
     public static final double POST_PROCESSOR_ALGAE_WHEELS_VOLTAGE = -1;
 
-    //EJECT Coral Constants TODO
     public static final double EJECT_CORAL_ELEVATOR_HEIGHT = 0;
     public static final double EJECT_CORAL_ARM_ANGLE = 0;
     public static final double EJECT_CORAL_CORAL_WHEELS_VOLTAGE = 0;
@@ -146,7 +144,7 @@ public class Constants {
     public static final double DEFAULT_ELEVATOR_HEIGHT = 0;
     public static final double DEFAULT_ARM_ANGLE = -1.5063691337036997;
     public static final double DEFAULT_CORAL_WHEELS_VOLTAGE = -0.1;
-    public static final double DEFAULT_ALGAE_WHEELS_VOLTAGE = 0;
+    public static final double DEFAULT_ALGAE_WHEELS_VOLTAGE = 3;
 
     //Algae Default Constants TODO
     public static final double ALGAE_DEFAULT_ELEVATOR_HEIGHT = 0;

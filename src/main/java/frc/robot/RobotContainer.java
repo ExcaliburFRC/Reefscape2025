@@ -114,17 +114,24 @@ public class RobotContainer implements Logged {
         m_driver.R1().onTrue(m_automations.changeRightSlice());
         m_driver.L1().onTrue(m_automations.changeLeftSlice());
 
-        m_operator.R1().onTrue(new InstantCommand(() -> this.right = true));
-        m_operator.L1().onTrue(new InstantCommand(() -> this.right = false));
+//        ][\
+//
+//
+//
+//     .R1().onTrue(new InstantCommand(() -> this.right = true).ignoringDisable(true));
+        m_operator.L1().onTrue(new InstantCommand(() -> this.right = false).ignoringDisable(true));
 
         m_operator.circle().onTrue(m_superstructure.ejectAlgaeCommand());
         m_operator.triangle().onTrue(m_superstructure.startAutomationCommand());
         m_operator.povDown().onTrue(m_superstructure.scoreAlgaeCommand(PROCESSOR_ID));
+        m_operator.povUp().toggleOnTrue(m_superstructure.alignToAlgaeCommand(NET_ID));
+        m_operator.create().toggleOnTrue(m_superstructure.scoreAlgaeCommand());
+
+        m_operator.R2().toggleOnTrue(m_superstructure.intakeCoralCommand().andThen(new WaitUntilCommand(m_superstructure.hasCoralTrigger())).andThen(m_superstructure.collapseCommand()));
 
         m_operator.square().onTrue(m_automations.cancelAutomationCommand());
 
-        m_operator.touchpad().whileTrue(m_superstructure.coastCommand().alongWith(m_swerve.coastCommand()).ignoringDisable(true));
-    }
+        m_operator.touchpad().whileTrue(m_superstructure.coastCommand().alongWith(m_swerve.coastCommand()).ignoringDisable(true));}
 
 
     public double deadband(double value) {
