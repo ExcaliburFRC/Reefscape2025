@@ -62,7 +62,7 @@
             }
           },
           {
-            "title": "Match Time",
+            "title": "match time",
             "x": 0.0,
             "y": 0.0,
             "width": 640.0,
@@ -78,7 +78,7 @@
             }
           },
           {
-            "title": "Camera",
+            "title": "orangepi_Port_1184_Output_MJPEG_Server",
             "x": 896.0,
             "y": 0.0,
             "width": 640.0,
@@ -91,7 +91,7 @@
             }
           },
           {
-            "title": "Current Reef Slice",
+            "title": "getReefSlice",
             "x": 0.0,
             "y": 384.0,
             "width": 384.0,
@@ -138,7 +138,7 @@
             }
           },
           {
-            "title": "State",
+            "title": "getCurrentRobotNamedSate",
             "x": 0.0,
             "y": 512.0,
             "width": 384.0,
@@ -151,7 +151,7 @@
             }
           },
           {
-            "title": "Target Reef Slice",
+            "title": "getTragetSlice",
             "x": 384.0,
             "y": 384.0,
             "width": 384.0,
@@ -181,7 +181,7 @@
             }
           },
           {
-            "title": "Back Camera",
+            "title": "orangepi_Port_1182_Output_MJPEG_Server",
             "x": 1280.0,
             "y": 640.0,
             "width": 256.0,
@@ -191,6 +191,19 @@
               "topic": "/CameraPublisher/orangepi_Port_1182_Output_MJPEG_Server",
               "period": 0.06,
               "rotation_turns": 0
+            }
+          },
+          {
+            "title": "autoChooser",
+            "x": 896.0,
+            "y": 640.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/autoChooser",
+              "period": 0.06,
+              "sort_options": false
             }
           }
         ]
@@ -219,19 +232,6 @@
               "field_rotation": 0.0,
               "robot_color": 4278264421,
               "trajectory_color": 4292128567
-            }
-          },
-          {
-            "title": "Auto Chooser",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "ComboBox Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/Auto Chooser",
-              "period": 0.06,
-              "sort_options": true
             }
           }
         ]

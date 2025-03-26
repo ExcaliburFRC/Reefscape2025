@@ -54,7 +54,7 @@ public class RobotContainer implements Logged {
     private final Automations m_automations;
 
 
-    private SendableChooser<Command> m_autoChooser = new SendableChooser<>();
+    public SendableChooser<Command> m_autoChooser = new SendableChooser<>();
 
     public RobotContainer() {
         m_decelerator.put(-1.0, 1.0);
@@ -62,7 +62,7 @@ public class RobotContainer implements Logged {
         m_automations = new Automations(m_swerve, m_superstructure);
 
 
-//        initAutoChooser();
+        initAutoChooser();
         initElastic();
 
         // Configure the trigger bindings
@@ -173,7 +173,7 @@ public class RobotContainer implements Logged {
         m_autoChooser.addOption("left auto", leftAutoCommand);
         m_autoChooser.addOption("right auto", rightAutoCommand);
 
-        SmartDashboard.putData("auto chooser", m_autoChooser);
+        SmartDashboard.putData("autoChooser", m_autoChooser);
     }
 
     private void initElastic() {
