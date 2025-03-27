@@ -124,14 +124,17 @@ public class RobotContainer implements Logged {
         m_operator.circle().onTrue(m_superstructure.ejectAlgaeCommand());
         m_operator.triangle().onTrue(m_superstructure.startAutomationCommand());
         m_operator.povDown().onTrue(m_superstructure.scoreAlgaeCommand(PROCESSOR_ID));
+
+        m_operator.povRight().toggleOnTrue(m_automations.netCommand());
+
         m_operator.povUp().toggleOnTrue(m_superstructure.alignToAlgaeCommand(NET_ID));
         m_operator.create().toggleOnTrue(m_superstructure.scoreAlgaeCommand());
 
         m_operator.R2().toggleOnTrue(m_superstructure.intakeCoralCommand().andThen(new WaitUntilCommand(m_superstructure.hasCoralTrigger())).andThen(m_superstructure.collapseCommand()));
-
         m_operator.square().onTrue(m_automations.cancelAutomationCommand());
 
-        m_operator.touchpad().whileTrue(m_superstructure.coastCommand().alongWith(m_swerve.coastCommand()).ignoringDisable(true));}
+        m_operator.touchpad().whileTrue(m_superstructure.coastCommand().alongWith(m_swerve.coastCommand()).ignoringDisable(true));
+    }
 
 
     public double deadband(double value) {
@@ -143,7 +146,11 @@ public class RobotContainer implements Logged {
                 m_automations.toggleAutoMode(),
                 new WaitUntilCommand(m_automations.m_atTargetSlicePose),
                 m_automations.L4Command(false),
-                m_superstructure.collapseCommand()
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.intakeAlgaeCommand(),
+                m_automations.toggleAutoMode(),
+                m_automations.netCommand()
+
         );
 
         Command leftAutoCommand = new SequentialCommandGroup(
@@ -174,11 +181,22 @@ public class RobotContainer implements Logged {
                 m_superstructure.collapseCommand()
         );
 
+        Command l4WithNet = new SequentialCommandGroup(
+                m_automations.toggleAutoMode(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.L4Command(true),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.intakeAlgaeCommand(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.netCommand()
+        );
+
         m_autoChooser.setDefaultOption("empty auto", new InstantCommand());
         m_autoChooser.addOption("exit from line", m_swerve.driveCommand(() -> new Vector2D(1, 0), () -> 0, () -> false).withTimeout(2));
         m_autoChooser.addOption("center auto", centerAutoCommand);
         m_autoChooser.addOption("left auto", leftAutoCommand);
         m_autoChooser.addOption("right auto", rightAutoCommand);
+        m_autoChooser.addOption("1 L4 with Net", rightAutoCommand);
 
         SmartDashboard.putData("autoChooser", m_autoChooser);
     }
@@ -239,7 +257,7 @@ public class RobotContainer implements Logged {
     }
 
     @Log.NT
-    public boolean atNetPose(){
+    public boolean atNetPose() {
         return m_automations.atNetPose();
     }
 }

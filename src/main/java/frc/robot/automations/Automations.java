@@ -61,6 +61,19 @@ public class Automations {
         return netPose.get();
     }
 
+    private Pose2d getNetPosePose() {
+        Translation2d robot = m_swerve.getPose2D().getTranslation();
+        AlliancePose netPose = POST_NET_POSES[0];
+        double distance = netPose.get().getTranslation().getDistance(robot);
+        for (int i = 1; i < POST_NET_POSES.length; i++) {
+            if (distance > robot.getDistance(POST_NET_POSES[i].get().getTranslation())) {
+                netPose = POST_NET_POSES[i];
+                distance = robot.getDistance(netPose.get().getTranslation());
+            }
+        }
+        return netPose.get();
+    }
+
     public Command intakeCoralCommand() {
         return scheduleExclusiveCommand(
                 new ParallelDeadlineGroup(
@@ -301,10 +314,18 @@ public class Automations {
     public Command netCommand() {
         return scheduleExclusiveCommand(
                 new SequentialCommandGroup(
-                        m_swerve.pidToPoseCommand(this::getNetPose),
+                        m_swerve.pidToPoseCommand(this::getNetPosePose),
                         m_superstructure.alignToAlgaeCommand(4),
+                        m_swerve.pidToPoseCommand(this::getNetPose),
                         m_superstructure.scoreAlgaeCommand(4),
-                        m_superstructure.collapseCommand()
+                        m_swerve.pidToPoseCommand(this::getNetPosePose),
+                        m_superstructure.collapseCommand().alongWith(
+                                m_swerve.driveCommand(
+                                        () -> new Vector2D(-0.7, 0),
+                                        () -> 0,
+                                        () -> false
+                                ).withTimeout(2)
+                        )
                 )
         );
     }

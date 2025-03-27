@@ -5,6 +5,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.excalib.additional_utilities.AllianceUtils;
 
+import javax.swing.plaf.PanelUI;
+
 import static frc.excalib.additional_utilities.AllianceUtils.*;
 
 public final class Constants {
@@ -29,7 +31,8 @@ public final class Constants {
         private static final Translation2d BASE_ALGAE = new Translation2d(5.7668696, 4.0259-0.02); //TODO: find x
         private static final Translation2d BASE_POST_ALGAE = new Translation2d(6.3, 4.0259-0.02); //TODO: find x
         private static final Translation2d BASE_GENERAL = new Translation2d(6.3, 4.0259);
-        public static final double NET_X_VALUE = 7.718;
+        public static final double NET_X_VALUE = 7.721;
+        public static final double POST_NET_X_VALUE = 7.418;
 
         public static AlliancePose[] GENERAL_POSES = {
                 new AlliancePose(BASE_GENERAL, Rotation2d.fromDegrees(180)),
@@ -99,6 +102,14 @@ public final class Constants {
                 new AlliancePose(NET_X_VALUE, 5, 0),
                 new AlliancePose(NET_X_VALUE, 5.5, 0),
                 new AlliancePose(NET_X_VALUE, 5, 0)
+        };
+        public static final AlliancePose[] POST_NET_POSES = {
+                new AlliancePose(POST_NET_X_VALUE, 7.5, 0),
+                new AlliancePose(POST_NET_X_VALUE, 7.0, 0),
+                new AlliancePose(POST_NET_X_VALUE, 6.5, 0),
+                new AlliancePose(POST_NET_X_VALUE, 5, 0),
+                new AlliancePose(POST_NET_X_VALUE, 5.5, 0),
+                new AlliancePose(POST_NET_X_VALUE, 5, 0)
         };
 
     }
