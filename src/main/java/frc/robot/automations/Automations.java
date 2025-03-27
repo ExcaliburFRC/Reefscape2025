@@ -26,7 +26,7 @@ public class Automations {
     public final Trigger m_atTargetSlicePose;
     private boolean autoMode = false;
     public final Trigger m_autoMode = new Trigger(() -> autoMode);
-    private final Trigger atNetPoseTrigger = new Trigger(() -> Math.abs(m_swerve.getPose2D().getX() - NET_X_VALUE) < 0.01);
+    private final Trigger atNetPoseTrigger = new Trigger(() -> Math.abs(m_swerve.getPose2D().getX() - NET_X_VALUE) < 0.03);
 
     public Automations(Swerve swerve, Superstructure superstructure) {
         this.m_superstructure = superstructure;
