@@ -26,6 +26,7 @@ public class Automations {
     public final Trigger m_atTargetSlicePose;
     private boolean autoMode = false;
     public final Trigger m_autoMode = new Trigger(() -> autoMode);
+    private final Trigger atNetPoseTrigger = new Trigger(() -> Math.abs(m_swerve.getPose2D().getX() - NET_X_VALUE) < 0.03);
 
     public Automations(Swerve swerve, Superstructure superstructure) {
         this.m_superstructure = superstructure;
@@ -45,6 +46,32 @@ public class Automations {
             }
         }
         return feeder;
+    }
+
+    private Pose2d getNetPose() {
+        Translation2d robot = m_swerve.getPose2D().getTranslation();
+        AlliancePose netPose = NET_POSES[0];
+        double distance = netPose.get().getTranslation().getDistance(robot);
+        for (int i = 1; i < NET_POSES.length; i++) {
+            if (distance > robot.getDistance(NET_POSES[i].get().getTranslation())) {
+                netPose = NET_POSES[i];
+                distance = robot.getDistance(netPose.get().getTranslation());
+            }
+        }
+        return netPose.get();
+    }
+
+    private Pose2d getNetPosePose() {
+        Translation2d robot = m_swerve.getPose2D().getTranslation();
+        AlliancePose netPose = POST_NET_POSES[0];
+        double distance = netPose.get().getTranslation().getDistance(robot);
+        for (int i = 1; i < POST_NET_POSES.length; i++) {
+            if (distance > robot.getDistance(POST_NET_POSES[i].get().getTranslation())) {
+                netPose = POST_NET_POSES[i];
+                distance = robot.getDistance(netPose.get().getTranslation());
+            }
+        }
+        return netPose.get();
     }
 
     public Command intakeCoralCommand() {
@@ -67,21 +94,19 @@ public class Automations {
                                         m_superstructure.intakeAlgaeCommand(3),
                                         () -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).ALGAE_LEVEL == 2
                                 ),
-                                m_swerve.pidToPoseCommand(() -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).alagePose.get()),
-                                m_swerve.stopCommand().withTimeout(0.1),
+                                m_swerve.pidToPoseCommand(
+                                        () -> Slice.getSlice(m_swerve.getPose2D().getTranslation()
+                                        ).alagePose.get()).until(m_superstructure.hasAlgaeTrigger()),
                                 new WaitUntilCommand(m_superstructure.hasAlgaeTrigger()),
-                                m_swerve.pidToPoseCommand(() -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).generalPose.get()),
-                                m_swerve.stopCommand().withTimeout(0.05),
-                                m_superstructure.collapseCommand()
+                                m_swerve.pidToPoseCommand(
+                                        () -> Slice.getSlice(m_swerve.getPose2D().getTranslation()
+                                        ).generalPose.get()),
+                                m_swerve.stopCommand().withTimeout(0.05)
                         ), m_superstructure.hasAlgaeTrigger().or(
                         m_autoMode.negate()).or(m_atTargetSlicePose.negate())
                 )
         );
     }
-
-//    public Command scoreAlgaeCommand() {
-//        return Commands.none();
-//    }
 
     public Command L1Command() {
         return scheduleExclusiveCommand(
@@ -98,7 +123,6 @@ public class Automations {
                                         )
                                 ),
                                 scoreCoralCommand(),
-                                m_superstructure.collapseCommand(),
                                 new WaitCommand(0.3),
                                 m_swerve.driveCommand(() -> new Vector2D(2, 0), () -> 0, () -> false).withTimeout(0.2)),
                         m_superstructure.hasCoralTrigger().negate().or(
@@ -238,7 +262,11 @@ public class Automations {
                 m_swerve.stopCommand().until(m_atTargetSlicePose.negate())
         ).alongWith(
                 new ConditionalCommand(
-                        m_superstructure.startAutomationCommand(),
+                        new ConditionalCommand(
+                                new InstantCommand(),
+                                m_superstructure.startAutomationCommand(),
+                                () -> m_superstructure.getState().equals(POST_L1) || m_superstructure.getState().equals(State.L1)
+                        ),
                         new InstantCommand(),
                         m_autoMode)
         );
@@ -275,6 +303,29 @@ public class Automations {
                         m_superstructure.collapseCommand(),
                         new InstantCommand(),
                         () -> m_superstructure.getState().equals(State.INTAKE)
+                )
+        );
+    }
+
+    public boolean atNetPose() {
+        return atNetPoseTrigger.getAsBoolean();
+    }
+
+    public Command netCommand() {
+        return scheduleExclusiveCommand(
+                new SequentialCommandGroup(
+                        m_swerve.pidToPoseCommand(this::getNetPosePose),
+                        m_superstructure.alignToAlgaeCommand(4),
+                        m_swerve.pidToPoseCommand(this::getNetPose),
+                        m_superstructure.scoreAlgaeCommand(4),
+                        m_swerve.pidToPoseCommand(this::getNetPosePose),
+                        m_superstructure.collapseCommand().alongWith(
+                                m_swerve.driveCommand(
+                                        () -> new Vector2D(-0.7, 0),
+                                        () -> 0,
+                                        () -> false
+                                ).withTimeout(2)
+                        )
                 )
         );
     }

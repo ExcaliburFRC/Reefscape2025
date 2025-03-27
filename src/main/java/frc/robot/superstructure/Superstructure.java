@@ -334,7 +334,7 @@ public class Superstructure implements Logged {
         } else if (currentState().equals("PRE_NET") || currentState().equals("NET") || currentState().equals("POST_NET")) {
             return "Scoring Net";
         }
-        return "Disabled";
+        return "Travel";
     }
 
     public Trigger hasAlgaeTrigger() {

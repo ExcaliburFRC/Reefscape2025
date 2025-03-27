@@ -5,6 +5,11 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import monologue.Annotations;
+import monologue.Annotations.Log;
+import monologue.Logged;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -16,7 +21,7 @@ import java.util.function.BiConsumer;
 import static org.photonvision.PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY;
 import static org.photonvision.PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
 
-public class PhotonAprilTagsCamera {
+public class PhotonAprilTagsCamera implements Logged {
     private final PhotonCamera m_camera;
     private final AprilTagFieldLayout m_fieldLayout;
 
@@ -24,11 +29,21 @@ public class PhotonAprilTagsCamera {
 
     private final Transform3d kRobotToCamera;
 
-    private final double TOO_FAR = 3.5; //m
+    private final double TOO_FAR = 3.5; // m
+    private final double TOO_LONG = 3; // s
+    private final Timer tagTimer = new Timer();
+    private final Timer tagTimerHigh = new Timer();
+    private final Trigger seenTrigger;
+    private final Trigger seenTriggerHigh;
 
     public PhotonAprilTagsCamera(String cameraName, AprilTagFields aprilTagField, Transform3d robotToCamera) {
         m_camera = new PhotonCamera(cameraName);
         m_camera.setDriverMode(false);
+
+        tagTimer.start();
+        tagTimerHigh.start();
+        seenTrigger = new Trigger(()-> tagTimer.get() < TOO_LONG);
+        seenTriggerHigh = new Trigger(()-> tagTimerHigh.get() < TOO_LONG);
 
         m_fieldLayout = AprilTagFieldLayout.loadField(aprilTagField);
 
@@ -62,6 +77,7 @@ public class PhotonAprilTagsCamera {
         if (result.hasTargets() && result.getBestTarget().getPoseAmbiguity() < 0.2) {
             Translation2d targetTranslation = result.getBestTarget().getBestCameraToTarget().getTranslation().toTranslation2d();
             if (targetTranslation.getDistance(new Translation2d(0, 0)) < TOO_FAR) {
+                tagTimer.restart();
                 m_photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
                 return m_photonPoseEstimator.update(result);
             }
@@ -82,6 +98,15 @@ public class PhotonAprilTagsCamera {
 
         toUpdate.accept(tag.get().plus(result.getBestTarget().getBestCameraToTarget()).toPose2d(), result.getTimestampSeconds());
         return true;
+    }
+
+    @Log.NT
+    public boolean getTagTimer(){
+        return seenTrigger.getAsBoolean();
+    }
+    @Log.NT
+    public boolean getTagTimerHigh(){
+        return seenTriggerHigh.getAsBoolean();
     }
 }
 

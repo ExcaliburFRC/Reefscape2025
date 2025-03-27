@@ -54,7 +54,7 @@ public class RobotContainer implements Logged {
     private final Automations m_automations;
 
 
-    private SendableChooser<Command> m_autoChooser;
+    public SendableChooser<Command> m_autoChooser = new SendableChooser<>();
 
     public RobotContainer() {
         m_decelerator.put(-1.0, 1.0);
@@ -62,7 +62,7 @@ public class RobotContainer implements Logged {
         m_automations = new Automations(m_swerve, m_superstructure);
 
 
-//        initAutoChooser();
+        initAutoChooser();
         initElastic();
 
         // Configure the trigger bindings
@@ -114,13 +114,23 @@ public class RobotContainer implements Logged {
         m_driver.R1().onTrue(m_automations.changeRightSlice());
         m_driver.L1().onTrue(m_automations.changeLeftSlice());
 
-        m_operator.R1().onTrue(new InstantCommand(() -> this.right = true));
-        m_operator.L1().onTrue(new InstantCommand(() -> this.right = false));
+//        ][\
+//
+//
+//
+        m_operator.R1().onTrue(new InstantCommand(() -> this.right = true).ignoringDisable(true));
+        m_operator.L1().onTrue(new InstantCommand(() -> this.right = false).ignoringDisable(true));
 
         m_operator.circle().onTrue(m_superstructure.ejectAlgaeCommand());
         m_operator.triangle().onTrue(m_superstructure.startAutomationCommand());
         m_operator.povDown().onTrue(m_superstructure.scoreAlgaeCommand(PROCESSOR_ID));
 
+        m_operator.povRight().toggleOnTrue(m_automations.netCommand());
+
+        m_operator.povUp().toggleOnTrue(m_superstructure.alignToAlgaeCommand(NET_ID));
+        m_operator.create().toggleOnTrue(m_superstructure.scoreAlgaeCommand());
+
+        m_operator.R2().toggleOnTrue(m_superstructure.intakeCoralCommand().andThen(new WaitUntilCommand(m_superstructure.hasCoralTrigger())).andThen(m_superstructure.collapseCommand()));
         m_operator.square().onTrue(m_automations.cancelAutomationCommand());
 
         m_operator.touchpad().whileTrue(m_superstructure.coastCommand().alongWith(m_swerve.coastCommand()).ignoringDisable(true));
@@ -136,7 +146,11 @@ public class RobotContainer implements Logged {
                 m_automations.toggleAutoMode(),
                 new WaitUntilCommand(m_automations.m_atTargetSlicePose),
                 m_automations.L4Command(false),
-                m_superstructure.collapseCommand()
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.intakeAlgaeCommand(),
+                m_automations.toggleAutoMode(),
+                m_automations.netCommand()
+
         );
 
         Command leftAutoCommand = new SequentialCommandGroup(
@@ -167,13 +181,24 @@ public class RobotContainer implements Logged {
                 m_superstructure.collapseCommand()
         );
 
+        Command l4WithNet = new SequentialCommandGroup(
+                m_automations.toggleAutoMode(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.L4Command(true),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.intakeAlgaeCommand(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.netCommand()
+        );
+
         m_autoChooser.setDefaultOption("empty auto", new InstantCommand());
         m_autoChooser.addOption("exit from line", m_swerve.driveCommand(() -> new Vector2D(1, 0), () -> 0, () -> false).withTimeout(2));
         m_autoChooser.addOption("center auto", centerAutoCommand);
         m_autoChooser.addOption("left auto", leftAutoCommand);
         m_autoChooser.addOption("right auto", rightAutoCommand);
+        m_autoChooser.addOption("1 L4 with Net", rightAutoCommand);
 
-        SmartDashboard.putData("auto chooser", m_autoChooser);
+        SmartDashboard.putData("autoChooser", m_autoChooser);
     }
 
     private void initElastic() {
@@ -229,5 +254,10 @@ public class RobotContainer implements Logged {
     @Log.NT
     public boolean atAutoMode() {
         return m_automations.m_autoMode.getAsBoolean();
+    }
+
+    @Log.NT
+    public boolean atNetPose() {
+        return m_automations.atNetPose();
     }
 }
