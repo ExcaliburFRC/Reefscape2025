@@ -26,6 +26,7 @@ public class Automations {
     public final Trigger m_atTargetSlicePose;
     private boolean autoMode = false;
     public final Trigger m_autoMode = new Trigger(() -> autoMode);
+    private final Trigger atNetPoseTrigger = new Trigger(() -> Math.abs(m_swerve.getPose2D().getX() - NET_X_VALUE) < 0.01);
 
     public Automations(Swerve swerve, Superstructure superstructure) {
         this.m_superstructure = superstructure;
@@ -87,8 +88,7 @@ public class Automations {
                                 m_swerve.pidToPoseCommand(
                                         () -> Slice.getSlice(m_swerve.getPose2D().getTranslation()
                                         ).generalPose.get()),
-                                m_swerve.stopCommand().withTimeout(0.05),
-                                m_superstructure.collapseCommand()
+                                m_swerve.stopCommand().withTimeout(0.05)
                         ), m_superstructure.hasAlgaeTrigger().or(
                         m_autoMode.negate()).or(m_atTargetSlicePose.negate())
                 )
@@ -252,7 +252,7 @@ public class Automations {
                         new ConditionalCommand(
                                 new InstantCommand(),
                                 m_superstructure.startAutomationCommand(),
-                                ()->m_superstructure.getState().equals(POST_L1) || m_superstructure.getState().equals(State.L1)
+                                () -> m_superstructure.getState().equals(POST_L1) || m_superstructure.getState().equals(State.L1)
                         ),
                         new InstantCommand(),
                         m_autoMode)
@@ -294,8 +294,18 @@ public class Automations {
         );
     }
 
+    public boolean atNetPose() {
+        return atNetPoseTrigger.getAsBoolean();
+    }
 
-//    public Command netCommand(){
-//        return new
-//    }
+    public Command netCommand() {
+        return scheduleExclusiveCommand(
+                new SequentialCommandGroup(
+                        m_swerve.pidToPoseCommand(this::getNetPose),
+                        m_superstructure.alignToAlgaeCommand(4),
+                        m_superstructure.scoreAlgaeCommand(4),
+                        m_superstructure.collapseCommand()
+                )
+        );
+    }
 }

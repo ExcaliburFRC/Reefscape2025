@@ -118,7 +118,7 @@ public class RobotContainer implements Logged {
 //
 //
 //
-//     .R1().onTrue(new InstantCommand(() -> this.right = true).ignoringDisable(true));
+        m_operator.R1().onTrue(new InstantCommand(() -> this.right = true).ignoringDisable(true));
         m_operator.L1().onTrue(new InstantCommand(() -> this.right = false).ignoringDisable(true));
 
         m_operator.circle().onTrue(m_superstructure.ejectAlgaeCommand());
@@ -236,5 +236,10 @@ public class RobotContainer implements Logged {
     @Log.NT
     public boolean atAutoMode() {
         return m_automations.m_autoMode.getAsBoolean();
+    }
+
+    @Log.NT
+    public boolean atNetPose(){
+        return m_automations.atNetPose();
     }
 }
