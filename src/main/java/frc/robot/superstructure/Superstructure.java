@@ -13,10 +13,10 @@ import monologue.Logged;
 import java.util.HashMap;
 
 public class Superstructure implements Logged {
-    private Elevator m_elevator;
-    private Arm m_arm;
-    private CoralSystem m_coralSystem;
-    private AlgaeSystem m_algaeSystem;
+    private final Elevator m_elevator;
+    private final Arm m_arm;
+    private final CoralSystem m_coralSystem;
+    private final AlgaeSystem m_algaeSystem;
 
     public Trigger m_toleranceTrigger;
     private State m_currentState;
@@ -101,11 +101,9 @@ public class Superstructure implements Logged {
                     m_runningCommand = newCommand;
                     m_runningCommand.schedule();
                 },
-                () -> {
-                }, // No execute action needed
-                (interrupted) -> {
-                }, // No special end behavior needed
-                () -> !m_runningCommand.isScheduled() // Ends when the command is no longer scheduled
+                () -> {},
+                (interrupted) -> {},
+                () -> !m_runningCommand.isScheduled()
         );
     }
 
@@ -118,11 +116,9 @@ public class Superstructure implements Logged {
                     m_runningStateCommand = stateCommand;
                     m_runningStateCommand.schedule();
                 },
-                () -> {
-                }, // No execute action needed
-                (interrupted) -> {
-                }, // No special end behavior needed
-                () -> !m_runningStateCommand.isScheduled() // Ends when the command is no longer scheduled
+                () -> {},
+                (interrupted) -> {},
+                () -> !m_runningStateCommand.isScheduled()
         );
     }
 
@@ -148,7 +144,8 @@ public class Superstructure implements Logged {
                         scheduleExclusiveStateCommand(state),
                         new PrintCommand("cant go to level " + level + " no coral exist"),
                         this.m_coralSystem.m_hasCoralTrigger
-                ));
+                )
+        );
     }
 
     public Command scoreCoralCommand() {
@@ -183,7 +180,8 @@ public class Superstructure implements Logged {
                         new SequentialCommandGroup(
                                 new WaitUntilCommand(m_toleranceTrigger),
                                 scoreCoralCommand(score, after),
-                                new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate())
+                                new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate()
+                                )
                         ),
                         new PrintCommand("has no coral or not at correct state"),
                         m_coralSystem.m_hasCoralTrigger.and(() -> getCoralPreState(level).equals(m_currentState))
@@ -199,7 +197,9 @@ public class Superstructure implements Logged {
                                 new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger)
                         ),
                         new PrintCommand("can't intake - intake coral command"),
-                        m_coralSystem.m_hasCoralTrigger.negate().and(() -> !m_algaeSystem.hasAlgae())));
+                        m_coralSystem.m_hasCoralTrigger.negate().and(() -> !m_algaeSystem.hasAlgae())
+                )
+        );
     }
 
     public Command intakeAlgaeCommand(int level) {
@@ -218,9 +218,9 @@ public class Superstructure implements Logged {
                         scheduleExclusiveStateCommand(state),
                         new PrintCommand("cant go to level " + level + " no coral exist"),
                         this.m_algaeSystem.m_hasAlgaeTrigger
-                ));
+                )
+        );
     }
-
 
     private Command scoreAlgaeCommand(State score, State after) {
         return scheduleExclusiveCommand(
@@ -235,7 +235,6 @@ public class Superstructure implements Logged {
     public Command scoreAlgaeCommand() {
         return new MapCommand<>(m_algaeMap, this::getState);
     }
-
 
     public Command scoreAlgaeCommand(int level) {
         State score, after;
@@ -309,32 +308,20 @@ public class Superstructure implements Logged {
 
     @Log.NT
     public String getCurrentRobotNamedSate() {
-        if (currentState().equals("DEFUALT")) {
-            return "Travel";
-        } else if (currentState().equals("AUTOMATION_DEFAULT")) {
-            return "Automating...";
-        } else if (currentState().equals("INTAKE")) {
-            return "Intake";
-        } else if (currentState().equals("INTAKE_ALGAE2")) {
-            return "Intake Algae 2";
-        } else if (currentState().equals("ALGAE_DEFAULT")) {
-            return "Automating Algae";
-        } else if (currentState().equals("INTAKE_ALGAE3")) {
-            return "Intake Algae 3";
-        } else if (currentState().equals("PRE_L4") || currentState().equals("L4") || currentState().equals("POST_L4")) {
-            return "Scoring L4";
-        } else if (currentState().equals("PRE_L3") || currentState().equals("L3") || currentState().equals("POST_L3")) {
-            return "Scoring L3";
-        } else if (currentState().equals("PRE_L2") || currentState().equals("L2") || currentState().equals("POST_L2")) {
-            return "Scoring L2";
-        } else if (currentState().equals("PRE_L1") || currentState().equals("L1") || currentState().equals("POST_L1")) {
-            return "Scoring L1";
-        } else if (currentState().equals("PROCESSOR") || currentState().equals("PRE_PROCESSOR") || currentState().equals("POST_PROCESSOR")) {
-            return "Scoring Processor";
-        } else if (currentState().equals("PRE_NET") || currentState().equals("NET") || currentState().equals("POST_NET")) {
-            return "Scoring Net";
-        }
-        return "Travel";
+        return switch (currentState()) {
+            case "AUTOMATION_DEFAULT" -> "Autonomous";
+            case "INTAKE" -> "Intake";
+            case "INTAKE_ALGAE2" -> "Intake Algae 2";
+            case "ALGAE_DEFAULT" -> "Automating Algae";
+            case "INTAKE_ALGAE3" -> "Intake Algae 3";
+            case "PRE_L4", "L4", "POST_L4" -> "Scoring L4";
+            case "PRE_L3", "L3", "POST_L3" -> "Scoring L3";
+            case "PRE_L2", "L2", "POST_L2" -> "Scoring L2";
+            case "PRE_L1", "L1", "POST_L1" -> "Scoring L1";
+            case "PROCESSOR", "PRE_PROCESSOR", "POST_PROCESSOR" -> "Scoring Processor";
+            case "PRE_NET", "NET", "POST_NET" -> "Scoring Net";
+            default -> "Travel";
+        };
     }
 
     public Trigger hasAlgaeTrigger() {

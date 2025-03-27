@@ -31,9 +31,6 @@ public class Robot extends TimedRobot {
         boolean fileOnly = false;
         boolean lazyLogging = true;
         Monologue.setupMonologue(m_robotContainer, "Robot", fileOnly, lazyLogging);
-//        addPeriodic(Monologue::updateAll, 0.5);
-//        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
-
         addPeriodic(m_robotContainer.m_odometryUpdater, 0.01);
     }
 
@@ -46,7 +43,6 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-//        Monologue.setFileOnly(DriverStation.isFMSAttached());
         Monologue.updateAll();
         CommandScheduler.getInstance().run();
     }
@@ -87,8 +83,6 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
-
-//        this.m_robotContainer.superstructure.setStateCommand(State.DEFAULT, ()-> true).schedule();
     }
 
     /**

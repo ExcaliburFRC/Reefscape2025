@@ -42,8 +42,6 @@ public enum State {
             m_coralVoltage,
             m_algaeVoltage;
 
-
-
     State(
             double elevatorHeight,
             double armAngle,

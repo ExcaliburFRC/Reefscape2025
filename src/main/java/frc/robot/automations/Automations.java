@@ -213,11 +213,9 @@ public class Automations {
                     m_runningCommand = newCommand;
                     m_runningCommand.schedule();
                 },
-                () -> {
-                }, // No execute action needed
-                (interrupted) -> {
-                }, // No special end behavior needed
-                () -> !m_runningCommand.isScheduled() // Ends when the command is no longer scheduled
+                () -> {},
+                (interrupted) -> {},
+                () -> !m_runningCommand.isScheduled()
         );
     }
 

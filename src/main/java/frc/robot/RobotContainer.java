@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
@@ -19,7 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.excalib.additional_utilities.LEDs;
 import frc.excalib.control.math.MathUtils;
 import frc.excalib.control.math.Vector2D;
@@ -27,14 +23,12 @@ import frc.excalib.swerve.Swerve;
 import frc.robot.automations.Automations;
 import frc.robot.automations.Slice;
 import frc.robot.superstructure.Superstructure;
-import monologue.Annotations;
 import monologue.Annotations.Log;
 import monologue.Logged;
 
 import static frc.robot.Constants.*;
 import static frc.robot.Constants.SwerveConstants.*;
 import static frc.robot.automations.Constants.FieldConstants.getReefCenter;
-import static monologue.Annotations.*;
 
 public class RobotContainer implements Logged {
     private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
@@ -46,7 +40,6 @@ public class RobotContainer implements Logged {
     private boolean right;
 
     public final Runnable m_odometryUpdater = m_swerve::updateOdometry;
-
 
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
     private final CommandPS5Controller m_operator = new CommandPS5Controller(1);
@@ -61,7 +54,6 @@ public class RobotContainer implements Logged {
         m_decelerator.put(1.0, 0.25);
         m_automations = new Automations(m_swerve, m_superstructure);
 
-
         initAutoChooser();
         initElastic();
 
@@ -70,7 +62,6 @@ public class RobotContainer implements Logged {
     }
 
     private void configureBindings() {
-
         m_swerve.setDefaultCommand(
                 new SequentialCommandGroup(
                         m_automations.autoSwerveCommand().until(m_automations.m_autoMode.negate()),
@@ -114,10 +105,6 @@ public class RobotContainer implements Logged {
         m_driver.R1().onTrue(m_automations.changeRightSlice());
         m_driver.L1().onTrue(m_automations.changeLeftSlice());
 
-//        ][\
-//
-//
-//
         m_operator.R1().onTrue(new InstantCommand(() -> this.right = true).ignoringDisable(true));
         m_operator.L1().onTrue(new InstantCommand(() -> this.right = false).ignoringDisable(true));
 
@@ -181,22 +168,11 @@ public class RobotContainer implements Logged {
                 m_superstructure.collapseCommand()
         );
 
-        Command l4WithNet = new SequentialCommandGroup(
-                m_automations.toggleAutoMode(),
-                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
-                m_automations.L4Command(true),
-                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
-                m_automations.intakeAlgaeCommand(),
-                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
-                m_automations.netCommand()
-        );
-
-        m_autoChooser.setDefaultOption("empty auto", new InstantCommand());
-        m_autoChooser.addOption("exit from line", m_swerve.driveCommand(() -> new Vector2D(1, 0), () -> 0, () -> false).withTimeout(2));
-        m_autoChooser.addOption("center auto", centerAutoCommand);
-        m_autoChooser.addOption("left auto", leftAutoCommand);
-        m_autoChooser.addOption("right auto", rightAutoCommand);
-        m_autoChooser.addOption("1 L4 with Net", rightAutoCommand);
+        m_autoChooser.setDefaultOption("Empty Automation", new InstantCommand());
+        m_autoChooser.addOption("Exit From Start Line", m_swerve.driveCommand(() -> new Vector2D(1, 0), () -> 0, () -> false).withTimeout(2));
+        m_autoChooser.addOption("Center Automation", centerAutoCommand);
+        m_autoChooser.addOption("Left Automation", leftAutoCommand);
+        m_autoChooser.addOption("Right Automation", rightAutoCommand);
 
         SmartDashboard.putData("autoChooser", m_autoChooser);
     }
@@ -211,20 +187,17 @@ public class RobotContainer implements Logged {
         ShuffleboardTab swerveTab = Shuffleboard.getTab("Swerve");
         SendableChooser<Rotation2d> angleChooser = new SendableChooser<>();
 
-        // angle chooser options
         angleChooser.setDefaultOption("0", new Rotation2d());
         angleChooser.addOption("90", new Rotation2d(Math.PI / 2));
         angleChooser.addOption("180", new Rotation2d(Math.PI));
         angleChooser.addOption("270", new Rotation2d(3 * Math.PI / 2));
 
         swerveTab.add("Angle Chooser", angleChooser);
-
     }
 
     public Command getAutonomousCommand() {
         return m_autoChooser.getSelected();
     }
-
 
     @Log.NT
     public String getReefSlice() {

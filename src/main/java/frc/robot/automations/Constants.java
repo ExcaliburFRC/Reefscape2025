@@ -5,12 +5,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.excalib.additional_utilities.AllianceUtils;
 
-import javax.swing.plaf.PanelUI;
-
 import static frc.excalib.additional_utilities.AllianceUtils.*;
 
 public final class Constants {
-
     public static class FieldConstants {
         public static final Translation2d BLUE_REEF_CENTER = new Translation2d(4.4893484, 4.026);
         public static final Translation2d RED_REEF_CENTER = new Translation2d(FIELD_LENGTH_METERS - BLUE_REEF_CENTER.getX(), BLUE_REEF_CENTER.getY());
@@ -51,6 +48,7 @@ public final class Constants {
                 new AlliancePose(B1.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-60)),
                 new AlliancePose(B1.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(-120)),
         };
+
         public static final AlliancePose[] RIGHT_BRANCHES = {
                 new AlliancePose(B12, Rotation2d.fromDegrees(180)),
                 new AlliancePose(B12.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(120)),
@@ -77,6 +75,7 @@ public final class Constants {
                 new AlliancePose(BASE_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-60)),
                 new AlliancePose(BASE_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(-120)),
         };
+
         public static final AlliancePose[] POST_ALGAES = {
                 new AlliancePose(BASE_POST_ALGAE, Rotation2d.fromDegrees(180)),
                 new AlliancePose(BASE_POST_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-60)), Rotation2d.fromDegrees(-240)),
@@ -85,7 +84,7 @@ public final class Constants {
                 new AlliancePose(BASE_POST_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-240)), Rotation2d.fromDegrees(-60)),
                 new AlliancePose(BASE_POST_ALGAE.rotateAround(BLUE_REEF_CENTER, Rotation2d.fromDegrees(-300)), Rotation2d.fromDegrees(-120)),
         };
-        //
+
         public static final AlliancePose[] FEEDERS_POSES = {
                 new AlliancePose(new Translation2d(0.91, FIELD_WIDTH_METERS - 6.96), new Rotation2d(Units.degreesToRadians(54))),
                 new AlliancePose(new Translation2d(1.12, FIELD_WIDTH_METERS - 7.02), new Rotation2d(Units.degreesToRadians(54))),
@@ -103,6 +102,7 @@ public final class Constants {
                 new AlliancePose(NET_X_VALUE, 5.5, 0),
                 new AlliancePose(NET_X_VALUE, 5, 0)
         };
+
         public static final AlliancePose[] POST_NET_POSES = {
                 new AlliancePose(POST_NET_X_VALUE, 7.5, 0),
                 new AlliancePose(POST_NET_X_VALUE, 7.0, 0),
@@ -111,6 +111,5 @@ public final class Constants {
                 new AlliancePose(POST_NET_X_VALUE, 5.5, 0),
                 new AlliancePose(POST_NET_X_VALUE, 5, 0)
         };
-
     }
 }

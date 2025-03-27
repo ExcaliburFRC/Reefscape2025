@@ -22,7 +22,6 @@ import frc.excalib.swerve.Swerve;
 import frc.excalib.swerve.SwerveModule;
 
 import static com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless;
-import static frc.excalib.additional_utilities.AllianceUtils.FIELD_WIDTH_METERS;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
