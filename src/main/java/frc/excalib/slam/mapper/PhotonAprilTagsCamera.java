@@ -32,14 +32,18 @@ public class PhotonAprilTagsCamera implements Logged {
     private final double TOO_FAR = 3.5; // m
     private final double TOO_LONG = 3; // s
     private final Timer tagTimer = new Timer();
+    private final Timer tagTimerHigh = new Timer();
     private final Trigger seenTrigger;
+    private final Trigger seenTriggerHigh;
 
     public PhotonAprilTagsCamera(String cameraName, AprilTagFields aprilTagField, Transform3d robotToCamera) {
         m_camera = new PhotonCamera(cameraName);
         m_camera.setDriverMode(false);
 
         tagTimer.start();
+        tagTimerHigh.start();
         seenTrigger = new Trigger(()-> tagTimer.get() < TOO_LONG);
+        seenTriggerHigh = new Trigger(()-> tagTimerHigh.get() < TOO_LONG);
 
         m_fieldLayout = AprilTagFieldLayout.loadField(aprilTagField);
 
@@ -99,6 +103,10 @@ public class PhotonAprilTagsCamera implements Logged {
     @Log.NT
     public boolean getTagTimer(){
         return seenTrigger.getAsBoolean();
+    }
+    @Log.NT
+    public boolean getTagTimerHigh(){
+        return seenTriggerHigh.getAsBoolean();
     }
 }
 

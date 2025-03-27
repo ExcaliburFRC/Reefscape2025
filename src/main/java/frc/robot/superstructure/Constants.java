@@ -12,19 +12,19 @@ public class Constants {
 
     // PRE L1 Constants TODO
     public static final double PRE_L1_ELEVATOR_HEIGHT = 0;
-    public static final double PRE_L1_ARM_ANGLE = -1.608582730249298;
+    public static final double PRE_L1_ARM_ANGLE = -1.7;
     public static final double PRE_L1_CORAL_WHEELS_VOLTAGE = 0;
     public static final double PRE_L1_ALGAE_WHEELS_VOLTAGE = 3;
 
     // L1 Constants TODO
     public static final double L1_ELEVATOR_HEIGHT = 0;
-    public static final double L1_ARM_ANGLE = -1.608582730249298;
+    public static final double L1_ARM_ANGLE = -1.7;
     public static final double L1_CORAL_WHEELS_VOLTAGE = 5;
     public static final double L1_ALGAE_WHEELS_VOLTAGE = 3;
 
     // POST L1 Constants TODO
     public static final double POST_L1_ELEVATOR_HEIGHT = 0;
-    public static final double POST_L1_ARM_ANGLE = -1.608582730249298;
+    public static final double POST_L1_ARM_ANGLE = -1.7;
     public static final double POST_L1_CORAL_WHEELS_VOLTAGE = 5;
     public static final double POST_L1_ALGAE_WHEELS_VOLTAGE = 3;
 
@@ -47,19 +47,19 @@ public class Constants {
     public static final double POST_L2_ALGAE_WHEELS_VOLTAGE = 3;
 
     // PRE L3 Constants TODO
-    public static final double PRE_L3_ELEVATOR_HEIGHT = 0.0794 + 0.09;
+    public static final double PRE_L3_ELEVATOR_HEIGHT = 0.0794 + 0.11;
     public static final double PRE_L3_ARM_ANGLE = 1.2502;// + Math.PI * 3.0 / 180.0;
     public static final double PRE_L3_CORAL_WHEELS_VOLTAGE = 0;
     public static final double PRE_L3_ALGAE_WHEELS_VOLTAGE = 3;
 
     // L3 Constants TODO
-    public static final double L3_ELEVATOR_HEIGHT = 0.0794 + 0.09;
+    public static final double L3_ELEVATOR_HEIGHT = 0.0794 + 0.11;
     public static final double L3_ARM_ANGLE = 1.2502;// + Math.PI * 3.0 / 180.0;
     public static final double L3_CORAL_WHEELS_VOLTAGE = 7;
     public static final double L3_ALGAE_WHEELS_VOLTAGE = 3;
 
     // POST L3 Constants TODO
-    public static final double POST_L3_ELEVATOR_HEIGHT = 0.0794 + 0.0;
+    public static final double POST_L3_ELEVATOR_HEIGHT = 0.0794 + 0.11;
     public static final double POST_L3_ARM_ANGLE = 1.2502;// + Math.PI * 3.0 / 180.0;
     public static final double POST_L3_CORAL_WHEELS_VOLTAGE = 5;
     public static final double POST_L3_ALGAE_WHEELS_VOLTAGE = 3;

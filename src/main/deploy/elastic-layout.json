@@ -22,7 +22,7 @@
               "robot_length": 0.85,
               "show_other_objects": true,
               "show_trajectories": true,
-              "field_rotation": 90.0,
+              "field_rotation": -90.0,
               "robot_color": 4294901760,
               "trajectory_color": 4294967295
             }
@@ -65,7 +65,7 @@
             "title": "match time",
             "x": 0.0,
             "y": 0.0,
-            "width": 640.0,
+            "width": 384.0,
             "height": 384.0,
             "type": "Match Time",
             "properties": {
@@ -141,7 +141,7 @@
             "title": "getTragetSlice",
             "x": 384.0,
             "y": 384.0,
-            "width": 384.0,
+            "width": 512.0,
             "height": 128.0,
             "type": "Large Text Display",
             "properties": {
@@ -216,6 +216,40 @@
                 800.0,
                 600.0
               ]
+            }
+          },
+          {
+            "title": "getTagTimer",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/m_swerve/m_frontCamera/getTagTimer",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "atNetPose",
+            "x": 384.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/atNetPose",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           }
         ]
