@@ -40,8 +40,7 @@ public class LEDs extends SubsystemBase {
         Arrays.fill(orange, ORANGE.color);
         Arrays.fill(black, OFF.color);
 
-        setDefaultCommand(setPattern(LEDPattern.EXPAND, BLUE.color, TEAM_GOLD.color));
-//        setDefaultCommand(setPattern(LEDPattern.OFF, OFF.color));
+        setDefaultCommand(setPattern(LEDPattern.EXPAND, BLUE.color, WHITE.color));
     }
 
     public static LEDs getInstance() {

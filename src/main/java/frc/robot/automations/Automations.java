@@ -12,6 +12,8 @@ import frc.excalib.swerve.Swerve;
 import frc.robot.superstructure.State;
 import frc.robot.superstructure.Superstructure;
 
+import java.util.function.BooleanSupplier;
+
 import static frc.excalib.additional_utilities.AllianceUtils.*;
 import static frc.excalib.additional_utilities.Color.Colors.*;
 import static frc.robot.automations.Constants.FieldConstants.*;
@@ -78,7 +80,7 @@ public class Automations {
         return scheduleExclusiveCommand(
                 new ParallelDeadlineGroup(
                         m_superstructure.intakeCoralCommand(),
-                        new InstantCommand(() -> autoMode = false),
+                        setAutoMode(() -> false),
                         m_swerve.pidToPoseCommand(() -> getCoralIntakePose().get())
                 ).andThen(m_superstructure.collapseCommand())
         );
@@ -87,7 +89,7 @@ public class Automations {
     public Command intakeAlgaeCommand() {
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
-                        new PrintCommand("has algae, cant intake one"),
+                        new PrintCommand("has algae, cant intake one").andThen(setAutoMode(() -> true)),
                         new SequentialCommandGroup(
                                 new ConditionalCommand(
                                         m_superstructure.intakeAlgaeCommand(2),
@@ -95,12 +97,11 @@ public class Automations {
                                         () -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).ALGAE_LEVEL == 2
                                 ),
                                 m_swerve.pidToPoseCommand(
-                                        () -> Slice.getSlice(m_swerve.getPose2D().getTranslation()
-                                        ).alagePose.get()).until(m_superstructure.hasAlgaeTrigger()),
+                                        () -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).alagePose.get()
+                                ).until(m_superstructure.hasAlgaeTrigger()),
                                 new WaitUntilCommand(m_superstructure.hasAlgaeTrigger()),
                                 m_swerve.pidToPoseCommand(
-                                        () -> Slice.getSlice(m_swerve.getPose2D().getTranslation()
-                                        ).generalPose.get()),
+                                        () -> Slice.getSlice(m_swerve.getPose2D().getTranslation()).generalPose.get()),
                                 m_swerve.stopCommand().withTimeout(0.05)
                         ), m_superstructure.hasAlgaeTrigger().or(
                         m_autoMode.negate()).or(m_atTargetSlicePose.negate())
@@ -111,7 +112,7 @@ public class Automations {
     public Command L1Command() {
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
-                        new PrintCommand("doesn't have coral, cant score one"),
+                        new PrintCommand("doesn't have coral, cant score one").andThen(setAutoMode(() -> true)),
                         new SequentialCommandGroup(
                                 m_leds.setPattern(LEDs.LEDPattern.TRAIN_CIRCLE, PURPLE.color, WHITE.color).withDeadline(
                                         new SequentialCommandGroup(
@@ -135,7 +136,7 @@ public class Automations {
     public Command L4Command(boolean right) {
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
-                        new PrintCommand("doesn't have coral, cant score one"),
+                        new PrintCommand("doesn't have coral, cant score one").andThen(setAutoMode(() -> true)),
                         new SequentialCommandGroup(
                                 m_leds.setPattern(LEDs.LEDPattern.TRAIN_CIRCLE, PURPLE.color, WHITE.color).withDeadline(
                                         new SequentialCommandGroup(
@@ -166,7 +167,7 @@ public class Automations {
     public Command L3Command(boolean right) {
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
-                        new PrintCommand("doesn't have coral, cant score one"),
+                        new PrintCommand("doesn't have coral, cant score one").andThen(setAutoMode(() -> true)),
                         new SequentialCommandGroup(
                                 m_leds.setPattern(LEDs.LEDPattern.TRAIN_CIRCLE, PURPLE.color, WHITE.color).withDeadline(
                                         new SequentialCommandGroup(
@@ -213,8 +214,10 @@ public class Automations {
                     m_runningCommand = newCommand;
                     m_runningCommand.schedule();
                 },
-                () -> {},
-                (interrupted) -> {},
+                () -> {
+                },
+                (interrupted) -> {
+                },
                 () -> !m_runningCommand.isScheduled()
         );
     }
@@ -266,7 +269,8 @@ public class Automations {
                                 () -> m_superstructure.getState().equals(POST_L1) || m_superstructure.getState().equals(State.L1)
                         ),
                         new InstantCommand(),
-                        m_autoMode)
+                        m_autoMode
+                )
         );
     }
 
@@ -312,6 +316,7 @@ public class Automations {
     public Command netCommand() {
         return scheduleExclusiveCommand(
                 new SequentialCommandGroup(
+                        setAutoMode(() -> false),
                         m_swerve.pidToPoseCommand(this::getNetPosePose),
                         m_superstructure.alignToAlgaeCommand(4),
                         m_swerve.pidToPoseCommand(this::getNetPose),
@@ -327,4 +332,30 @@ public class Automations {
                 )
         );
     }
+
+    public Command manualIntakeCommand() {
+        return scheduleExclusiveCommand(
+                new SequentialCommandGroup(
+                        setAutoMode(() -> false),
+                        m_superstructure.intakeCoralCommand(),
+                        m_superstructure.collapseCommand()
+                )
+        );
+    }
+
+    public Command collapseCommand() {
+        return scheduleExclusiveCommand(m_superstructure.collapseCommand());
+    }
+
+    public Command setAutoMode(BooleanSupplier mode) {
+        return new InstantCommand(() -> {
+            autoMode = mode.getAsBoolean();
+            if (autoMode) m_tragetSlice = Slice.getSlice(m_swerve.getPose2D().getTranslation());
+        });
+    }
+
+    public Command ejectAlgaeCommand() {
+        return m_superstructure.ejectAlgaeCommand();
+    }
 }
+

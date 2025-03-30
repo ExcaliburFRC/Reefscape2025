@@ -16,28 +16,39 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.excalib.additional_utilities.LEDs;
+import frc.excalib.commands.MapCommand;
 import frc.excalib.control.math.MathUtils;
 import frc.excalib.control.math.Vector2D;
 import frc.excalib.swerve.Swerve;
 import frc.robot.automations.Automations;
+import frc.robot.automations.IntakeState;
+import frc.robot.automations.ScoreState;
 import frc.robot.automations.Slice;
 import frc.robot.superstructure.Superstructure;
 import monologue.Annotations.Log;
 import monologue.Logged;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static frc.robot.Constants.*;
 import static frc.robot.Constants.SwerveConstants.*;
 import static frc.robot.automations.Constants.FieldConstants.getReefCenter;
+import static frc.robot.automations.ScoreState.*;
+import static frc.robot.automations.ScoreState.EJECT_ALGAE;
+import static frc.robot.automations.ScoreState.L1;
 
 public class RobotContainer implements Logged {
     private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
-    // The robot's subsystems and commands are defined here...
 
     private final Swerve m_swerve = Constants.SwerveConstants.configureSwerve(new Pose2d());
-    private Superstructure m_superstructure = new Superstructure();
+    private final Superstructure m_superstructure = new Superstructure();
     private final LEDs leds = LEDs.getInstance();
     private boolean right;
+    private ScoreState m_currentScoreState = null;
+    private IntakeState m_currentIntakeState = null;
 
     public final Runnable m_odometryUpdater = m_swerve::updateOdometry;
 
@@ -46,6 +57,8 @@ public class RobotContainer implements Logged {
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
     private final Automations m_automations;
 
+    private final Trigger m_deportAutoMode = new Trigger(() -> Math.sqrt(
+            Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > 0.2);
 
     public SendableChooser<Command> m_autoChooser = new SendableChooser<>();
 
@@ -62,6 +75,23 @@ public class RobotContainer implements Logged {
     }
 
     private void configureBindings() {
+        Map<IntakeState, Command> intakeMap = new HashMap();
+        Map<ScoreState, Command> scoreMap = new HashMap();
+
+        scoreMap.put(L4_RIGHT, m_automations.L4Command(true));
+        scoreMap.put(L4_LEFT, m_automations.L4Command(false));
+        scoreMap.put(L3_RIGHT, m_automations.L3Command(true));
+        scoreMap.put(L3_LEFT, m_automations.L3Command(false));
+        scoreMap.put(L1, m_automations.L1Command());
+        scoreMap.put(EJECT_ALGAE, m_automations.ejectAlgaeCommand());
+        scoreMap.put(NET, m_automations.netCommand());
+        scoreMap.put(null, new PrintCommand("Score Mode Not Selected!"));
+
+        intakeMap.put(IntakeState.CORAL, m_automations.manualIntakeCommand());
+        intakeMap.put(IntakeState.ALGAE, m_automations.intakeAlgaeCommand());
+        intakeMap.put(IntakeState.AUTO_CORAL, m_automations.intakeCoralCommand());
+        intakeMap.put(null, new PrintCommand("Intake Mode Not Selected!"));
+
         m_swerve.setDefaultCommand(
                 new SequentialCommandGroup(
                         m_automations.autoSwerveCommand().until(m_automations.m_autoMode.negate()),
@@ -69,50 +99,86 @@ public class RobotContainer implements Logged {
                                 () -> new Vector2D(
                                         deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
                                         deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
-                                () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * (!m_driver.L2().getAsBoolean() ? m_decelerator.get(m_driver.getRawAxis(3)) : 0.065),
+                                () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * m_decelerator.get(m_driver.getRawAxis(3)),
                                 () -> true
                         ).until(m_automations.m_autoMode)
                 )
         );
 
-        m_operator.cross().toggleOnTrue(m_superstructure.alignToCoralCommand(1).andThen(m_superstructure.scoreCoralCommand()));
+        m_operator.cross().toggleOnTrue(
+                new InstantCommand(
+                        () -> this.m_currentScoreState = L1
+                )
+        );
 
         m_operator.circle().toggleOnTrue(
-                new ConditionalCommand(
-                        m_automations.L3Command(true),
-                        m_automations.L3Command(false),
-                        () -> right
+                new InstantCommand(
+                        () -> {
+                            if (right) {
+                                this.m_currentScoreState = L3_RIGHT;
+                            } else {
+                                this.m_currentScoreState = L3_LEFT;
+                            }
+                        }
                 )
         );
 
         m_operator.triangle().toggleOnTrue(
-                new ConditionalCommand(
-                        m_automations.L4Command(true),
-                        m_automations.L4Command(false),
-                        () -> right
+                new InstantCommand(
+                        () -> {
+                            if (right) {
+                                this.m_currentScoreState = L4_RIGHT;
+                            } else {
+                                this.m_currentScoreState = L4_LEFT;
+                            }
+                        }
                 )
         );
 
-        m_operator.povLeft().onTrue(m_automations.toggleAutoMode());
+        m_operator.R1().onTrue(
+                new InstantCommand(
+                        () -> {
+                            this.right = true;
+                            if (m_currentScoreState.equals(L4_LEFT)) {
+                                m_currentScoreState = L4_RIGHT;
+                            }
+                            if (m_currentScoreState.equals(L3_LEFT)) {
+                                m_currentScoreState = L3_RIGHT;
+                            }
+                        }
+                ).ignoringDisable(true));
 
-        m_operator.R2().toggleOnTrue(m_automations.intakeCoralCommand());
-        m_driver.L2().toggleOnTrue(m_automations.intakeAlgaeCommand());
+        m_operator.L1().onTrue(
+                new InstantCommand(
+                        () -> {
+                            this.right = false;
+                            if (m_currentScoreState.equals(L4_RIGHT)) {
+                                m_currentScoreState = L4_LEFT;
+                            }
+                            if (m_currentScoreState.equals(L3_RIGHT)) {
+                                m_currentScoreState = L3_LEFT;
+                            }
+                        }).ignoringDisable(true));
 
-        m_driver.options().onTrue(m_superstructure.collapseCommand());
-        m_operator.options().onTrue(m_superstructure.collapseCommand());
+        m_operator.povUp().toggleOnTrue(new InstantCommand(() -> this.m_currentScoreState = NET));
 
-        m_driver.create().onTrue(m_automations.cancelAutomationCommand());
-        m_operator.create().onTrue(m_automations.cancelAutomationCommand());
+        m_operator.R2().onTrue(new InstantCommand(() -> m_currentIntakeState = IntakeState.AUTO_CORAL));
+        m_operator.L2().onTrue(new InstantCommand(() -> m_currentIntakeState = IntakeState.ALGAE));
+        m_operator.povDown().onTrue(new InstantCommand(() -> m_currentIntakeState = IntakeState.CORAL));
+
+        m_operator.povLeft().onTrue(new InstantCommand(() -> m_currentScoreState = EJECT_ALGAE));
 
         m_driver.R1().onTrue(m_automations.changeRightSlice());
         m_driver.L1().onTrue(m_automations.changeLeftSlice());
 
-        m_operator.R1().onTrue(new InstantCommand(() -> this.right = true).ignoringDisable(true));
-        m_operator.L1().onTrue(new InstantCommand(() -> this.right = false).ignoringDisable(true));
+        m_driver.triangle().onTrue(new MapCommand<>(scoreMap, () -> m_currentScoreState));
+        m_driver.povUp().onTrue(new MapCommand<>(intakeMap, () -> m_currentIntakeState));
 
-//        m_operator.circle().onTrue(m_superstructure.ejectAlgaeCommand());
+        m_driver.povDown().onTrue(m_automations.toggleAutoMode());
+        m_deportAutoMode.onTrue(m_automations.setAutoMode(() -> false));
 
-        m_operator.povUp().toggleOnTrue(m_automations.netCommand());
+        m_operator.options().onTrue(m_automations.collapseCommand());
+        m_operator.create().onTrue(m_automations.cancelAutomationCommand());
 
         m_operator.touchpad().whileTrue(m_superstructure.coastCommand().alongWith(m_swerve.coastCommand()).ignoringDisable(true));
     }
@@ -224,7 +290,12 @@ public class RobotContainer implements Logged {
     }
 
     @Log.NT
-    public boolean atNetPose() {
-        return m_automations.atNetPose();
+    public String getIntakeMode(){
+    return m_currentIntakeState != null ? m_currentIntakeState.name(): "null";
+    }
+
+    @Log.NT
+    public String getScoreMode(){
+        return m_currentScoreState != null? m_currentScoreState.name() : "null";
     }
 }
