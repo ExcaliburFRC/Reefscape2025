@@ -75,9 +75,9 @@ public class RobotContainer implements Logged {
                 )
         );
 
-        m_driver.povDown().toggleOnTrue(m_automations.L1Command());
+        m_operator.cross().toggleOnTrue(m_superstructure.alignToCoralCommand(1).andThen(m_superstructure.scoreCoralCommand()));
 
-        m_driver.square().toggleOnTrue(
+        m_operator.circle().toggleOnTrue(
                 new ConditionalCommand(
                         m_automations.L3Command(true),
                         m_automations.L3Command(false),
@@ -85,7 +85,7 @@ public class RobotContainer implements Logged {
                 )
         );
 
-        m_driver.triangle().toggleOnTrue(
+        m_operator.triangle().toggleOnTrue(
                 new ConditionalCommand(
                         m_automations.L4Command(true),
                         m_automations.L4Command(false),
@@ -93,14 +93,16 @@ public class RobotContainer implements Logged {
                 )
         );
 
-        m_driver.cross().toggleOnTrue(m_automations.L1Command());
+        m_operator.povLeft().onTrue(m_automations.toggleAutoMode());
 
-        m_driver.povRight().onTrue(m_automations.toggleAutoMode());
-        m_driver.povUp().toggleOnTrue(m_automations.intakeCoralCommand());
-        m_driver.R2().toggleOnTrue(m_automations.intakeAlgaeCommand());
+        m_operator.R2().toggleOnTrue(m_automations.intakeCoralCommand());
+        m_driver.L2().toggleOnTrue(m_automations.intakeAlgaeCommand());
 
         m_driver.options().onTrue(m_superstructure.collapseCommand());
+        m_operator.options().onTrue(m_superstructure.collapseCommand());
+
         m_driver.create().onTrue(m_automations.cancelAutomationCommand());
+        m_operator.create().onTrue(m_automations.cancelAutomationCommand());
 
         m_driver.R1().onTrue(m_automations.changeRightSlice());
         m_driver.L1().onTrue(m_automations.changeLeftSlice());
@@ -108,17 +110,9 @@ public class RobotContainer implements Logged {
         m_operator.R1().onTrue(new InstantCommand(() -> this.right = true).ignoringDisable(true));
         m_operator.L1().onTrue(new InstantCommand(() -> this.right = false).ignoringDisable(true));
 
-        m_operator.circle().onTrue(m_superstructure.ejectAlgaeCommand());
-        m_operator.triangle().onTrue(m_superstructure.startAutomationCommand());
-        m_operator.povDown().onTrue(m_superstructure.scoreAlgaeCommand(PROCESSOR_ID));
+//        m_operator.circle().onTrue(m_superstructure.ejectAlgaeCommand());
 
-        m_operator.povRight().toggleOnTrue(m_automations.netCommand());
-
-        m_operator.povUp().toggleOnTrue(m_superstructure.alignToAlgaeCommand(NET_ID));
-        m_operator.create().toggleOnTrue(m_superstructure.scoreAlgaeCommand());
-
-        m_operator.R2().toggleOnTrue(m_superstructure.intakeCoralCommand().andThen(new WaitUntilCommand(m_superstructure.hasCoralTrigger())).andThen(m_superstructure.collapseCommand()));
-        m_operator.square().onTrue(m_automations.cancelAutomationCommand());
+        m_operator.povUp().toggleOnTrue(m_automations.netCommand());
 
         m_operator.touchpad().whileTrue(m_superstructure.coastCommand().alongWith(m_swerve.coastCommand()).ignoringDisable(true));
     }
