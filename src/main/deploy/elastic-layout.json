@@ -8,11 +8,76 @@
         "layouts": [],
         "containers": [
           {
-            "title": "Field",
-            "x": 1536.0,
+            "title": "Swerve Drive",
+            "x": 384.0,
             "y": 0.0,
             "width": 384.0,
-            "height": 896.0,
+            "height": 384.0,
+            "type": "SwerveDrive",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve Drive",
+              "period": 0.06,
+              "show_robot_rotation": true,
+              "rotation_unit": "Radians"
+            }
+          },
+          {
+            "title": "FMSInfo",
+            "x": 768.0,
+            "y": 768.0,
+            "width": 640.0,
+            "height": 256.0,
+            "type": "FMSInfo",
+            "properties": {
+              "topic": "/FMSInfo",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "swerve velocity",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/Robot/m_swerve/m_MODULES/swerve velocity",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -140.0,
+              "end_angle": 140.0,
+              "min_value": 0.0,
+              "max_value": 5.0,
+              "number_of_labels": 10,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
+            }
+          },
+          {
+            "title": "Voltage",
+            "x": 0.0,
+            "y": 768.0,
+            "width": 768.0,
+            "height": 256.0,
+            "type": "Voltage View",
+            "properties": {
+              "topic": "/SmartDashboard/PDH/Voltage",
+              "period": 0.06,
+              "data_type": "double",
+              "min_value": 8.0,
+              "max_value": 14.0,
+              "divisions": 5,
+              "inverted": false,
+              "orientation": "horizontal"
+            }
+          },
+          {
+            "title": "Field",
+            "x": 1664.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 768.0,
             "type": "Field",
             "properties": {
               "topic": "/SmartDashboard/Field",
@@ -23,227 +88,66 @@
               "show_other_objects": true,
               "show_trajectories": true,
               "field_rotation": -90.0,
-              "robot_color": 4294901760,
+              "robot_color": 4278264421,
               "trajectory_color": 4294967295
             }
           },
           {
-            "title": "hasCoral",
-            "x": 384.0,
-            "y": 512.0,
+            "title": "Alliance",
+            "x": 1152.0,
+            "y": 768.0,
             "width": 256.0,
             "height": 256.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/m_superstructure/m_coralSystem/hasCoral",
+              "topic": "/FMSInfo/IsRedAlliance",
               "period": 0.06,
               "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
+              "true_color": 4294198070,
+              "false_color": 4278264421,
               "true_icon": "None",
               "false_icon": "None"
             }
           },
           {
-            "title": "hasAlgae",
-            "x": 640.0,
-            "y": 512.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Robot/m_superstructure/m_algaeSystem/hasAlgae",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "match time",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 384.0,
-            "height": 384.0,
-            "type": "Match Time",
-            "properties": {
-              "topic": "/SmartDashboard/match time",
-              "period": 0.06,
-              "data_type": "double",
-              "time_display_mode": "Minutes and Seconds",
-              "red_start_time": 15,
-              "yellow_start_time": 30
-            }
-          },
-          {
-            "title": "getReefSlice",
-            "x": 0.0,
-            "y": 384.0,
-            "width": 384.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/Robot/getReefSlice",
-              "period": 0.06,
-              "data_type": "string"
-            }
-          },
-          {
-            "title": "getRightBranch",
+            "title": "USB Camera 0",
             "x": 768.0,
             "y": 0.0,
-            "width": 128.0,
-            "height": 384.0,
-            "type": "Boolean Box",
+            "width": 768.0,
+            "height": 768.0,
+            "type": "Camera Stream",
             "properties": {
-              "topic": "/Robot/getRightBranch",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
+              "topic": "/CameraPublisher/USB Camera 0",
+              "period": 0.06
             }
           },
           {
-            "title": "getLeftBranch",
-            "x": 640.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 384.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Robot/getLeftBranch",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "getCurrentRobotNamedSate",
+            "title": "Elevator Height",
             "x": 0.0,
-            "y": 512.0,
-            "width": 384.0,
-            "height": 256.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/Robot/m_superstructure/getCurrentRobotNamedSate",
-              "period": 0.06,
-              "data_type": "string"
-            }
-          },
-          {
-            "title": "getTragetSlice",
-            "x": 384.0,
             "y": 384.0,
-            "width": 512.0,
-            "height": 128.0,
-            "type": "Large Text Display",
+            "width": 256.0,
+            "height": 384.0,
+            "type": "Number Bar",
             "properties": {
-              "topic": "/Robot/getTragetSlice",
+              "topic": "/Shuffleboard/Superstructure/Elevator Height",
               "period": 0.06,
-              "data_type": "string"
+              "data_type": "double",
+              "min_value": 0.0,
+              "max_value": 1.0,
+              "divisions": 10,
+              "inverted": false,
+              "orientation": "vertical"
             }
           },
           {
-            "title": "atAutoMode",
-            "x": 896.0,
-            "y": 512.0,
+            "title": "hasCoral",
+            "x": 256.0,
+            "y": 384.0,
             "width": 640.0,
-            "height": 128.0,
+            "height": 384.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/atAutoMode",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "orangepi_Port_1182_Output_MJPEG_Server",
-            "x": 1280.0,
-            "y": 640.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Camera Stream",
-            "properties": {
-              "topic": "/CameraPublisher/orangepi_Port_1182_Output_MJPEG_Server",
-              "period": 0.06,
-              "rotation_turns": 0,
-              "compression": 39,
-              "fps": 30,
-              "resolution": [
-                800.0,
-                600.0
-              ]
-            }
-          },
-          {
-            "title": "autoChooser",
-            "x": 896.0,
-            "y": 640.0,
-            "width": 384.0,
-            "height": 128.0,
-            "type": "ComboBox Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/autoChooser",
-              "period": 0.06,
-              "sort_options": false
-            }
-          },
-          {
-            "title": "orangepi_Port_1184_Output_MJPEG_Server",
-            "x": 896.0,
-            "y": 0.0,
-            "width": 640.0,
-            "height": 512.0,
-            "type": "Camera Stream",
-            "properties": {
-              "topic": "/CameraPublisher/orangepi_Port_1184_Output_MJPEG_Server",
-              "period": 0.06,
-              "rotation_turns": 0,
-              "compression": 29,
-              "fps": 30,
-              "resolution": [
-                800.0,
-                600.0
-              ]
-            }
-          },
-          {
-            "title": "getTagTimer",
-            "x": 384.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Robot/m_swerve/m_frontCamera/getTagTimer",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "atNetPose",
-            "x": 384.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Robot/atNetPose",
+              "topic": "/Robot/m_superstructure/m_gripper/hasCoral",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -264,7 +168,7 @@
             "title": "Field",
             "x": 256.0,
             "y": 0.0,
-            "width": 1536.0,
+            "width": 1664.0,
             "height": 640.0,
             "type": "Field",
             "properties": {
@@ -278,6 +182,19 @@
               "field_rotation": 0.0,
               "robot_color": 4278264421,
               "trajectory_color": 4292128567
+            }
+          },
+          {
+            "title": "Auto Chooser",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Chooser",
+              "period": 0.06,
+              "sort_options": true
             }
           }
         ]
@@ -328,7 +245,7 @@
           {
             "title": "Odometry Setter",
             "x": 0.0,
-            "y": 384.0,
+            "y": 256.0,
             "width": 256.0,
             "height": 384.0,
             "type": "List Layout",
@@ -400,7 +317,7 @@
             "x": 0.0,
             "y": 0.0,
             "width": 384.0,
-            "height": 384.0,
+            "height": 256.0,
             "type": "Radial Gauge",
             "properties": {
               "topic": "/Robot/m_swerve/m_MODULES/swerve velocity",
@@ -455,7 +372,7 @@
             "x": 1152.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 128.0,
+            "height": 256.0,
             "type": "Subsystem",
             "properties": {
               "topic": "/SmartDashboard/swerve info",
@@ -475,7 +392,7 @@
             "x": 768.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 512.0,
+            "height": 640.0,
             "type": "Number Bar",
             "properties": {
               "topic": "/Shuffleboard/Superstructure/Elevator Height",
@@ -493,7 +410,7 @@
             "x": 1024.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 128.0,
+            "height": 256.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/Shuffleboard/Superstructure/Elevator At Setpoint",
@@ -508,9 +425,9 @@
           {
             "title": "Elevator Setpoint",
             "x": 1024.0,
-            "y": 128.0,
+            "y": 256.0,
             "width": 256.0,
-            "height": 128.0,
+            "height": 256.0,
             "type": "Text Display",
             "properties": {
               "topic": "/Shuffleboard/Superstructure/Elevator Setpoint",
@@ -524,7 +441,7 @@
             "x": 1024.0,
             "y": 256.0,
             "width": 256.0,
-            "height": 128.0,
+            "height": 256.0,
             "type": "Subsystem",
             "properties": {
               "topic": "/SmartDashboard/Elevator",
@@ -533,10 +450,10 @@
           },
           {
             "title": "Gripper",
-            "x": 512.0,
+            "x": 640.0,
             "y": 384.0,
             "width": 256.0,
-            "height": 128.0,
+            "height": 256.0,
             "type": "Subsystem",
             "properties": {
               "topic": "/SmartDashboard/Gripper",
@@ -547,7 +464,7 @@
             "title": "Arm Angle",
             "x": 0.0,
             "y": 0.0,
-            "width": 512.0,
+            "width": 640.0,
             "height": 384.0,
             "type": "Graph",
             "properties": {
@@ -561,10 +478,10 @@
           },
           {
             "title": "Arm At Setpoint",
-            "x": 512.0,
+            "x": 640.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 128.0,
+            "height": 256.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/Shuffleboard/Superstructure/Arm At Setpoint",
@@ -578,10 +495,10 @@
           },
           {
             "title": "Arm Setpoint",
-            "x": 512.0,
-            "y": 128.0,
+            "x": 640.0,
+            "y": 256.0,
             "width": 256.0,
-            "height": 128.0,
+            "height": 256.0,
             "type": "Text Display",
             "properties": {
               "topic": "/Shuffleboard/Superstructure/Arm Setpoint",
@@ -592,10 +509,10 @@
           },
           {
             "title": "Arm",
-            "x": 512.0,
+            "x": 640.0,
             "y": 256.0,
             "width": 256.0,
-            "height": 128.0,
+            "height": 256.0,
             "type": "Subsystem",
             "properties": {
               "topic": "/SmartDashboard/Arm",
@@ -626,8 +543,8 @@
             "title": "Voltage",
             "x": 384.0,
             "y": 0.0,
-            "width": 896.0,
-            "height": 128.0,
+            "width": 768.0,
+            "height": 256.0,
             "type": "Voltage View",
             "properties": {
               "topic": "/SmartDashboard/PDH/Voltage",
@@ -643,8 +560,8 @@
           {
             "title": "TotalCurrent",
             "x": 384.0,
-            "y": 128.0,
-            "width": 896.0,
+            "y": 256.0,
+            "width": 768.0,
             "height": 640.0,
             "type": "Graph",
             "properties": {
@@ -660,7 +577,7 @@
           },
           {
             "title": "Command Scheduler",
-            "x": 1280.0,
+            "x": 1152.0,
             "y": 0.0,
             "width": 384.0,
             "height": 384.0,
@@ -674,10 +591,311 @@
       }
     },
     {
-      "name": "Competition",
+      "name": "Operator",
       "grid_layout": {
         "layouts": [],
-        "containers": []
+        "containers": [
+          {
+            "title": "L4 Right",
+            "x": 896.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/L4 Right",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "L4 Left",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/L4 Left",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "L3 Right",
+            "x": 896.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/L3 Right",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "L3 Left",
+            "x": 640.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/L3 Left",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "Net",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Net",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "Eject",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Eject",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "L1",
+            "x": 768.0,
+            "y": 384.0,
+            "width": 512.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/L1",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "L3Right",
+            "x": 1152.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/L3Right",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "L4Left",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/L4Left",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "L4Right",
+            "x": 1152.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/L4Right",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "L3Left",
+            "x": 512.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/L3Left",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Net",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/Net",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Eject",
+            "x": 384.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/Eject",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "L1",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 512.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/L1",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "Manual Coral",
+            "x": 512.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Manual Coral",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "Algae",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Algae",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "Auto Coral",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Coral",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "Coral",
+            "x": 384.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/Coral",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Alage",
+            "x": 384.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/Alage",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "ManualCoral",
+            "x": 512.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/ManualCoral",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          }
+        ]
       }
     }
   ]
