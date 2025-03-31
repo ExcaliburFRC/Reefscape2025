@@ -296,6 +296,10 @@ public class Superstructure implements Logged {
         return scheduleExclusiveCommand(scheduleExclusiveStateCommand(State.AUTOMATION_DEFAULT));
     }
 
+    public Command forceShootCoral() {
+        return scheduleExclusiveCommand(m_coralSystem.manualCommand(3).withTimeout(1.5));
+    }
+
     @Log.NT
     public State getState() {
         return m_currentState;

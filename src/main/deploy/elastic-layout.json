@@ -894,6 +894,45 @@
               "true_icon": "None",
               "false_icon": "None"
             }
+          },
+          {
+            "title": "Collapse Command",
+            "x": 0.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Collapse Command",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Cancel Automation",
+            "x": 384.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Cancel Automation",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "autoChooser",
+            "x": 896.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/autoChooser",
+              "period": 0.06,
+              "sort_options": false
+            }
           }
         ]
       }

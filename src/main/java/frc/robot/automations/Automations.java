@@ -125,7 +125,9 @@ public class Automations {
                                 ),
                                 scoreCoralCommand(),
                                 new WaitCommand(0.3),
-                                m_swerve.driveCommand(() -> new Vector2D(2, 0), () -> 0, () -> false).withTimeout(0.2)),
+                                m_swerve.driveCommand(() -> new Vector2D(2, 0), () -> 0, () -> false).withTimeout(0.2),
+                                m_superstructure.collapseCommand()
+                        ),
                         m_superstructure.hasCoralTrigger().negate().or(
                                 m_autoMode.negate()).or(
                                 m_atTargetSlicePose.negate())
@@ -355,7 +357,11 @@ public class Automations {
     }
 
     public Command ejectAlgaeCommand() {
-        return m_superstructure.ejectAlgaeCommand();
+        return scheduleExclusiveCommand(m_superstructure.ejectAlgaeCommand());
+    }
+
+    public Command forceShootCoral() {
+        return scheduleExclusiveCommand(m_superstructure.forceShootCoral());
     }
 }
 

@@ -109,7 +109,6 @@ public class RobotContainer implements Logged {
         m_deportAutoMode.onTrue(m_automations.setAutoMode(() -> false));
 
         m_driver.options().onTrue(m_automations.collapseCommand());
-//        m_operator.create().onTrue(m_automations.cancelAutomationCommand());
 
         m_driver.touchpad().whileTrue(m_superstructure.coastCommand().alongWith(m_swerve.coastCommand()).ignoringDisable(true));
     }
@@ -159,13 +158,18 @@ public class RobotContainer implements Logged {
 
         SmartDashboard.putData("L3 Right", new InstantCommand(() -> m_currentScoreState = L3_RIGHT).alongWith(vibrateControllerCommand(10,0.25)));
         SmartDashboard.putData("L3 Left", new InstantCommand(() -> m_currentScoreState = L3_LEFT).alongWith(vibrateControllerCommand(10,0.25)));
-        SmartDashboard.putData("L1", new InstantCommand(() -> m_currentScoreState = L1).alongWith(vibrateControllerCommand(10,0.25)));
-        SmartDashboard.putData("Net", new InstantCommand(() -> m_currentScoreState = NET).alongWith(vibrateControllerCommand(10,0.25)));
-        SmartDashboard.putData("Eject", new InstantCommand(() -> m_currentScoreState = EJECT_ALGAE).alongWith(vibrateControllerCommand(10,0.25).andThen(m_automations.ejectAlgaeCommand())));
+        SmartDashboard.putData("            L1          ", new InstantCommand(() -> m_currentScoreState = L1).alongWith(vibrateControllerCommand(10,0.25)));
+        SmartDashboard.putData("            Net         ", new InstantCommand(() -> m_currentScoreState = NET).alongWith(vibrateControllerCommand(10,0.25)));
+        SmartDashboard.putData("            Eject           ", new InstantCommand(() -> m_currentScoreState = EJECT_ALGAE).alongWith(vibrateControllerCommand(10,0.25).andThen(m_automations.ejectAlgaeCommand())));
 
         SmartDashboard.putData("Auto Coral", new InstantCommand(() -> m_currentIntakeState = AUTO_CORAL).alongWith(vibrateControllerCommand(10,0.25)));
         SmartDashboard.putData("Manual Coral", new InstantCommand(() -> m_currentIntakeState = CORAL).alongWith(vibrateControllerCommand(10,0.25)));
-        SmartDashboard.putData("Algae", new InstantCommand(() -> m_currentIntakeState = ALGAE).alongWith(vibrateControllerCommand(10,0.25)));
+        SmartDashboard.putData("             Algae           ", new InstantCommand(() -> m_currentIntakeState = ALGAE).alongWith(vibrateControllerCommand(10,0.25)));
+
+        SmartDashboard.putData("Collapse Command", m_automations.collapseCommand());
+        SmartDashboard.putData("Cancel Automation", m_automations.cancelAutomationCommand());
+
+        SmartDashboard.putData("Force Shoot Coral", m_automations.forceShootCoral());
     }
 
     public Command getAutonomousCommand() {
