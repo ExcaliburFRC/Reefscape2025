@@ -105,8 +105,8 @@ public class Swerve extends SubsystemBase implements Logged {
         m_backCamera = new PhotonAprilTagsCamera("Back", k2025Reefscape, new Transform3d(-0.1455338456, 0.2979238, 0.94232478177, new Rotation3d(0, Math.toRadians(-48), Math.toRadians(180))));
 
         m_swerveDriveKinematics = m_MODULES.getSwerveDriveKinematics();
-        velocityLimit.put(0.1, 0.3);
-        velocityLimit.put(0.7, 1.5);
+        velocityLimit.put(0.1, 0.4);
+        velocityLimit.put(0.7, 2.0);
         velocityLimit.put(1.5, MAX_VEL);
 
         initAutoBuilder();
@@ -529,5 +529,10 @@ public class Swerve extends SubsystemBase implements Logged {
         m_MODULES.periodic();
 //        updateOdometry();
         m_field.setRobotPose(getPose2D());
+    }
+
+    @Log.NT
+    public boolean seenTag() {
+        return m_frontCamera.getTagTimer() || m_backCamera.getTagTimer();
     }
 }

@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class Constants {
     //INTAKE Constants
-    public static final double INTAKE_ELEVATOR_HEIGHT = 0.23;
+    public static final double INTAKE_ELEVATOR_HEIGHT = 0.24;
     public static final double INTAKE_ARM_ANGLE = -1.77+0.05;
     public static final double INTAKE_CORAL_WHEELS_VOLTAGE = -3;
     public static final double INTAKE_ALGAE_WHEELS_VOLTAGE = 3;

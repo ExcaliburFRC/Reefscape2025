@@ -297,7 +297,7 @@ public class Superstructure implements Logged {
     }
 
     public Command forceShootCoral() {
-        return scheduleExclusiveCommand(m_coralSystem.manualCommand(3).withTimeout(1.5));
+        return scheduleExclusiveCommand(m_coralSystem.manualCommand(3).withTimeout(0.5));
     }
 
     @Log.NT

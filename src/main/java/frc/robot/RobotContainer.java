@@ -264,4 +264,9 @@ public class RobotContainer implements Logged {
     public boolean ManualCoral() {
         return CORAL.equals(this.m_currentIntakeState);
     }
+
+    @Log.NT
+    public boolean getTagTimer() {
+        return m_swerve.seenTag();
+    }
 }
