@@ -10,6 +10,7 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -33,6 +34,7 @@ import monologue.Logged;
 import java.util.HashMap;
 import java.util.Map;
 
+import static edu.wpi.first.wpilibj.GenericHID.RumbleType.kBothRumble;
 import static frc.robot.Constants.*;
 import static frc.robot.Constants.SwerveConstants.*;
 import static frc.robot.automations.Constants.FieldConstants.getReefCenter;
@@ -49,6 +51,8 @@ public class RobotContainer implements Logged {
     private final LEDs leds = LEDs.getInstance();
     private ScoreState m_currentScoreState = null;
     private IntakeState m_currentIntakeState = null;
+    private final XboxController driverVibration = new XboxController(5);
+
 
     public final Runnable m_odometryUpdater = m_swerve::updateOdometry;
 
@@ -93,7 +97,6 @@ public class RobotContainer implements Logged {
         intakeMap.put(null, new PrintCommand("Intake Mode Not Selected!"));
 
         m_swerve.setDefaultCommand(new SequentialCommandGroup(m_automations.autoSwerveCommand().until(m_automations.m_autoMode.negate()), m_swerve.driveCommand(() -> new Vector2D(deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)), deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))), () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * m_decelerator.get(m_driver.getRawAxis(3)), () -> true).until(m_automations.m_autoMode)));
-
 
 
         m_driver.circle().onTrue(m_automations.changeRightSlice());
@@ -151,22 +154,29 @@ public class RobotContainer implements Logged {
 
         swerveTab.add("Angle Chooser", angleChooser);
 
-        SmartDashboard.putData("L4 Right", new InstantCommand(() -> m_currentScoreState = L4_RIGHT));
-        SmartDashboard.putData("L4 Left", new InstantCommand(() -> m_currentScoreState = L4_LEFT));
+        SmartDashboard.putData("L4 Right", new InstantCommand(() -> m_currentScoreState = L4_RIGHT).alongWith(vibrateControllerCommand(10,0.25)));
+        SmartDashboard.putData("L4 Left", new InstantCommand(() -> m_currentScoreState = L4_LEFT).alongWith(vibrateControllerCommand(10,0.25)));
 
-        SmartDashboard.putData("L3 Right", new InstantCommand(() -> m_currentScoreState = L3_RIGHT));
-        SmartDashboard.putData("L3 Left", new InstantCommand(() -> m_currentScoreState = L3_LEFT));
-        SmartDashboard.putData("L1", new InstantCommand(() -> m_currentScoreState = L1));
-        SmartDashboard.putData("Net", new InstantCommand(() -> m_currentScoreState = NET));
-        SmartDashboard.putData("Eject", new InstantCommand(() -> m_currentScoreState = EJECT_ALGAE).andThen(m_automations.ejectAlgaeCommand()));
+        SmartDashboard.putData("L3 Right", new InstantCommand(() -> m_currentScoreState = L3_RIGHT).alongWith(vibrateControllerCommand(10,0.25)));
+        SmartDashboard.putData("L3 Left", new InstantCommand(() -> m_currentScoreState = L3_LEFT).alongWith(vibrateControllerCommand(10,0.25)));
+        SmartDashboard.putData("L1", new InstantCommand(() -> m_currentScoreState = L1).alongWith(vibrateControllerCommand(10,0.25)));
+        SmartDashboard.putData("Net", new InstantCommand(() -> m_currentScoreState = NET).alongWith(vibrateControllerCommand(10,0.25)));
+        SmartDashboard.putData("Eject", new InstantCommand(() -> m_currentScoreState = EJECT_ALGAE).alongWith(vibrateControllerCommand(10,0.25).andThen(m_automations.ejectAlgaeCommand())));
 
-        SmartDashboard.putData("Auto Coral", new InstantCommand(() -> m_currentIntakeState = AUTO_CORAL));
-        SmartDashboard.putData("Manual Coral", new InstantCommand(() -> m_currentIntakeState = CORAL));
-        SmartDashboard.putData("Algae", new InstantCommand(() -> m_currentIntakeState = ALGAE));
+        SmartDashboard.putData("Auto Coral", new InstantCommand(() -> m_currentIntakeState = AUTO_CORAL).alongWith(vibrateControllerCommand(10,0.25)));
+        SmartDashboard.putData("Manual Coral", new InstantCommand(() -> m_currentIntakeState = CORAL).alongWith(vibrateControllerCommand(10,0.25)));
+        SmartDashboard.putData("Algae", new InstantCommand(() -> m_currentIntakeState = ALGAE).alongWith(vibrateControllerCommand(10,0.25)));
     }
 
     public Command getAutonomousCommand() {
         return m_autoChooser.getSelected();
+    }
+
+    private Command vibrateControllerCommand(int intensity, double seconds) {
+        return Commands.runEnd(
+                        () -> driverVibration.setRumble(kBothRumble, intensity / 100.0),
+                        () -> driverVibration.setRumble(kBothRumble, 0))
+                .withTimeout(seconds).ignoringDisable(true);
     }
 
     @Log.NT
