@@ -112,7 +112,7 @@ public class Automations {
     public Command L1Command() {
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
-                        new PrintCommand("doesn't have coral, cant score one").andThen(setAutoMode(() -> true)),
+                        new PrintCommand("doesn't have coral, cant score one"),
                         new SequentialCommandGroup(
                                 m_leds.setPattern(LEDs.LEDPattern.TRAIN_CIRCLE, PURPLE.color, WHITE.color).withDeadline(
                                         new SequentialCommandGroup(
@@ -125,12 +125,10 @@ public class Automations {
                                 ),
                                 scoreCoralCommand(),
                                 new WaitCommand(0.3),
-                                m_swerve.driveCommand(() -> new Vector2D(2, 0), () -> 0, () -> false).withTimeout(0.2),
+//                                m_swerve.driveCommand(() -> new Vector2D(2, 0), () -> 0, () -> false).withTimeout(0.2),
                                 m_superstructure.collapseCommand()
                         ),
-                        m_superstructure.hasCoralTrigger().negate().or(
-                                m_autoMode.negate()).or(
-                                m_atTargetSlicePose.negate())
+                        m_superstructure.hasCoralTrigger().negate()
                 )
         );
     }

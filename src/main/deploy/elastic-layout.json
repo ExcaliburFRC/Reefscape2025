@@ -118,7 +118,8 @@
             "type": "Camera Stream",
             "properties": {
               "topic": "/CameraPublisher/USB Camera 0",
-              "period": 0.06
+              "period": 0.06,
+              "rotation_turns": 0
             }
           },
           {
@@ -648,32 +649,6 @@
             }
           },
           {
-            "title": "Net",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 384.0,
-            "height": 128.0,
-            "type": "Command",
-            "properties": {
-              "topic": "/SmartDashboard/Net",
-              "period": 0.06,
-              "show_type": false
-            }
-          },
-          {
-            "title": "Eject",
-            "x": 0.0,
-            "y": 128.0,
-            "width": 384.0,
-            "height": 128.0,
-            "type": "Command",
-            "properties": {
-              "topic": "/SmartDashboard/Eject",
-              "period": 0.06,
-              "show_type": false
-            }
-          },
-          {
             "title": "L1",
             "x": 768.0,
             "y": 384.0,
@@ -793,19 +768,6 @@
             }
           },
           {
-            "title": "L1",
-            "x": 768.0,
-            "y": 256.0,
-            "width": 512.0,
-            "height": 128.0,
-            "type": "Command",
-            "properties": {
-              "topic": "/SmartDashboard/L1",
-              "period": 0.06,
-              "show_type": false
-            }
-          },
-          {
             "title": "Manual Coral",
             "x": 512.0,
             "y": 256.0,
@@ -819,23 +781,10 @@
             }
           },
           {
-            "title": "Algae",
-            "x": 0.0,
-            "y": 384.0,
-            "width": 384.0,
-            "height": 128.0,
-            "type": "Command",
-            "properties": {
-              "topic": "/SmartDashboard/Algae",
-              "period": 0.06,
-              "show_type": false
-            }
-          },
-          {
             "title": "Auto Coral",
-            "x": 0.0,
+            "x": 128.0,
             "y": 256.0,
-            "width": 384.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Command",
             "properties": {
@@ -899,18 +848,18 @@
             "title": "Collapse Command",
             "x": 0.0,
             "y": 512.0,
-            "width": 384.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Command",
             "properties": {
               "topic": "/SmartDashboard/Collapse Command",
               "period": 0.06,
-              "show_type": true
+              "show_type": false
             }
           },
           {
             "title": "Cancel Automation",
-            "x": 384.0,
+            "x": 256.0,
             "y": 512.0,
             "width": 384.0,
             "height": 128.0,
@@ -918,7 +867,7 @@
             "properties": {
               "topic": "/SmartDashboard/Cancel Automation",
               "period": 0.06,
-              "show_type": true
+              "show_type": false
             }
           },
           {
@@ -932,6 +881,88 @@
               "topic": "/SmartDashboard/autoChooser",
               "period": 0.06,
               "sort_options": false
+            }
+          },
+          {
+            "title": "             Algae           ",
+            "x": 128.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/             Algae           ",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "            Net         ",
+            "x": 128.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/            Net         ",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "            L1          ",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 512.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/            L1          ",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "            Eject           ",
+            "x": 128.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/            Eject           ",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "getTagTimer",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 512.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Robot/getTagTimer",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Force Shoot Coral",
+            "x": 640.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Force Shoot Coral",
+              "period": 0.06,
+              "show_type": false
             }
           }
         ]
