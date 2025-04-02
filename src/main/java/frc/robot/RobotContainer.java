@@ -61,8 +61,8 @@ public class RobotContainer implements Logged {
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
     private final Automations m_automations;
 
-    private final Trigger m_deportAutoMode = new Trigger(() -> Math.sqrt(Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > 0.1
-    );
+    private final Trigger m_deportAutoMode = new Trigger(() -> Math.sqrt(Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > 0.1);
+    private final Trigger m_deportIntakeMode = new Trigger(() -> Math.sqrt(Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > 0.3);
 
     public SendableChooser<Command> m_autoChooser = new SendableChooser<>();
 
@@ -93,7 +93,7 @@ public class RobotContainer implements Logged {
 
         intakeMap.put(CORAL, m_automations.manualIntakeCommand());
         intakeMap.put(ALGAE, m_automations.intakeAlgaeCommand());
-        intakeMap.put(AUTO_CORAL, m_automations.intakeCoralCommand().until(m_deportAutoMode.debounce(0.5)).andThen(m_automations.manualIntakeCommand()));
+        intakeMap.put(AUTO_CORAL, m_automations.intakeCoralCommand().until(m_deportIntakeMode.debounce(0.5)).andThen(m_automations.manualIntakeCommand()));
         intakeMap.put(null, new PrintCommand("Intake Mode Not Selected!"));
 
         m_swerve.setDefaultCommand(new SequentialCommandGroup(m_automations.autoSwerveCommand().until(m_automations.m_autoMode.negate()), m_swerve.driveCommand(() -> new Vector2D(deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)), deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))), () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * m_decelerator.get(m_driver.getRawAxis(3)), () -> true).until(m_automations.m_autoMode)));
