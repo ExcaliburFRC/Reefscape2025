@@ -109,7 +109,7 @@ public class Automations {
         );
     }
 
-    public Command L1Command() {
+    public Command L1Command(Trigger overrideTrigger) {
         return scheduleExclusiveCommand(
                 new ConditionalCommand(
                         new PrintCommand("doesn't have coral, cant score one"),
@@ -129,7 +129,7 @@ public class Automations {
                                 m_superstructure.collapseCommand()
                         ),
                         m_superstructure.hasCoralTrigger().negate()
-                )
+                ).until(overrideTrigger)
         );
     }
 

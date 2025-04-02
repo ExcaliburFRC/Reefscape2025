@@ -86,14 +86,14 @@ public class RobotContainer implements Logged {
         scoreMap.put(L4_LEFT, m_automations.L4Command(false));
         scoreMap.put(L3_RIGHT, m_automations.L3Command(true));
         scoreMap.put(L3_LEFT, m_automations.L3Command(false));
-        scoreMap.put(L1, m_automations.L1Command());
+        scoreMap.put(L1, m_automations.L1Command(m_deportAutoMode.debounce(0.5)));
         scoreMap.put(EJECT_ALGAE, m_automations.ejectAlgaeCommand());
         scoreMap.put(NET, m_automations.netCommand());
         scoreMap.put(null, new PrintCommand("Score Mode Not Selected!"));
 
         intakeMap.put(CORAL, m_automations.manualIntakeCommand());
         intakeMap.put(ALGAE, m_automations.intakeAlgaeCommand());
-        intakeMap.put(AUTO_CORAL, m_automations.intakeCoralCommand());
+        intakeMap.put(AUTO_CORAL, m_automations.intakeCoralCommand().until(m_deportAutoMode.debounce(0.5)).andThen(m_automations.manualIntakeCommand()));
         intakeMap.put(null, new PrintCommand("Intake Mode Not Selected!"));
 
         m_swerve.setDefaultCommand(new SequentialCommandGroup(m_automations.autoSwerveCommand().until(m_automations.m_autoMode.negate()), m_swerve.driveCommand(() -> new Vector2D(deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)), deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))), () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * m_decelerator.get(m_driver.getRawAxis(3)), () -> true).until(m_automations.m_autoMode)));
