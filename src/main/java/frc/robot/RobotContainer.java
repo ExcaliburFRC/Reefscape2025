@@ -57,12 +57,12 @@ public class RobotContainer implements Logged {
     public final Runnable m_odometryUpdater = m_swerve::updateOdometry;
 
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
-//    private final CommandPS5Controller m_operator = new CommandPS5Controller(1);
+    //    private final CommandPS5Controller m_operator = new CommandPS5Controller(1);
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
     private final Automations m_automations;
 
-    private final Trigger m_deportAutoMode = new Trigger(() -> Math.sqrt(Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > 0.1);
-    private final Trigger m_deportIntakeMode = new Trigger(() -> Math.sqrt(Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > 0.3);
+    private final Trigger m_deportAutoMode = new Trigger(() -> Math.sqrt(Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > 0.5);
+    private final Trigger m_deportIntakeMode = new Trigger(() -> Math.sqrt(Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > 0.5);
 
     public SendableChooser<Command> m_autoChooser = new SendableChooser<>();
 
@@ -153,18 +153,18 @@ public class RobotContainer implements Logged {
 
         swerveTab.add("Angle Chooser", angleChooser);
 
-        SmartDashboard.putData("L4 Right", new InstantCommand(() -> m_currentScoreState = L4_RIGHT).alongWith(vibrateControllerCommand(10,0.25)));
-        SmartDashboard.putData("L4 Left", new InstantCommand(() -> m_currentScoreState = L4_LEFT).alongWith(vibrateControllerCommand(10,0.25)));
+        SmartDashboard.putData("L4 Right", new InstantCommand(() -> m_currentScoreState = L4_RIGHT).alongWith(vibrateControllerCommand(10, 0.25)));
+        SmartDashboard.putData("L4 Left", new InstantCommand(() -> m_currentScoreState = L4_LEFT).alongWith(vibrateControllerCommand(10, 0.25)));
 
-        SmartDashboard.putData("L3 Right", new InstantCommand(() -> m_currentScoreState = L3_RIGHT).alongWith(vibrateControllerCommand(10,0.25)));
-        SmartDashboard.putData("L3 Left", new InstantCommand(() -> m_currentScoreState = L3_LEFT).alongWith(vibrateControllerCommand(10,0.25)));
-        SmartDashboard.putData("            L1          ", new InstantCommand(() -> m_currentScoreState = L1).alongWith(vibrateControllerCommand(10,0.25)));
-        SmartDashboard.putData("            Net         ", new InstantCommand(() -> m_currentScoreState = NET).alongWith(vibrateControllerCommand(10,0.25)));
-        SmartDashboard.putData("            Eject           ", new InstantCommand(() -> m_currentScoreState = EJECT_ALGAE).alongWith(vibrateControllerCommand(10,0.25).andThen(m_automations.ejectAlgaeCommand())));
+        SmartDashboard.putData("L3 Right", new InstantCommand(() -> m_currentScoreState = L3_RIGHT).alongWith(vibrateControllerCommand(10, 0.25)));
+        SmartDashboard.putData("L3 Left", new InstantCommand(() -> m_currentScoreState = L3_LEFT).alongWith(vibrateControllerCommand(10, 0.25)));
+        SmartDashboard.putData("            L1          ", new InstantCommand(() -> m_currentScoreState = L1).alongWith(vibrateControllerCommand(10, 0.25)));
+        SmartDashboard.putData("            Net         ", new InstantCommand(() -> m_currentScoreState = NET).alongWith(vibrateControllerCommand(10, 0.25)));
+        SmartDashboard.putData("            Eject           ", new InstantCommand(() -> m_currentScoreState = EJECT_ALGAE).alongWith(vibrateControllerCommand(10, 0.25).andThen(m_automations.ejectAlgaeCommand())));
 
-        SmartDashboard.putData("Auto Coral", new InstantCommand(() -> m_currentIntakeState = AUTO_CORAL).alongWith(vibrateControllerCommand(10,0.25)));
-        SmartDashboard.putData("Manual Coral", new InstantCommand(() -> m_currentIntakeState = CORAL).alongWith(vibrateControllerCommand(10,0.25)));
-        SmartDashboard.putData("             Algae           ", new InstantCommand(() -> m_currentIntakeState = ALGAE).alongWith(vibrateControllerCommand(10,0.25)));
+        SmartDashboard.putData("Auto Coral", new InstantCommand(() -> m_currentIntakeState = AUTO_CORAL).alongWith(vibrateControllerCommand(10, 0.25)));
+        SmartDashboard.putData("Manual Coral", new InstantCommand(() -> m_currentIntakeState = CORAL).alongWith(vibrateControllerCommand(10, 0.25)));
+        SmartDashboard.putData("             Algae           ", new InstantCommand(() -> m_currentIntakeState = ALGAE).alongWith(vibrateControllerCommand(10, 0.25)));
 
         SmartDashboard.putData("Collapse Command", m_automations.collapseCommand());
         SmartDashboard.putData("Cancel Automation", m_automations.cancelAutomationCommand());

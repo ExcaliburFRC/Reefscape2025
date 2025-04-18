@@ -150,7 +150,7 @@ public class Automations {
                                                 )
                                         )
                                 ),
-                                new WaitCommand(0.25),
+                                new WaitCommand(0.6),
                                 scoreCoralCommand(),
                                 resetSuperstructureCommand().alongWith(
                                         m_swerve.pidToPoseCommand(

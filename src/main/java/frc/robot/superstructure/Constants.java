@@ -55,7 +55,7 @@ public class Constants {
     // L3 Constants
     public static final double L3_ELEVATOR_HEIGHT = 0.0794 + 0.11;
     public static final double L3_ARM_ANGLE = 1.2502;// + Math.PI * 3.0 / 180.0;
-    public static final double L3_CORAL_WHEELS_VOLTAGE = 7;
+    public static final double L3_CORAL_WHEELS_VOLTAGE = 5.25;
     public static final double L3_ALGAE_WHEELS_VOLTAGE = 3;
 
     // POST L3 Constants

@@ -28,7 +28,7 @@ public final class Constants {
         private static final Translation2d BASE_ALGAE = new Translation2d(5.7668696, 4.0259-0.02); //TODO: find x
         private static final Translation2d BASE_POST_ALGAE = new Translation2d(6.3, 4.0259-0.02); //TODO: find x
         private static final Translation2d BASE_GENERAL = new Translation2d(6.3, 4.0259);
-        public static final double NET_X_VALUE = 7.721;
+        public static final double NET_X_VALUE = 7.746;
         public static final double POST_NET_X_VALUE = 7.418;
 
         public static AlliancePose[] GENERAL_POSES = {
