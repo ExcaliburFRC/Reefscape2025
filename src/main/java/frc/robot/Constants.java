@@ -169,5 +169,5 @@ public final class Constants {
     public static final int NET_ID = 4;
     public static final AlliancePose RIGHT_AUTO_POSE = new AlliancePose(7.147, 2.0, 140);
     public static final AlliancePose LEFT_AUTO_POSE = new AlliancePose(7.147, 6.052, -140);
-    public static final double DEPORT_TOLORANCE = 0.5;
+    public static final double DEPORT_TOLERANCE = 0.5;
 }

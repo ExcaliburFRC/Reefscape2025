@@ -60,9 +60,9 @@ public class RobotContainer implements Logged {
     private final Automations m_automations;
 
     private final Trigger m_deportAutoMode = new Trigger(
-            () -> Math.sqrt(Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > DEPORT_TOLORANCE);
+            () -> Math.sqrt(Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > DEPORT_TOLERANCE);
     private final Trigger m_deportIntakeMode = new Trigger(
-            () -> Math.sqrt(Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > DEPORT_TOLORANCE);
+            () -> Math.sqrt(Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > DEPORT_TOLERANCE);
 
     public SendableChooser<Command> m_autoChooser = new SendableChooser<>();
 

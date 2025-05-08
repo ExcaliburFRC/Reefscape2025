@@ -42,7 +42,7 @@ public class Elevator extends SubsystemBase implements Logged {
     private double m_prevVel = 0;
     private double m_accel = 0;
 
-    public final Trigger m_toleranceTrigger, m_defultTrigger, m_closedTrigger;
+    public final Trigger m_toleranceTrigger, m_defaultTrigger, m_closedTrigger;
     public DoubleSupplier m_heightSupplier, m_armRadSupplier;
     private Trigger m_hasCoralTrigger = new Trigger(() -> true);
 
@@ -83,7 +83,7 @@ public class Elevator extends SubsystemBase implements Logged {
             Math.abs(m_setpoint - m_heightSupplier.getAsDouble()) < TOLERANCE
         );
 
-        m_defultTrigger = new Trigger(() ->
+        m_defaultTrigger = new Trigger(() ->
             Math.abs(State.DEFAULT.m_elevatorHeight - m_heightSupplier.getAsDouble()) < TOLERANCE
         );
 
