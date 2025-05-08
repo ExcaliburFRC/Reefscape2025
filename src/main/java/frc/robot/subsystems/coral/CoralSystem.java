@@ -23,10 +23,6 @@ public class CoralSystem extends SubsystemBase implements Logged {
     public CoralSystem() {
         this.m_coralWheel = new Mechanism(new TalonFXMotor(MOTOR_ID));
 
-//        this.m_hasCoralTrigger = new Trigger(
-//                () -> hasCoral
-//        ).debounce(HAS_CORAL_DEBOUNCE);
-
         this.m_hasCoralTrigger = new Trigger(() -> !m_limitSwitch.get()).debounce(HAS_CORAL_DEBOUNCE);
         this.m_voltageState = 0;
         this.setDefaultCommand(defaultCommand());

@@ -13,20 +13,18 @@ import static monologue.Annotations.*;
 
 public class AlgaeSystem extends SubsystemBase implements Logged {
     private final Mechanism m_algaeWheel;
-    private final TalonFXMotor m_motor;
     public final Trigger m_hasAlgaeTrigger;
     private double m_voltageState;
 
     public AlgaeSystem() {
-        m_motor = new TalonFXMotor(MOTOR_ID);
+        TalonFXMotor m_motor = new TalonFXMotor(MOTOR_ID);
         m_motor.setCurrentLimit(25,40);
 
         this.m_algaeWheel = new Mechanism(m_motor);
 
         this.m_hasAlgaeTrigger = new Trigger(
-                () -> this.m_algaeWheel.logCurrent() > Math.abs(HAS_ALGAE_CURRENT) &&
-                        Math.abs(m_algaeWheel.logVelocity()) < HAS_ALGAE_VELOCITY
-        ).debounce(HAS_ALGAE_DEBOUNCE);
+                () -> (this.m_algaeWheel.logCurrent() > Math.abs(HAS_ALGAE_CURRENT)) &&
+                        (Math.abs(m_algaeWheel.logVelocity()) < HAS_ALGAE_VELOCITY)).debounce(HAS_ALGAE_DEBOUNCE);
 
         this.m_voltageState = 0;
         this.setDefaultCommand(defaultCommand());
@@ -37,12 +35,7 @@ public class AlgaeSystem extends SubsystemBase implements Logged {
     }
 
     private Command defaultCommand() {
-        return new RunCommand(
-                () -> {
-                    this.m_algaeWheel.setVoltage(this.m_voltageState);
-                },
-                this
-        );
+        return new RunCommand(() -> this.m_algaeWheel.setVoltage(this.m_voltageState), this);
     }
 
     public Command setStateCommand(double voltageState) {
