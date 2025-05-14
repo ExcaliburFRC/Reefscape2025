@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.excalib.control.gains.Gains;
-import frc.excalib.control.motor.controllers.Motor;
+import frc.excalib.control.motor.Motor;
 import frc.excalib.mechanisms.Mechanism;
 
 import java.util.function.DoubleSupplier;
@@ -35,8 +35,8 @@ public class FlyWheel extends Mechanism {
         m_gains = gains;
         this.maxAcceleration = maxAcceleration;
         this.maxJerk = maxJerk;
-        this.m_pidController = new PIDController(m_gains.kp, m_gains.ki, m_gains.kd);
-        this.m_FF_CONTROLLER = new SimpleMotorFeedforward(gains.ks, gains.kv, gains.ka);
+        this.m_pidController = gains.getPIDcontroller();
+        this.m_FF_CONTROLLER = gains.getSimpleFF();
     }
 
     /**

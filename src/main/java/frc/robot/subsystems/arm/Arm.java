@@ -13,7 +13,7 @@ import frc.excalib.control.gains.SysidConfig;
 import frc.excalib.control.limits.ContinuousSoftLimit;
 import frc.excalib.control.limits.SoftLimit;
 import frc.excalib.control.math.physics.Mass;
-import frc.excalib.control.motor.controllers.MotorGroup;
+import frc.excalib.control.motor.motor_types.MotorGroup;
 import frc.excalib.control.motor.controllers.TalonFXMotor;
 import frc.robot.superstructure.State;
 import monologue.Logged;

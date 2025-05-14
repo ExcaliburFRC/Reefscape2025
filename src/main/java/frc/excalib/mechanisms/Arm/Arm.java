@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.excalib.control.gains.Gains;
 import frc.excalib.control.limits.SoftLimit;
 import frc.excalib.control.math.physics.Mass;
-import frc.excalib.control.motor.controllers.Motor;
+import frc.excalib.control.motor.Motor;
 import frc.excalib.mechanisms.Mechanism;
 
 import java.util.function.Consumer;
@@ -34,7 +34,7 @@ public class Arm extends Mechanism {
         m_kg = gains.kg;
         m_kv = gains.kv;
         m_ks = gains.ks;
-        m_PIDController = new PIDController(gains.kp, gains.ki, gains.kd);
+        m_PIDController = gains.getPIDcontroller();
         m_mass = mass;
     }
 

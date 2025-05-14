@@ -1,5 +1,10 @@
 package frc.excalib.control.gains;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+
 /**
  * this class bundles together multiple types of gains
  */
@@ -48,5 +53,22 @@ public class Gains {
         this.kg = kg;
         this.kv = kv;
         this.ka = ka;
+    }
+
+
+    public PIDController getPIDcontroller(){
+        return new PIDController(this.kp, this.ki, this.kd);
+    }
+
+    public ArmFeedforward getArmFF(){
+        return new ArmFeedforward(this.ks, this.kg, this.kv, this.ka);
+    }
+
+    public ElevatorFeedforward getElevatorFF(){
+        return new ElevatorFeedforward(this.ks, this.kg, this.kv, this.ka);
+    }
+
+    public SimpleMotorFeedforward getSimpleFF(){
+        return new SimpleMotorFeedforward(this.ks, this.kv, this.ka);
     }
 }
