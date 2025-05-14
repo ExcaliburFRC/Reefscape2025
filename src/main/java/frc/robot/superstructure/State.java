@@ -37,17 +37,9 @@ public enum State {
     ALGAE_DEFAULT(ALGAE_DEFAULT_ELEVATOR_HEIGHT, ALGAE_DEFAULT_ARM_ANGLE, ALGAE_DEFAULT_CORAL_WHEELS_VOLTAGE, ALGAE_DEFAULT_ALGAE_WHEELS_VOLTAGE),
     AUTOMATION_DEFAULT(AUTOMATION_DEFAULT_ELEVATOR_HEIGHT, AUTOMATION_DEFAULT_ARM_ANGLE, AUTOMATION_DEFAULT_CORAL_WHEELS_VOLTAGE, AUTOMATION_DEFAULT_ALGAE_WHEELS_VOLTAGE);
 
-    public final double m_elevatorHeight,
-            m_armAngle,
-            m_coralVoltage,
-            m_algaeVoltage;
+    public final double m_elevatorHeight, m_armAngle, m_coralVoltage, m_algaeVoltage;
 
-    State(
-            double elevatorHeight,
-            double armAngle,
-            double coralVoltage,
-            double algaeVoltage
-    ) {
+    State(double elevatorHeight, double armAngle, double coralVoltage, double algaeVoltage) {
         m_elevatorHeight = elevatorHeight;
         m_armAngle = armAngle;
         m_coralVoltage = coralVoltage;

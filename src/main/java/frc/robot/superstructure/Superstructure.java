@@ -32,11 +32,12 @@ public class Superstructure implements Logged {
         m_coralSystem = new CoralSystem();
 
         m_arm.setElevatorHeightSupplier(m_elevator.m_heightSupplier);
-        m_arm.setHasAlgaeTrigger(() -> m_algaeSystem.hasAlgae());
+        m_arm.setHasAlgaeTrigger(m_algaeSystem::hasAlgae);
         m_arm.setHasCoralTrigger(m_coralSystem.m_hasCoralTrigger);
 
         m_elevator.setArmRadSupplier(m_arm.m_radSupplier);
         m_elevator.setHasCoralTrigger(m_coralSystem.m_hasCoralTrigger);
+
         m_toleranceTrigger = m_arm.m_toleranceTrigger.and(m_elevator.m_toleranceTrigger);
         m_currentState = State.DEFAULT;
         scheduleExclusiveStateCommand(State.DEFAULT).schedule();
@@ -50,75 +51,68 @@ public class Superstructure implements Logged {
     }
 
     private State getCoralPreState(int level) {
-        State state;
-        switch (level) {
-            case 1 -> state = State.PRE_L1;
-            case 2 -> state = State.PRE_L2;
-            case 3 -> state = State.PRE_L3;
-            case 4 -> state = State.PRE_L4;
-            default -> state = State.DEFAULT;
-        }
-        return state;
+        return switch (level) {
+            case 1 -> State.PRE_L1;
+            case 2 -> State.PRE_L2;
+            case 3 -> State.PRE_L3;
+            case 4 -> State.PRE_L4;
+            default -> State.DEFAULT;
+        };
     }
 
     private State getIntakeAlgaeState(int level) {
-        State state;
-        switch (level) {
-            case 2 -> state = State.INTAKE_ALGAE2;
-            case 3 -> state = State.INTAKE_ALGAE3;
-            default -> state = State.DEFAULT;
-        }
-        return state;
+        return switch (level) {
+            case 2 -> State.INTAKE_ALGAE2;
+            case 3 -> State.INTAKE_ALGAE3;
+            default -> State.DEFAULT;
+        };
     }
 
     private State getPreScoreAlgaeState(int level) {
-        State state;
-        switch (level) {
-            case 1 -> state = State.PRE_PROCESSOR;
-            case 4 -> state = State.PRE_NET;
-            default -> state = State.DEFAULT;
-        }
-        return state;
+        return switch (level) {
+            case 1 -> State.PRE_PROCESSOR;
+            case 4 -> State.PRE_NET;
+            default -> State.DEFAULT;
+        };
     }
-
 
     private Command setStateCommand(State state) {
         return new ParallelCommandGroup(
-                new InstantCommand(() -> this.m_currentState = state),
-                m_algaeSystem.setStateCommand(state.m_algaeVoltage),
-                m_coralSystem.setStateCommand(state.m_coralVoltage),
-                m_elevator.changeSetpointCommand(state.m_elevatorHeight),
-                m_arm.changeSetpointCommand(state.m_armAngle))
-                .andThen(new WaitUntilCommand(m_toleranceTrigger)).withName("");
+            new InstantCommand(() -> this.m_currentState = state),
+            m_algaeSystem.setStateCommand(state.m_algaeVoltage),
+            m_coralSystem.setStateCommand(state.m_coralVoltage),
+            m_elevator.changeSetpointCommand(state.m_elevatorHeight),
+            m_arm.changeSetpointCommand(state.m_armAngle)
+        ).andThen(new WaitUntilCommand(m_toleranceTrigger)).withName("");
     }
 
     private Command scheduleExclusiveCommand(Command newCommand) {
         return new FunctionalCommand(
-                () -> {
-                    if (m_runningCommand != null && m_runningCommand.isScheduled()) {
-                        m_runningCommand.cancel();
-                    }
-                    m_runningCommand = newCommand;
-                    m_runningCommand.schedule();
-                },
-                () -> {},
-                (interrupted) -> {},
-                () -> !m_runningCommand.isScheduled()
+            () -> {
+                if (m_runningCommand != null && m_runningCommand.isScheduled()) {
+                    m_runningCommand.cancel();
+                }
+                m_runningCommand = newCommand;
+                m_runningCommand.schedule();
+            },
+            () -> {},
+            (interrupted) -> {},
+            () -> !m_runningCommand.isScheduled()
         );
     }
 
     private Command scheduleExclusiveStateCommand(Command stateCommand) {
         return new FunctionalCommand(
-                () -> {
-                    if (m_runningStateCommand != null && m_runningStateCommand.isScheduled()) {
-                        m_runningStateCommand.cancel();
-                    }
-                    m_runningStateCommand = stateCommand;
-                    m_runningStateCommand.schedule();
-                },
-                () -> {},
-                (interrupted) -> {},
-                () -> !m_runningStateCommand.isScheduled()
+            () -> {
+                if (m_runningStateCommand != null && m_runningStateCommand.isScheduled()) {
+                    m_runningStateCommand.cancel();
+                }
+                m_runningStateCommand = stateCommand;
+                m_runningStateCommand.schedule();
+            },
+            () -> {},
+            (interrupted) -> {},
+            () -> !m_runningStateCommand.isScheduled()
         );
     }
 
@@ -128,10 +122,10 @@ public class Superstructure implements Logged {
 
     private Command scoreCoralCommand(State score, State after) {
         return new SequentialCommandGroup(
-                scheduleExclusiveStateCommand(score),
-                new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate()).withTimeout(0.1),
-                scheduleExclusiveStateCommand(after),
-                new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate().debounce(0.2))
+            scheduleExclusiveStateCommand(score),
+            new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate()).withTimeout(0.1),
+            scheduleExclusiveStateCommand(after),
+            new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate().debounce(0.2))
         );
     }
 
@@ -140,11 +134,11 @@ public class Superstructure implements Logged {
         if (state.equals(State.DEFAULT))
             return new PrintCommand(level + " is not a valid coral level, cant align to it");
         return scheduleExclusiveCommand(
-                new ConditionalCommand(
-                        scheduleExclusiveStateCommand(state),
-                        new PrintCommand("cant go to level " + level + " no coral exist"),
-                        this.m_coralSystem.m_hasCoralTrigger
-                )
+            new ConditionalCommand(
+                scheduleExclusiveStateCommand(state),
+                new PrintCommand("cant go to level " + level + " no coral exist"),
+                this.m_coralSystem.m_hasCoralTrigger
+            )
         );
     }
 
@@ -155,50 +149,38 @@ public class Superstructure implements Logged {
     private Command scoreCoralCommand(int level) {
         State score, after;
         switch (level) {
-            case 1 -> {
-                score = State.L1;
-                after = State.POST_L1;
-            }
-            case 2 -> {
-                score = State.L2;
-                after = State.POST_L2;
-            }
-            case 3 -> {
-                score = State.L3;
-                after = State.POST_L3;
-            }
-            case 4 -> {
-                score = State.L4;
-                after = State.POST_L4;
-            }
+            case 1 -> { score = State.L1; after = State.POST_L1; }
+            case 2 -> { score = State.L2; after = State.POST_L2; }
+            case 3 -> { score = State.L3; after = State.POST_L3; }
+            case 4 -> { score = State.L4; after = State.POST_L4; }
             default -> {
                 return new PrintCommand(level + " is not a valid coral level, cant score to it");
             }
         }
+
         return scheduleExclusiveCommand(
-                new ConditionalCommand(
-                        new SequentialCommandGroup(
-                                new WaitUntilCommand(m_toleranceTrigger),
-                                scoreCoralCommand(score, after),
-                                new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate()
-                                )
-                        ),
-                        new PrintCommand("has no coral or not at correct state"),
-                        m_coralSystem.m_hasCoralTrigger.and(() -> getCoralPreState(level).equals(m_currentState))
-                )
+            new ConditionalCommand(
+                new SequentialCommandGroup(
+                    new WaitUntilCommand(m_toleranceTrigger),
+                    scoreCoralCommand(score, after),
+                    new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger.negate())
+                ),
+                new PrintCommand("has no coral or not at correct state"),
+                m_coralSystem.m_hasCoralTrigger.and(() -> getCoralPreState(level).equals(m_currentState))
+            )
         );
     }
 
     public Command intakeCoralCommand() {
         return scheduleExclusiveCommand(
-                new ConditionalCommand(
-                        new SequentialCommandGroup(
-                                scheduleExclusiveStateCommand(State.INTAKE).until(m_coralSystem.m_hasCoralTrigger),
-                                new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger)
-                        ),
-                        new PrintCommand("can't intake - intake coral command"),
-                        m_coralSystem.m_hasCoralTrigger.negate().and(() -> !m_algaeSystem.hasAlgae())
-                )
+            new ConditionalCommand(
+                new SequentialCommandGroup(
+                    scheduleExclusiveStateCommand(State.INTAKE).until(m_coralSystem.m_hasCoralTrigger),
+                    new WaitUntilCommand(m_coralSystem.m_hasCoralTrigger)
+                ),
+                new PrintCommand("can't intake - intake coral command"),
+                m_coralSystem.m_hasCoralTrigger.negate().and(() -> !m_algaeSystem.hasAlgae())
+            )
         );
     }
 
@@ -214,21 +196,21 @@ public class Superstructure implements Logged {
         if (state.equals(State.DEFAULT))
             return new PrintCommand(level + " is not a valid coral level, cant align to it");
         return scheduleExclusiveCommand(
-                new ConditionalCommand(
-                        scheduleExclusiveStateCommand(state),
-                        new PrintCommand("cant go to level " + level + " no coral exist"),
-                        this.m_algaeSystem.m_hasAlgaeTrigger
-                )
+            new ConditionalCommand(
+                scheduleExclusiveStateCommand(state),
+                new PrintCommand("cant go to level " + level + " no coral exist"),
+                this.m_algaeSystem.m_hasAlgaeTrigger
+            )
         );
     }
 
     private Command scoreAlgaeCommand(State score, State after) {
         return scheduleExclusiveCommand(
-                new SequentialCommandGroup(
-                        scheduleExclusiveStateCommand(score),
-                        new WaitUntilCommand(m_algaeSystem.m_hasAlgaeTrigger.negate().debounce(0.5)),
-                        scheduleExclusiveCommand(scheduleExclusiveStateCommand(after))
-                )
+            new SequentialCommandGroup(
+                scheduleExclusiveStateCommand(score),
+                new WaitUntilCommand(m_algaeSystem.m_hasAlgaeTrigger.negate().debounce(0.5)),
+                scheduleExclusiveCommand(scheduleExclusiveStateCommand(after))
+            )
         );
     }
 
@@ -239,56 +221,52 @@ public class Superstructure implements Logged {
     public Command scoreAlgaeCommand(int level) {
         State score, after;
         switch (level) {
-            case 1 -> {
-                score = State.PROCESSOR;
-                after = State.POST_PROCESSOR;
-            }
-            case 4 -> {
-                score = State.NET;
-                after = State.POST_NET;
-            }
+            case 1 -> { score = State.PROCESSOR; after = State.POST_PROCESSOR; }
+            case 4 -> { score = State.NET; after = State.POST_NET; }
             default -> {
                 return new PrintCommand(level + " is not a valid coral level, cant score to it");
             }
         }
+
         return scheduleExclusiveCommand(
-                new ConditionalCommand(
-                        new WaitUntilCommand(m_toleranceTrigger).andThen(scoreAlgaeCommand(score, after)),
-                        new PrintCommand("has no coral or not at correct state"),
-                        m_algaeSystem.m_hasAlgaeTrigger.and(() -> getPreScoreAlgaeState(level).equals(m_currentState))
-                ));
+            new ConditionalCommand(
+                new WaitUntilCommand(m_toleranceTrigger).andThen(scoreAlgaeCommand(score, after)),
+                new PrintCommand("has no coral or not at correct state"),
+                m_algaeSystem.m_hasAlgaeTrigger.and(() -> getPreScoreAlgaeState(level).equals(m_currentState))
+            )
+        );
     }
 
     public Command ejectAlgaeCommand() {
         return scheduleExclusiveCommand(
-                new ConditionalCommand(
-                        new SequentialCommandGroup(
-                                scheduleExclusiveStateCommand(State.EJECT_ALGAE).until(hasAlgaeTrigger().negate().debounce(0.2)),
-                                new WaitUntilCommand(hasAlgaeTrigger().negate().debounce(0.2)),
-                                collapseCommand()
-                        ),
-                        new PrintCommand("has no algae "),
-                        hasAlgaeTrigger()
-                )
+            new ConditionalCommand(
+                new SequentialCommandGroup(
+                    scheduleExclusiveStateCommand(State.EJECT_ALGAE).until(hasAlgaeTrigger().negate().debounce(0.2)),
+                    new WaitUntilCommand(hasAlgaeTrigger().negate().debounce(0.2)),
+                    collapseCommand()
+                ),
+                new PrintCommand("has no algae "),
+                hasAlgaeTrigger()
+            )
         );
     }
 
     public Command collapseCommand() {
         return scheduleExclusiveCommand(
-                new ConditionalCommand(
-                        scheduleExclusiveStateCommand(State.ALGAE_DEFAULT),
-                        scheduleExclusiveStateCommand(State.DEFAULT),
-                        () -> m_algaeSystem.hasAlgae()
-                )
+            new ConditionalCommand(
+                scheduleExclusiveStateCommand(State.ALGAE_DEFAULT),
+                scheduleExclusiveStateCommand(State.DEFAULT),
+                m_algaeSystem::hasAlgae
+            )
         );
     }
 
     public Command coastCommand() {
         return scheduleExclusiveCommand(
-                new ParallelCommandGroup(
-                        m_arm.coastCommand(),
-                        m_elevator.coastCommand()
-                ).ignoringDisable(true)
+            new ParallelCommandGroup(
+                m_arm.coastCommand(),
+                m_elevator.coastCommand()
+            ).ignoringDisable(true)
         );
     }
 

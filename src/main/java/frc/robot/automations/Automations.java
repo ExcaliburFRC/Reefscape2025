@@ -41,9 +41,9 @@ public class Automations {
         Translation2d robot = m_swerve.getPose2D().getTranslation();
         AlliancePose feeder = FEEDERS_POSES[0];
         double distance = feeder.get().getTranslation().getDistance(robot);
-        for (int i = 1; i < FEEDERS_POSES.length; i++) {
-            if (distance > robot.getDistance(FEEDERS_POSES[i].get().getTranslation())) {
-                feeder = FEEDERS_POSES[i];
+            for (AlliancePose selectedPose : FEEDERS_POSES) {
+            if (distance > robot.getDistance(selectedPose.get().getTranslation())) {
+                feeder = selectedPose;
                 distance = robot.getDistance(feeder.get().getTranslation());
             }
         }
@@ -54,9 +54,9 @@ public class Automations {
         Translation2d robot = m_swerve.getPose2D().getTranslation();
         AlliancePose netPose = NET_POSES[0];
         double distance = netPose.get().getTranslation().getDistance(robot);
-        for (int i = 1; i < NET_POSES.length; i++) {
-            if (distance > robot.getDistance(NET_POSES[i].get().getTranslation())) {
-                netPose = NET_POSES[i];
+        for (AlliancePose selectedPose : NET_POSES) {
+            if (distance > robot.getDistance(netPose.get().getTranslation())) {
+                netPose = selectedPose;
                 distance = robot.getDistance(netPose.get().getTranslation());
             }
         }
@@ -67,9 +67,9 @@ public class Automations {
         Translation2d robot = m_swerve.getPose2D().getTranslation();
         AlliancePose netPose = POST_NET_POSES[0];
         double distance = netPose.get().getTranslation().getDistance(robot);
-        for (int i = 1; i < POST_NET_POSES.length; i++) {
-            if (distance > robot.getDistance(POST_NET_POSES[i].get().getTranslation())) {
-                netPose = POST_NET_POSES[i];
+        for (AlliancePose selectedPose : POST_NET_POSES){
+            if (distance > robot.getDistance(selectedPose.get().getTranslation())) {
+                netPose = selectedPose;
                 distance = robot.getDistance(netPose.get().getTranslation());
             }
         }
@@ -125,7 +125,6 @@ public class Automations {
                                 ),
                                 scoreCoralCommand(),
                                 new WaitCommand(0.3),
-//                                m_swerve.driveCommand(() -> new Vector2D(2, 0), () -> 0, () -> false).withTimeout(0.2),
                                 m_superstructure.collapseCommand()
                         ),
                         m_superstructure.hasCoralTrigger().negate()
@@ -214,10 +213,8 @@ public class Automations {
                     m_runningCommand = newCommand;
                     m_runningCommand.schedule();
                 },
-                () -> {
-                },
-                (interrupted) -> {
-                },
+                () -> {},
+                (interrupted) -> {},
                 () -> !m_runningCommand.isScheduled()
         );
     }
@@ -350,7 +347,9 @@ public class Automations {
     public Command setAutoMode(BooleanSupplier mode) {
         return new InstantCommand(() -> {
             autoMode = mode.getAsBoolean();
-            if (autoMode) m_tragetSlice = Slice.getSlice(m_swerve.getPose2D().getTranslation());
+            if (autoMode) m_tragetSlice = Slice.getSlice(
+                    m_swerve.getPose2D().getTranslation()
+            );
         });
     }
 

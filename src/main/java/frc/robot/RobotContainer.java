@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
@@ -44,25 +43,26 @@ import static frc.robot.automations.ScoreState.EJECT_ALGAE;
 import static frc.robot.automations.ScoreState.L1;
 
 public class RobotContainer implements Logged {
-    private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
-
     private final Swerve m_swerve = Constants.SwerveConstants.configureSwerve(new Pose2d());
     private final Superstructure m_superstructure = new Superstructure();
     private final LEDs leds = LEDs.getInstance();
+
+    PowerDistribution PDH = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
     private ScoreState m_currentScoreState = null;
     private IntakeState m_currentIntakeState = null;
-    private final XboxController driverVibration = new XboxController(5);
-
 
     public final Runnable m_odometryUpdater = m_swerve::updateOdometry;
 
+    private final XboxController m_driverVibration = new XboxController(5);
     private final CommandPS5Controller m_driver = new CommandPS5Controller(0);
-    //    private final CommandPS5Controller m_operator = new CommandPS5Controller(1);
+
     private final InterpolatingDoubleTreeMap m_decelerator = new InterpolatingDoubleTreeMap();
     private final Automations m_automations;
 
-    private final Trigger m_deportAutoMode = new Trigger(() -> Math.sqrt(Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > 0.5);
-    private final Trigger m_deportIntakeMode = new Trigger(() -> Math.sqrt(Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > 0.5);
+    private final Trigger m_deportAutoMode = new Trigger(
+            () -> Math.sqrt(Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > DEPORT_TOLERANCE);
+    private final Trigger m_deportIntakeMode = new Trigger(
+            () -> Math.sqrt(Math.pow(m_driver.getLeftX(), 2) + Math.pow(m_driver.getLeftY(), 2)) > DEPORT_TOLERANCE);
 
     public SendableChooser<Command> m_autoChooser = new SendableChooser<>();
 
@@ -73,14 +73,12 @@ public class RobotContainer implements Logged {
 
         initAutoChooser();
         initElastic();
-
-        // Configure the trigger bindings
         configureBindings();
     }
 
     private void configureBindings() {
-        Map<IntakeState, Command> intakeMap = new HashMap();
-        Map<ScoreState, Command> scoreMap = new HashMap();
+        Map<IntakeState, Command> intakeMap = new HashMap<>();
+        Map<ScoreState, Command> scoreMap = new HashMap<>();
 
         scoreMap.put(L4_RIGHT, m_automations.L4Command(true));
         scoreMap.put(L4_LEFT, m_automations.L4Command(false));
@@ -96,8 +94,19 @@ public class RobotContainer implements Logged {
         intakeMap.put(AUTO_CORAL, m_automations.intakeCoralCommand().until(m_deportIntakeMode.debounce(0.5)).andThen(m_automations.manualIntakeCommand()));
         intakeMap.put(null, new PrintCommand("Intake Mode Not Selected!"));
 
-        m_swerve.setDefaultCommand(new SequentialCommandGroup(m_automations.autoSwerveCommand().until(m_automations.m_autoMode.negate()), m_swerve.driveCommand(() -> new Vector2D(deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)), deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))), () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * m_decelerator.get(m_driver.getRawAxis(3)), () -> true).until(m_automations.m_autoMode)));
-
+        m_swerve.setDefaultCommand(
+                new SequentialCommandGroup(
+                        m_automations.autoSwerveCommand().until(
+                                m_automations.m_autoMode.negate()
+                        ), m_swerve.driveCommand(
+                        () -> new Vector2D(
+                                deadband(-m_driver.getLeftY()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3)),
+                                deadband(-m_driver.getLeftX()) * MAX_VEL * m_decelerator.get(m_driver.getRawAxis(3))),
+                        () -> deadband(-m_driver.getRightX()) * MAX_OMEGA_RAD_PER_SEC * m_decelerator.get(m_driver.getRawAxis(3)),
+                        () -> true
+                ).until(m_automations.m_autoMode)
+                )
+        );
 
         m_driver.circle().onTrue(m_automations.changeRightSlice());
         m_driver.povLeft().onTrue(m_automations.changeLeftSlice());
@@ -109,7 +118,6 @@ public class RobotContainer implements Logged {
         m_deportAutoMode.onTrue(m_automations.setAutoMode(() -> false));
 
         m_driver.options().onTrue(m_automations.collapseCommand());
-
         m_driver.touchpad().whileTrue(m_superstructure.coastCommand().alongWith(m_swerve.coastCommand()).ignoringDisable(true));
     }
 
@@ -119,16 +127,47 @@ public class RobotContainer implements Logged {
     }
 
     private void initAutoChooser() {
-        Command centerAutoCommand = new SequentialCommandGroup(m_automations.toggleAutoMode(), new WaitUntilCommand(m_automations.m_atTargetSlicePose), m_automations.L4Command(false), new WaitUntilCommand(m_automations.m_atTargetSlicePose), m_automations.intakeAlgaeCommand(), m_automations.toggleAutoMode(), m_automations.netCommand()
-
+        Command centerAutoCommand = new SequentialCommandGroup(
+                m_automations.toggleAutoMode(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.L4Command(false),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.intakeAlgaeCommand(),
+                m_automations.toggleAutoMode(),
+                m_automations.netCommand()
         );
 
-        Command leftAutoCommand = new SequentialCommandGroup(new InstantCommand(() -> m_swerve.resetOdometry(LEFT_AUTO_POSE.get())), m_automations.toggleAutoMode(), new WaitUntilCommand(m_automations.m_atTargetSlicePose), m_automations.L4Command(true), new WaitUntilCommand(m_automations.m_atTargetSlicePose), m_automations.intakeCoralCommand(), m_automations.toggleAutoMode(), new WaitUntilCommand(m_automations.m_atTargetSlicePose), m_automations.L4Command(false), new WaitUntilCommand(m_automations.m_atTargetSlicePose), m_superstructure.collapseCommand());
+        Command leftAutoCommand = new SequentialCommandGroup(
+                new InstantCommand(() -> m_swerve.resetOdometry(LEFT_AUTO_POSE.get()))
+                , m_automations.toggleAutoMode(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.L4Command(true),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.intakeCoralCommand(),
+                m_automations.toggleAutoMode(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.L4Command(false),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_superstructure.collapseCommand()
+        );
 
-        Command rightAutoCommand = new SequentialCommandGroup(new InstantCommand(() -> m_swerve.resetOdometry(RIGHT_AUTO_POSE.get())), m_automations.toggleAutoMode(), new WaitUntilCommand(m_automations.m_atTargetSlicePose), m_automations.L4Command(true), new WaitUntilCommand(m_automations.m_atTargetSlicePose), m_automations.intakeCoralCommand(), m_automations.toggleAutoMode(), new WaitUntilCommand(m_automations.m_atTargetSlicePose), m_automations.L4Command(false), new WaitUntilCommand(m_automations.m_atTargetSlicePose), m_superstructure.collapseCommand());
+        Command rightAutoCommand = new SequentialCommandGroup(
+                new InstantCommand(() -> m_swerve.resetOdometry(RIGHT_AUTO_POSE.get())),
+                m_automations.toggleAutoMode(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.L4Command(true),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.intakeCoralCommand(),
+                m_automations.toggleAutoMode(),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_automations.L4Command(false),
+                new WaitUntilCommand(m_automations.m_atTargetSlicePose),
+                m_superstructure.collapseCommand()
+        );
 
         m_autoChooser.setDefaultOption("Empty Automation", new InstantCommand());
-        m_autoChooser.addOption("Exit From Start Line", m_swerve.driveCommand(() -> new Vector2D(1, 0), () -> 0, () -> false).withTimeout(2));
+        m_autoChooser.addOption("Exit From Start Line", m_swerve.driveCommand(
+                () -> new Vector2D(1, 0), () -> 0, () -> false).withTimeout(2));
         m_autoChooser.addOption("Center Automation", centerAutoCommand);
         m_autoChooser.addOption("Left Automation", leftAutoCommand);
         m_autoChooser.addOption("Right Automation", rightAutoCommand);
@@ -138,9 +177,8 @@ public class RobotContainer implements Logged {
 
     private void initElastic() {
         SmartDashboard.putNumber("match time", DriverStation.getMatchTime());
-        PowerDistribution PDH = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
-        SmartDashboard.putData("PDH", PDH);
 
+        SmartDashboard.putData("PDH", PDH);
         SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance());
 
         ShuffleboardTab swerveTab = Shuffleboard.getTab("Swerve");
@@ -153,18 +191,18 @@ public class RobotContainer implements Logged {
 
         swerveTab.add("Angle Chooser", angleChooser);
 
-        SmartDashboard.putData("L4 Right", new InstantCommand(() -> m_currentScoreState = L4_RIGHT).alongWith(vibrateControllerCommand(10, 0.25)));
-        SmartDashboard.putData("L4 Left", new InstantCommand(() -> m_currentScoreState = L4_LEFT).alongWith(vibrateControllerCommand(10, 0.25)));
+        SmartDashboard.putData("L4 Right", new InstantCommand(() -> m_currentScoreState = L4_RIGHT).alongWith(vibrateControllerCommand()));
+        SmartDashboard.putData("L4 Left", new InstantCommand(() -> m_currentScoreState = L4_LEFT).alongWith(vibrateControllerCommand()));
 
-        SmartDashboard.putData("L3 Right", new InstantCommand(() -> m_currentScoreState = L3_RIGHT).alongWith(vibrateControllerCommand(10, 0.25)));
-        SmartDashboard.putData("L3 Left", new InstantCommand(() -> m_currentScoreState = L3_LEFT).alongWith(vibrateControllerCommand(10, 0.25)));
-        SmartDashboard.putData("            L1          ", new InstantCommand(() -> m_currentScoreState = L1).alongWith(vibrateControllerCommand(10, 0.25)));
-        SmartDashboard.putData("            Net         ", new InstantCommand(() -> m_currentScoreState = NET).alongWith(vibrateControllerCommand(10, 0.25)));
-        SmartDashboard.putData("            Eject           ", new InstantCommand(() -> m_currentScoreState = EJECT_ALGAE).alongWith(vibrateControllerCommand(10, 0.25).andThen(m_automations.ejectAlgaeCommand())));
+        SmartDashboard.putData("L3 Right", new InstantCommand(() -> m_currentScoreState = L3_RIGHT).alongWith(vibrateControllerCommand()));
+        SmartDashboard.putData("L3 Left", new InstantCommand(() -> m_currentScoreState = L3_LEFT).alongWith(vibrateControllerCommand()));
+        SmartDashboard.putData("            L1          ", new InstantCommand(() -> m_currentScoreState = L1).alongWith(vibrateControllerCommand()));
+        SmartDashboard.putData("            Net         ", new InstantCommand(() -> m_currentScoreState = NET).alongWith(vibrateControllerCommand()));
+        SmartDashboard.putData("            Eject           ", new InstantCommand(() -> m_currentScoreState = EJECT_ALGAE).alongWith(vibrateControllerCommand().andThen(m_automations.ejectAlgaeCommand())));
 
-        SmartDashboard.putData("Auto Coral", new InstantCommand(() -> m_currentIntakeState = AUTO_CORAL).alongWith(vibrateControllerCommand(10, 0.25)));
-        SmartDashboard.putData("Manual Coral", new InstantCommand(() -> m_currentIntakeState = CORAL).alongWith(vibrateControllerCommand(10, 0.25)));
-        SmartDashboard.putData("             Algae           ", new InstantCommand(() -> m_currentIntakeState = ALGAE).alongWith(vibrateControllerCommand(10, 0.25)));
+        SmartDashboard.putData("Auto Coral", new InstantCommand(() -> m_currentIntakeState = AUTO_CORAL).alongWith(vibrateControllerCommand()));
+        SmartDashboard.putData("Manual Coral", new InstantCommand(() -> m_currentIntakeState = CORAL).alongWith(vibrateControllerCommand()));
+        SmartDashboard.putData("             Algae           ", new InstantCommand(() -> m_currentIntakeState = ALGAE).alongWith(vibrateControllerCommand()));
 
         SmartDashboard.putData("Collapse Command", m_automations.collapseCommand());
         SmartDashboard.putData("Cancel Automation", m_automations.cancelAutomationCommand());
@@ -176,11 +214,11 @@ public class RobotContainer implements Logged {
         return m_autoChooser.getSelected();
     }
 
-    private Command vibrateControllerCommand(int intensity, double seconds) {
+    private Command vibrateControllerCommand() {
         return Commands.runEnd(
-                        () -> driverVibration.setRumble(kBothRumble, intensity / 100.0),
-                        () -> driverVibration.setRumble(kBothRumble, 0))
-                .withTimeout(seconds).ignoringDisable(true);
+                        () -> m_driverVibration.setRumble(kBothRumble, 10 / 100.0),
+                        () -> m_driverVibration.setRumble(kBothRumble, 0))
+                .withTimeout(0.25).ignoringDisable(true);
     }
 
     @Log.NT
