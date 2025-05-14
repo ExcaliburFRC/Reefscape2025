@@ -1,4 +1,4 @@
-package frc.excalib.control.motor.controllers;
+package frc.excalib.control.motor.motor_types;
 
 import frc.excalib.control.motor.Motor;
 import frc.excalib.control.motor.motor_specs.DirectionState;
@@ -143,5 +143,10 @@ public class MotorGroup implements Motor {
         for (Motor motor : m_motors) {
             motor.setMotorPosition(position);
         }
+    }
+
+    protected void setDifferentialVoltage(double voltageA, double voltageB) {
+        m_motors[0].setVoltage(voltageA);
+        m_motors[1].setVoltage(voltageB);
     }
 }

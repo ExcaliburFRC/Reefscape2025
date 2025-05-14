@@ -35,8 +35,8 @@ public final class Turret extends Mechanism {
         super(motor);
         m_rotationLimit = rotationLimit;
 
-        m_anglePIDcontroller = new PIDController(angleGains.kp, angleGains.ki, angleGains.kd);
-        m_angleFFcontroller = new SimpleMotorFeedforward(angleGains.ks, angleGains.kv, angleGains.ka);
+        m_anglePIDcontroller = angleGains.getPIDcontroller();
+        m_angleFFcontroller = angleGains.getSimpleFF();
 
         m_anglePIDcontroller.setTolerance(PIDtolerance);
         m_anglePIDcontroller.enableContinuousInput(-Math.PI, Math.PI);

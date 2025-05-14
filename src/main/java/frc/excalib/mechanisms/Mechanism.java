@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.excalib.control.gains.SysidConfig;
 import frc.excalib.control.motor.Motor;
 import frc.excalib.control.motor.motor_specs.IdleState;
+import frc.excalib.control.motor.motor_types.DifferentialMotor;
 import monologue.Logged;
 
 import java.util.function.DoubleSupplier;
@@ -147,5 +148,13 @@ public class Mechanism implements Logged {
         if (isLinear)
             return getLinearSysIdRoutine(subsystem, positionSupplier, config).dynamic(direction);
         return getAngularSysIdRoutine(subsystem, positionSupplier, config).dynamic(direction).withName("quadForward");
+    }
+
+    protected void setDifferentialVoltage(double voltageA, double voltageB){
+        if (!(this.m_motor instanceof DifferentialMotor)) {
+            System.out.println("setDifferentialVoltage only works with a DifferentialMotor");
+            return;
+        }
+        ((DifferentialMotor) this.m_motor).setDifferentialVoltage(voltageA, voltageB);
     }
 }
